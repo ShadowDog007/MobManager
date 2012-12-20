@@ -1,0 +1,64 @@
+TotalMaximum:
+  Monsters: 512
+  Animals: 512
+  Squid: 64
+
+EnabledWorlds:
+- world
+- world_nether
+- world_the_end
+
+WorldMaximum:
+  world:
+    Monsters: 512
+    Animals: 512
+    Squid: 64
+  world_nether:
+    Monsters: 512
+    Animals: 512
+    Squid: 64
+  world_the_end:
+    Monsters: 512
+    Animals: 512
+    Squid: 64
+	
+
+# Limits to the number of mobs dynamically calculated by the number of loaded chunks in the world
+ChunkCalculatedMaximum:
+  world:
+    Monsters: 10
+    Animals: 10
+    Squid: 5
+  world_nether:
+    Monsters: 10
+    Animals: 10
+    Squid: 5
+  world_the_end:
+    Monsters: 10
+    Animals: 10
+    Squid: 5
+
+# Stops animals from breeding if there are too many animals in the chunk
+BreedingMaximumsPerChunk:
+  world: 20
+  world_nether: 20
+  world_the_end: 5
+	
+SpawnChunkDistance: 6
+
+Layers:
+- '0:32'
+- '16:48'
+- '32:64'
+- '48:80'
+- '64:96'
+- '80:112'
+- '96:128'
+- '112:144'
+- '128:160'
+- '144:176'
+- '160:192'
+- '176:208'
+- '192:224'
+- '208:240'
+- '224:256'
