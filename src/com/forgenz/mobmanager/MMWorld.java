@@ -59,7 +59,7 @@ public class MMWorld
 		P.p.getLogger().info(String.format("Loaded world '%s', limits M:%d, A:%d, S:%d", world.getName(), maxMonsters, maxAnimals, maxSquid));
 	}
 
-	protected boolean updateNumMobs()
+	public boolean updateNumMobs()
 	{
 		if (!updatedThisTick)
 		{
@@ -156,10 +156,24 @@ public class MMWorld
 	{
 		return numMonsters;
 	}
+	
+	/**
+	 * Calculates the maximum number of monsters currently allowed in the world
+	 * @return The max number of monsters
+	 */
+	public int maxMonsters()
+	{
+		int totalMax = P.cfg.getInt("WorldMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE);
+		int dynMax = P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE) * numChunks >> 8;
+		
+		if (totalMax > dynMax)
+			return dynMax;
+		return totalMax;
+	}
 
 	public boolean withinMonsterLimit()
 	{
-		return (numMonsters < P.cfg.getInt("WorldMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE)) && (numMonsters < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE) * numChunks >> 8);
+		return maxMonsters() > numMonsters;
 	}
 
 	public void changeNumMonsters(final boolean increase)
@@ -174,10 +188,24 @@ public class MMWorld
 	{
 		return numAnimals;
 	}
+	
+	/**
+	 * Calculates the maximum number of animals currently allowed in the world
+	 * @return The max number of monsters
+	 */
+	public int maxAnimals()
+	{
+		int totalMax = P.cfg.getInt("WorldMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE);
+		int dynMax = P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE) * numChunks >> 8;
+		
+		if (totalMax > dynMax)
+			return dynMax;
+		return totalMax;
+	}
 
 	public boolean withinAnimalLimit()
 	{
-		return (numAnimals < P.cfg.getInt("WorldMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE)) && (numAnimals < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE) * numChunks >> 8);
+		return maxAnimals() > numAnimals;
 	}
 
 	public void changeNumAnimals(final boolean increase)
@@ -192,10 +220,24 @@ public class MMWorld
 	{
 		return numSquid;
 	}
-
+	
+	/**
+	 * Calculates the maximum number of squid currently allowed in the world
+	 * @return The max number of monsters
+	 */
+	public int maxSquid()
+	{
+		int totalMax = P.cfg.getInt("WorldMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE);
+		int dynMax = P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE) * numChunks >> 8;
+		
+		if (totalMax > dynMax)
+			return dynMax;
+		return totalMax;
+	}
+	
 	public boolean withinSquidLimit()
 	{
-		return (numSquid < P.cfg.getInt("WorldMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE)) && (numSquid < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE) * numChunks >> 8);
+		return maxSquid() > numSquid;
 	}
 
 	public void changeNumSquid(final boolean increase)
