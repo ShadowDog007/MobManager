@@ -41,7 +41,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 	public static P p = null;
 	public static MemoryConfiguration cfg = null;
 
-	private HashMap<String, MMWorld> worlds = null;
+	public HashMap<String, MMWorld> worlds = null;
 
 	@Override
 	public void onLoad()
@@ -107,9 +107,11 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 				int numAnimals = 0;
 				int numSquid = 0;
 
-				for (final Entry<String, MMWorld> world : worlds.entrySet())
+				for (final Entry<String, MMWorld> e : worlds.entrySet())
 				{
-					for (final Entry<MMCoord, MMChunk> chunk : world.getValue().getChunks())
+					MMWorld world = e.getValue();
+					sender.sendMessage(String.format("W: %s, MaxM: %d, MaxA: %d, MaxS: %d", world.getWorld().getName(), world.maxMonsters(), world.maxAnimals(), world.maxSquid()));
+					for (final Entry<MMCoord, MMChunk> chunk : world.getChunks())
 					{
 						for (final MMLayer layer : chunk.getValue().getLayers())
 							if (layer.getNumPlayers() > 0)
@@ -120,9 +122,9 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 						numPlayers += chunk.getValue().getNumPlayers();
 						++numChunks;
 					}
-					numMonsters += world.getValue().getNumMonsters();
-					numAnimals += world.getValue().getNumAnimals();
-					numSquid += world.getValue().getNumSquid();
+					numMonsters += world.getNumMonsters();
+					numAnimals += world.getNumAnimals();
+					numSquid += world.getNumSquid();
 				}
 
 				sender.sendMessage(String.format("Worlds: %d, Chunks: %d", worlds.size(), numChunks));
@@ -229,7 +231,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 			layer.playerLeft();
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerMove(final PlayerMoveEvent event)
 	{
 		// First we make sure there is actually any point in doing anything
@@ -283,7 +285,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerTeleport(final PlayerTeleportEvent event)
 	{
 		// Fetch the world the player is teleporting from
@@ -414,7 +416,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		// If the world is not found we ignore the spawn
 		if (world == null)
 			return;
-
+		
 		// Fetch the chunk the spawn is occurring on
 		final MMChunk chunk = world.getChunk(event.getLocation().getChunk());
 		// ERROR D:
@@ -434,6 +436,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 			{
 				// Try to update number of mobs in this world
 				world.updateNumMobs();
+
 				// Check if we are within breeding limits
 				if (!chunk.withinBreedingLimits())
 				{
@@ -441,7 +444,6 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 					return;
 				}
 			}
-
 			// These Spawn Reasons will be only be allowed if limits have not
 			// been met
 		case DEFAULT:
@@ -489,30 +491,35 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 				event.setCancelled(true);
 				return;
 			}
-
-			// These Spawn Reasons are ignored and will be allowed regardless of
-			// limits
-		case SLIME_SPLIT:
-		case SPAWNER_EGG:
-		case CUSTOM:
-			// Meh Might as well.
-		case BUILD_IRONGOLEM:
-		case BUILD_SNOWMAN:
-		case BUILD_WITHER:
-			// Not sure what to do with these ones
-		case JOCKEY:
-		case LIGHTNING:
 		default:
-			// Counts the mob
-			if (isMonster(event.getEntity()))
-				world.changeNumMonsters(true);
-			else if (isAnimal(event.getEntity()))
-			{
-				world.changeNumAnimals(true);
-				chunk.changeNumAnimals(true);
-			} else if (isSquid(event.getEntity()))
-				world.changeNumSquid(true);
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void countCreatureSpawns(CreatureSpawnEvent event)
+	{
+		// Check if we don't need to count the mob
+		if (ignoreCreature(event.getEntity()))
+			return;
+		
+		MMWorld world = worlds.get(event.getLocation().getWorld().getName());
+		
+		// Counts the mob
+		if (isMonster(event.getEntity()))
+		{
+			world.changeNumMonsters(true);
+		}
+		else if (isAnimal(event.getEntity()))
+		{
+			world.changeNumAnimals(true);
+			MMChunk chunk = world.getChunk(event.getLocation().getChunk());
+			chunk.changeNumAnimals(true);
+		}
+		else if (isSquid(event.getEntity()))
+		{
+			world.changeNumSquid(true);
+		}
+		
 		// TODO REMOVE THIS SHIT
 		getLogger().info(String.format("Entity: %s, Reason: %s", event.getEntity().toString(), event.getSpawnReason().toString()));
 	}
