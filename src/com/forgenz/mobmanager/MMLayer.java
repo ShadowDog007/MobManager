@@ -1,5 +1,11 @@
 package com.forgenz.mobmanager;
 
+/**
+ * Keeps track of players within a given Y coordinate range
+ * 
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
 public class MMLayer
 {
 

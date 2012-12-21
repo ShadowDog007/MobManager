@@ -9,6 +9,13 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+/**
+ * Keeps track of players within a given chunk </br>
+ * Also keeps track of animals inside the chunk for limiting the number of animals that can be bread (Is That The Right Word?) in one place
+ * 
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
 public class MMChunk
 {
 	private static Pattern layerPattern = Pattern.compile("^\\d+:{1}\\d+$");

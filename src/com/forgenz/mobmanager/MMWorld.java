@@ -9,6 +9,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
+/**
+ * Keeps track of the number of mobs of different types within a world
+ * 
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
 public class MMWorld
 {
 	private World world;

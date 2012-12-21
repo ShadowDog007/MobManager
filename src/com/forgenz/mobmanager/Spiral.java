@@ -1,5 +1,11 @@
 package com.forgenz.mobmanager;
 
+/**
+ * Spirals out from a center chunk fetching chunks within a radius
+ * 
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
 public class Spiral
 {
 

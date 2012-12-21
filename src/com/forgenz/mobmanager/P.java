@@ -28,6 +28,13 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * <b>MobManager</b> </br>
+ * MobManager aims to reduce the number of unnecessary mob spawns </br>
+ * 
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
 public class P extends JavaPlugin implements Listener, CommandExecutor
 {
 

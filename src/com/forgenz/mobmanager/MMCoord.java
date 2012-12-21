@@ -1,5 +1,11 @@
 package com.forgenz.mobmanager;
 
+/**
+ * A Simple class to help with storage/fetching of MMCunck objects
+ * 
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
 public class MMCoord
 {
 	private int x;
