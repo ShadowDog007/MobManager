@@ -1,13 +1,10 @@
-TotalMaximum:
-  Monsters: 512
-  Animals: 512
-  Squid: 64
-
+# List of all the worlds which MobManager is active in
 EnabledWorlds:
 - world
 - world_nether
 - world_the_end
 
+# Mob limits for each world for each type of mob
 WorldMaximum:
   world:
     Monsters: 512
@@ -24,6 +21,8 @@ WorldMaximum:
 
 
 # Limits to the number of mobs dynamically calculated by the number of loaded chunks in the world
+# Calculated with the below formula
+# maxMobs = ( Number of active chunks * Config Value ) / 256
 ChunkCalculatedMaximum:
   world:
     Monsters: 10
@@ -44,8 +43,10 @@ BreedingMaximumsPerChunk:
   world_nether: 20
   world_the_end: 5
 
+# The distance (in chunks) to scan for nearby players
 SpawnChunkDistance: 6
 
+# Each layer
 Layers:
 - '0:16'
 - '8:24'
