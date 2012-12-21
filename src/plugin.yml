@@ -1,12 +1,16 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 0.1
-authors: [Michael McKnight(ShadowDog007)]
+version: 0.2
+authors: [Michael McKnight (ShadowDog007)]
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
 
-# Perms coming soonish
-# permissions:
+permissions:
+  mobmanager.admin:
+    description: Gives access to all admin commands
+    default: op
 
-
-# Commands coming soonish
-# commands:
+commands:
+  mm:
+    description: 'MobManager command'
+    permission: mobmanager.admin
+    permission-message: '[MobManager] You do not have permissions to access this command'

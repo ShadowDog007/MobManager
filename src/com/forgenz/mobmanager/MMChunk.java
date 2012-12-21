@@ -17,7 +17,7 @@ public class MMChunk
 	private Chunk chunk;
 	private MMCoord coord;
 	private ArrayList<MMLayer> layers;
-	
+
 	private int numPlayers = 0;
 	private int numAnimals = 0;
 
@@ -50,22 +50,16 @@ public class MMChunk
 			}
 
 			layers.add(new MMLayer(miny, maxy, 0));
-			
+
 			// Adds any already existing Players or Animals
-			for (Entity entity : chunk.getEntities())
-			{
+			for (final Entity entity : chunk.getEntities())
 				if (entity instanceof Player)
 				{
-					for (MMLayer layerIn : getLayersAt(entity.getLocation().getBlockY()))
-					{
+					playerEntered();
+					for (final MMLayer layerIn : getLayersAt(entity.getLocation().getBlockY()))
 						layerIn.playerEntered();
-					}
-				}
-				else if (entity instanceof Animals)
-				{
+				} else if (entity instanceof Animals)
 					++numAnimals;
-				}
-			}
 		}
 
 		this.chunk = chunk;
@@ -97,32 +91,60 @@ public class MMChunk
 
 		return layersAt;
 	}
-	
+
 	public boolean withinBreedingLimits()
 	{
 		return numAnimals < P.cfg.getInt("BreedingMaximumsPerChunk." + chunk.getWorld().getName(), Integer.MAX_VALUE);
 	}
-	
-	public void changeNumAnimals(boolean increase)
+
+	public void resetNumAnimals()
+	{
+		numAnimals = 0;
+	}
+
+	public void changeNumAnimals(final boolean increase)
 	{
 		if (increase)
 			++numAnimals;
 		else
 			--numAnimals;
 	}
-	
+
 	public boolean hasPlayers()
 	{
 		return numPlayers > 0;
 	}
+
+	public int getNumPlayers()
+	{
+		return numPlayers;
+	}
+
 	public void playerEntered()
 	{
 		++numPlayers;
+		
+		P.p.getLogger().warning(String.format("ENTERED Chunk %d, %d P: %d", chunk.getX(), chunk.getZ(), numPlayers));
 	}
-	
+
 	public void playerLeft()
 	{
-		--numPlayers;
+		if (--numPlayers < 0)
+		{
+			numPlayers = 0;
+
+			P.p.getLogger().warning("Player left a chunk with no players in it?");
+			/*P.p.getLogger().warning(String.format("Chunk: %d, %d", chunk.getX(), chunk.getZ()));
+			try
+			{
+				throw new Exception();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}*/
+		}
+		P.p.getLogger().warning(String.format("LEFT Chunk %d, %d P: %d", chunk.getX(), chunk.getZ(), numPlayers));
 	}
 
 	@Override

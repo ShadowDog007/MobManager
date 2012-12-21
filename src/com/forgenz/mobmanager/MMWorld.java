@@ -1,13 +1,13 @@
 package com.forgenz.mobmanager;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Squid;
+import org.bukkit.entity.LivingEntity;
 
 public class MMWorld
 {
@@ -15,6 +15,8 @@ public class MMWorld
 
 	private HashMap<MMCoord, MMChunk> chunks;
 	private int numChunks = 0;
+
+	private boolean updatedThisTick = false;
 
 	private int numMonsters = 0;
 	private int numAnimals = 0;
@@ -36,24 +38,75 @@ public class MMWorld
 
 			// Counts the number of living entities
 			for (final Entity entity : chunk.getEntities())
-				if (entity instanceof Monster)
+				if (P.p.isMonster(entity))
 					++numMonsters;
-				else if (entity instanceof Animals)
+				else if (P.p.isAnimal(entity))
 					++numAnimals;
-				else if (entity instanceof Squid)
+				else if (P.p.isSquid(entity))
 					++numSquid;
 		}
-		
-		int maxMonsters = P.cfg.getInt("WorldMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE);
-		int maxAnimals = P.cfg.getInt("WorldMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE);
-		int maxSquid = P.cfg.getInt("WorldMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE);
-		
-		P.p.getLogger().info(String.format("Loaded world '%s' with maximums M:%d, A:%d, S:%d", world.getName(), maxMonsters, maxAnimals, maxSquid));
+
+		final int maxMonsters = P.cfg.getInt("WorldMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE);
+		final int maxAnimals = P.cfg.getInt("WorldMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE);
+		final int maxSquid = P.cfg.getInt("WorldMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE);
+
+		P.p.getLogger().info(String.format("Loaded world '%s', limits M:%d, A:%d, S:%d", world.getName(), maxMonsters, maxAnimals, maxSquid));
+	}
+
+	protected boolean updateNumMobs()
+	{
+		if (!updatedThisTick)
+		{
+			numMonsters = 0;
+			numAnimals = 0;
+			numSquid = 0;
+
+			for (final Chunk chunk : world.getLoadedChunks())
+			{
+				final MMChunk mmchunk = getChunk(chunk);
+
+				mmchunk.resetNumAnimals();
+
+				for (final Entity entity : chunk.getEntities())
+				{
+					if (!(entity instanceof LivingEntity))
+						continue;
+
+					if (P.p.isMonster(entity))
+						++numMonsters;
+					else if (P.p.isAnimal(entity))
+					{
+						++numAnimals;
+						mmchunk.changeNumAnimals(true);
+					} else if (P.p.isSquid(entity))
+						++numSquid;
+				}
+			}
+			// Reset 'updatedThisTick' so updates can be run in the next tick
+			P.p.getServer().getScheduler().runTaskLater(P.p,
+				new Runnable()
+				{
+					public void run()
+					{
+						updatedThisTick = false;
+					}
+				}
+				, 1L);
+			
+			updatedThisTick = true;
+			return true;
+		}
+		return false;
 	}
 
 	public World getWorld()
 	{
 		return world;
+	}
+
+	public Set<Map.Entry<MMCoord, MMChunk>> getChunks()
+	{
+		return chunks.entrySet();
 	}
 
 	public MMChunk getChunk(final Chunk chunk)
@@ -63,7 +116,7 @@ public class MMWorld
 
 		return getChunk(new MMCoord(chunk.getX(), chunk.getZ()));
 	}
-	
+
 	public MMChunk getChunk(final MMCoord coord)
 	{
 		return chunks.get(coord);
@@ -93,39 +146,54 @@ public class MMWorld
 		--numChunks;
 	}
 
+	public int getNumMonsters()
+	{
+		return numMonsters;
+	}
+
 	public boolean withinMonsterLimit()
 	{
-		return (numMonsters < P.cfg.getInt("WorldMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE)) 
-				&& (numMonsters < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE) * numChunks / 256);
+		return (numMonsters < P.cfg.getInt("WorldMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE)) && (numMonsters < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Monsters", Integer.MAX_VALUE) * numChunks >> 8);
 	}
-	
-	public void changeNumMonsters(boolean increase) {
+
+	public void changeNumMonsters(final boolean increase)
+	{
 		if (increase)
 			++numMonsters;
 		else
 			--numMonsters;
 	}
 
+	public int getNumAnimals()
+	{
+		return numAnimals;
+	}
+
 	public boolean withinAnimalLimit()
 	{
-		return (numAnimals < P.cfg.getInt("WorldMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE))
-				&& (numAnimals < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE) * numChunks / 256);
+		return (numAnimals < P.cfg.getInt("WorldMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE)) && (numAnimals < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Animals", Integer.MAX_VALUE) * numChunks >> 8);
 	}
-	
-	public void changeNumAnimals(boolean increase) {
+
+	public void changeNumAnimals(final boolean increase)
+	{
 		if (increase)
 			++numAnimals;
 		else
 			--numAnimals;
 	}
 
+	public int getNumSquid()
+	{
+		return numSquid;
+	}
+
 	public boolean withinSquidLimit()
 	{
-		return (numSquid < P.cfg.getInt("WorldMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE))
-				&& (numSquid < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE) * numChunks / 256);
+		return (numSquid < P.cfg.getInt("WorldMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE)) && (numSquid < P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + ".Squid", Integer.MAX_VALUE) * numChunks >> 8);
 	}
-	
-	public void changeNumSquid(boolean increase) {
+
+	public void changeNumSquid(final boolean increase)
+	{
 		if (increase)
 			++numSquid;
 		else
