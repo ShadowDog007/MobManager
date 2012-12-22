@@ -130,8 +130,6 @@ public class MMChunk
 	public void playerEntered()
 	{
 		++numPlayers;
-		
-		P.p.getLogger().warning(String.format("ENTERED Chunk %d, %d P: %d", chunk.getX(), chunk.getZ(), numPlayers));
 	}
 
 	public void playerLeft()
@@ -141,17 +139,7 @@ public class MMChunk
 			numPlayers = 0;
 
 			P.p.getLogger().warning("Player left a chunk with no players in it?");
-			/*P.p.getLogger().warning(String.format("Chunk: %d, %d", chunk.getX(), chunk.getZ()));
-			try
-			{
-				throw new Exception();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}*/
 		}
-		P.p.getLogger().warning(String.format("LEFT Chunk %d, %d P: %d", chunk.getX(), chunk.getZ(), numPlayers));
 	}
 
 	@Override

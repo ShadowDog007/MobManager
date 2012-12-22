@@ -43,7 +43,6 @@ public class MMLayer
 
 	public int playerEntered()
 	{
-		P.p.getLogger().warning(String.format("ENTERED Layer: %d - %d P: %d", miny, maxy, numPlayers + 1));
 		return ++numPlayers;
 	}
 
@@ -54,17 +53,7 @@ public class MMLayer
 			numPlayers = 0;
 
 			P.p.getLogger().warning("Player left a layer with no players in it?");
-			/*try
-			{
-				throw new Exception();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}*/
 		}
-		
-		P.p.getLogger().warning(String.format("LEFT Layer: %d - %d P: %d", miny, maxy, numPlayers));
 
 		return numPlayers;
 	}

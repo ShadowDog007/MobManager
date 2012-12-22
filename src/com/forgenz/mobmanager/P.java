@@ -1,5 +1,7 @@
 package com.forgenz.mobmanager;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -20,7 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -97,53 +99,69 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 	@Override
 	public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args)
 	{
-		if (args.length == 1)
-			if (args[0].equalsIgnoreCase("test"))
+		if (args.length > 0)
+			if (args[0].equalsIgnoreCase("count"))
 			{
-				int numChunks = 0;
-				int numPlayers = 0;
-				int numPlayers2 = 0;
-				int numMonsters = 0;
-				int numAnimals = 0;
-				int numSquid = 0;
-
-				for (final Entry<String, MMWorld> e : worlds.entrySet())
+				Collection<MMWorld> worldList;
+				
+				if (args.length > 1)
 				{
-					MMWorld world = e.getValue();
-					sender.sendMessage(String.format("W: %s, MaxM: %d, MaxA: %d, MaxS: %d", world.getWorld().getName(), world.maxMonsters(), world.maxAnimals(), world.maxSquid()));
-					for (final Entry<MMCoord, MMChunk> chunk : world.getChunks())
+					MMWorld world = worlds.get(args[1]);
+					
+					if (world == null)
 					{
-						for (final MMLayer layer : chunk.getValue().getLayers())
-							if (layer.getNumPlayers() > 0)
-							{
-								numPlayers2 += layer.getNumPlayers();
-								getLogger().info(String.format("Found %d players | X:%d Z:%d MinY:%d MaxY:%d ", layer.getNumPlayers(), chunk.getValue().getCoord().getX(), chunk.getValue().getCoord().getZ(), layer.getMinY(), layer.getMaxY()));
-							}
-						numPlayers += chunk.getValue().getNumPlayers();
-						++numChunks;
+						sender.sendMessage("The world '" + args[1] + "' does not exist or is inactive");
+						return true;
 					}
-					numMonsters += world.getNumMonsters();
-					numAnimals += world.getNumAnimals();
-					numSquid += world.getNumSquid();
+					
+					worldList = new ArrayList<MMWorld>();
+					
+					worldList.add(world);
 				}
+				else
+				{
+					worldList = worlds.values();
+				}
+				
+				int totalMonsters = 0;
+				int totalAnimals = 0;
+				int totalSquid = 0;
+				
+				int totalMaxMonsters = 0;
+				int totalMaxAnimals = 0;
+				int totalMaxSquid = 0;
 
-				sender.sendMessage(String.format("Worlds: %d, Chunks: %d", worlds.size(), numChunks));
-				sender.sendMessage(String.format("Players: %d, Monsters: %d, Animals: %d, Squid: %d", numPlayers, numMonsters, numAnimals, numSquid));
-				sender.sendMessage(String.format("Players2: %d", numPlayers2));
-
-				numMonsters = 0;
-				numAnimals = 0;
-				numSquid = 0;
-
-				for (final World world : getServer().getWorlds())
-					for (final Entity entity : world.getEntities())
-						if (isMonster(entity))
-							++numMonsters;
-						else if (isAnimal(entity))
-							++numAnimals;
-						else if (isSquid(entity))
-							++numSquid;
-				sender.sendMessage(String.format("Monsters: %d, Animals: %d, Squid: %d", numMonsters, numAnimals, numSquid));
+				for (final MMWorld world : worldList)
+				{					
+					world.updateNumMobs();
+					
+					int numPlayers = 0;
+					for (final Entry<MMCoord, MMChunk> chunk : world.getChunks())
+						numPlayers += chunk.getValue().getNumPlayers();
+										
+					sender.sendMessage(String.format("World: %s, Chunks: %d", world.getWorld().getName(), world.getChunks().size()));
+					sender.sendMessage(String.format("P: %d M: %d/%d, A: %d/%d, S: %d/%d", numPlayers, world.getNumMonsters(), world.maxMonsters(), world.getNumAnimals(), world.maxAnimals(), world.getNumSquid(), world.maxSquid()));
+					
+					if (args.length == 1)
+					{
+						totalMonsters += world.getNumMonsters();
+						totalAnimals += world.getNumAnimals();
+						totalSquid += world.getNumSquid();
+						
+						totalMaxMonsters += world.maxMonsters();
+						totalMaxAnimals += world.maxAnimals();
+						totalMaxSquid += world.maxSquid();
+					}
+				}
+				
+				if (args.length == 1)
+				{
+					int totalMobs = totalMonsters + totalAnimals + totalSquid;
+					int totalMaxMobs = totalMaxMonsters + totalMaxAnimals + totalMaxSquid;
+					sender.sendMessage(String.format("Totals: P: %d, M: %d/%d, A: %d/%d, S: %d/%d, T: %d/%d", getServer().getOnlinePlayers().length,  totalMonsters, totalMaxMonsters, totalAnimals, totalMaxAnimals, totalSquid, totalMaxSquid, totalMobs, totalMaxMobs));
+				}
+				
+				return true;
 			}
 		return false;
 	}
@@ -180,7 +198,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLogin(final PlayerLoginEvent event)
+	public void onPlayerJoin(final PlayerJoinEvent event)
 	{
 		// Fetch the world the player logged into
 		final MMWorld world = worlds.get(event.getPlayer().getLocation().getWorld().getName());
@@ -192,17 +210,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		// Fetch the chunk the player logged into
 		final MMChunk chunk = world.getChunk(event.getPlayer().getLocation().getChunk());
 
-		// ERROR D:
-		if (chunk == null)
-		{
-			getLogger().warning("Player logged into an unknown chunk");
-			return;
-		}
-
-		// Update the chunk and each layers player count
-		chunk.playerEntered();
-		for (final MMLayer layer : chunk.getLayersAt(event.getPlayer().getLocation().getBlockY()))
-			layer.playerEntered();
+		updateChunkPlayerCount(chunk, event.getPlayer().getLocation().getBlockY(), null, 0);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -218,17 +226,33 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		// Fetch the chunk the player quit from
 		final MMChunk chunk = world.getChunk(event.getPlayer().getLocation().getChunk());
 
-		// ERROR D:
-		if (chunk == null)
+		updateChunkPlayerCount(null, 0, chunk, event.getPlayer().getLocation().getBlockY());
+	}
+	
+	/**
+	 * Updates the player counts within each chunk </br>
+	 * @param toChunk The chunk the player is moving into
+	 * @param toY The height of the player inside the to chunk
+	 * @param fromChunk The chunk the player moved from
+	 * @param fromY The height the player was at when they moved
+	 */
+	public void updateChunkPlayerCount(final MMChunk toChunk, final int toY, final MMChunk fromChunk, final int fromY)
+	{		
+		if (fromChunk != null)
 		{
-			getLogger().warning("Player quit from an unknown chunk");
-			return;
+			fromChunk.playerLeft();
+			
+			for (MMLayer layer : fromChunk.getLayersAt(fromY))
+				layer.playerLeft();
 		}
-
-		// Update the chunk and each layers player count
-		chunk.playerLeft();
-		for (final MMLayer layer : chunk.getLayersAt(event.getPlayer().getLocation().getBlockY()))
-			layer.playerLeft();
+		
+		if (toChunk != null)
+		{
+			toChunk.playerEntered();
+			
+			for (MMLayer layer : toChunk.getLayersAt(toY))
+				layer.playerEntered();
+		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -249,17 +273,9 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 			// Fetch the chunks the player is moving between
 			final MMChunk fromChunk = world.getChunk(event.getFrom().getChunk());
 			final MMChunk toChunk = world.getChunk(event.getTo().getChunk());
-
-			// Update each chunks player count
-			fromChunk.playerLeft();
-			toChunk.playerEntered();
-
-			// Update each layers player count
-			for (final MMLayer layer : fromChunk.getLayersAt(event.getFrom().getBlockY()))
-				layer.playerLeft();
-
-			for (final MMLayer layer : toChunk.getLayersAt(event.getTo().getBlockY()))
-				layer.playerEntered();
+			
+			// Update chunks player count
+			updateChunkPlayerCount(toChunk, event.getTo().getBlockY(), fromChunk, event.getFrom().getBlockY());
 		}
 		// Check if the player is only moving up or down
 		else if (event.getTo().getBlockY() != event.getFrom().getBlockY())
@@ -274,63 +290,31 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 			// Fetch the chunk the player is moving in
 			final MMChunk chunk = world.getChunk(event.getTo().getChunk());
 
-			// Update each layers player count
-			// TODO Find a better way to tell if a player is moving between
-			// layers (NOTE: Layers can overlap)
-			for (final MMLayer layer : chunk.getLayersAt(event.getFrom().getBlockY()))
-				layer.playerLeft();
-
-			for (final MMLayer layer : chunk.getLayersAt(event.getTo().getBlockY()))
-				layer.playerEntered();
+			updateChunkPlayerCount(chunk, event.getTo().getBlockY(), chunk, event.getFrom().getBlockY());
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerTeleport(final PlayerTeleportEvent event)
 	{
-		// Fetch the world the player is teleporting from
-		final MMWorld fromWorld = worlds.get(event.getFrom().getWorld().getName());
-		MMWorld toWorld = null;
-
-		// Check if the world is active
-		if (fromWorld != null)
+		// Check if the worlds differ
+		if (!event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName()))
 		{
-			// If the from world and to world are the same worlds copy the
-			// reference
-			if (event.getTo().getWorld().getName().equals(fromWorld.getWorld().getName()))
-				toWorld = fromWorld;
-
-			// Fetch the chunk the player teleported from
-			final MMChunk fromChunk = fromWorld.getChunk(event.getFrom().getChunk());
-
-			// Update the chunks player count
-			fromChunk.playerLeft();
-
-			// Update each layers player count
-			for (final MMLayer layer : fromChunk.getLayersAt(event.getFrom().getBlockY()))
-				layer.playerLeft();
+			// Fetch each world
+			MMWorld toWorld = worlds.get(event.getTo().getWorld().getName());
+			MMWorld fromWorld = worlds.get(event.getFrom().getWorld().getName());
+			
+			// Fetch each chunk
+			MMChunk toChunk = toWorld != null ? toWorld.getChunk(event.getTo().getChunk()) : null;
+			MMChunk fromChunk = fromWorld != null ? fromWorld.getChunk(event.getFrom().getChunk()) : null;
+			
+			// Update player counts
+			updateChunkPlayerCount(toChunk, event.getTo().getBlockY(), fromChunk, event.getFrom().getBlockY());
 		}
-
-		// If the toWorld has not been set fetch it (NOTE: Could be because
-		// fromWorld was inactive)
-		if (toWorld == null)
-			toWorld = worlds.get(event.getTo().getWorld().getName());
-
-		// Check if the world is active
-		if (toWorld != null)
+		else
 		{
-			// Fetch the chunk the player teleported into
-			final MMChunk toChunk = toWorld.getChunk(event.getTo().getChunk());
-
-			// Update the chunks player count
-			toChunk.playerEntered();
-
-			// Update each layers player count
-			for (final MMLayer layer : toChunk.getLayersAt(event.getTo().getBlockY()))
-				layer.playerEntered();
-		} else
-			// TODO REMOVE THIS SHIT
-			getLogger().warning("Missing to world on Teleport");
+			onPlayerMove(event);
+		}
 	}
 
 	/**
@@ -521,7 +505,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		}
 		
 		// TODO REMOVE THIS SHIT
-		getLogger().info(String.format("Entity: %s, Reason: %s", event.getEntity().toString(), event.getSpawnReason().toString()));
+		// getLogger().info(String.format("Entity: %s, Reason: %s", event.getEntity().toString(), event.getSpawnReason().toString()));
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
