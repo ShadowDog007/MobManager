@@ -6,18 +6,19 @@ EnabledWorlds:
 - world_the_end
 
 # MobTypes:
-#	Monsters: 		Blaze, Creeper, Enderman, Giant, Silverfish,
-#					Skeleton, Spider, CaveSpider, Witch, Wither,
-#					Zombie, PigZombie, Ghast, Slime, MagmaCube
+#    Monsters:       Blaze, Creeper, Enderman, Giant,
+#                    Silverfish, Skeleton, Spider, CaveSpider,
+#                    Witch, Wither, Zombie, PigZombie, Ghast,
+#                    Slime, MagmaCube
 #
-#	Animals: 		Chicken, Cow, MushroomCow, Ocelot, Pig
-#					Sheep, Wolf, IronGolem, Snowman
+#    Animals:        Chicken, Cow, MushroomCow, Ocelot,
+#                    Pig, Sheep, Wolf, IronGolem, Snowman
 #
-#	Water_Animals:	Squid
+#    Water_Animals:  Squid
 #
-#	Ambient:		Bat
+#    Ambient:         Bat
 #
-#	Villager:		Villager
+#    Villager:        Villager
 
 # Mob limits for each world for each type of mob
 WorldMaximum:
@@ -41,56 +42,70 @@ WorldMaximum:
     Villager: 0
 
 
-# Limits to the number of mobs dynamically calculated by the number of loaded chunks in the world
+# Limits to the number of mobs dynamically calculated
+#    by the number of loaded chunks in the world
+#
 # Calculated with the below formula
 # maxMobs = ( Number of active chunks * Config Value ) / 256
 ChunkCalculatedMaximum:
   world:
-    Monsters: 14
+    Monsters: 16
     Animals: 8
-    Water_Animals: 3
-    Ambient: 3
+    Water_Animals: 2
+    Ambient: 4
     Villager: 5
   world_nether:
     Monsters: 16
     Animals: 2
     Water_Animals: 0
-    Ambient: 2
+    Ambient: 0
     Villager: 0
   world_the_end:
     Monsters: 16
     Animals: 0
     Water_Animals: 0
-    Ambient: 2
+    Ambient: 0
     Villager: 0
 
-# Stops animals from breeding if there are too many animals in the chunk
+# Stops animals from breeding if there are
+#   too many animals in the chunk
 BreedingMaximumsPerChunk:
-  world: 40
+  world: 20
   world_nether: 10
   world_the_end: 0
 
-# The distance (in chunks) to scan for nearby players went a mob spawns
+# The distance (in chunks) to scan for
+#   nearby players when a mob spawns
 SpawnChunkDistance: 6
 
-# How many extra layers below normal will be checked for players when a flying mob attempts to spawn
+# How many extra layers below normal will be checked
+#   for players when a flying mob attempts to spawn
+#
 # This allows a higher chance for flying mobs to spawn
 FlyingMobAditionalLayerDepth: 2
 
-# How often (In ticks, 20 ticks = 1 second) the mobs in a world is allowed to be recounted
+# How often (In ticks, 20 ticks = 1 second) the mobs
+#    in a world is allowed to be recounted
+#
 # MobManager can only keep track of mob deaths, not mob despawns
-# The lower this number the less often monsters will go above the current maximum mob values
+# The lower this number the less often monsters will go above the
+#   current maximum mob values
 # NOTE: Mobs can be spawned over their limits by other plugins, 
-#		spawn eggs as they are not prevented (Perhaps an option to do so in a later version of MobManager?)
-# NOTE: MobManager also can't count mobs which are removed by other plugins (Depending on how its done)
-#		So decreasing this count will also decrease the time it takes for mobs to respawn
+#		spawn eggs as they are not prevented
+#       (Perhaps an option to do so in a later version of MobManager?)
+#
+# NOTE: MobManager also can't count mobs which are removed
+#       by other plugins (Depending on how its done)
+#       So decreasing this count will also decrease the time it
+#       takes for mobs to respawn
 TicksPerRecount: 40
 
 # Layers to use
 # Each layer stores the players within them
 # Layers at the same heights are checked around mob spawns
-# The mob spawn is only allowed if one of the layers checked contains a player
-
+# The mob spawn is only allowed if one of the layers
+#   checked contains a player
+#
 # Layers should overlap to give an even distribution of mobs
 Layers:
 - '0:16'
