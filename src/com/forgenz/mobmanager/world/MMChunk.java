@@ -1,4 +1,4 @@
-package com.forgenz.mobmanager;
+package com.forgenz.mobmanager.world;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,8 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+
+import com.forgenz.mobmanager.P;
 
 /**
  * Keeps track of players within a given chunk </br>
@@ -57,17 +59,40 @@ public class MMChunk
 			}
 
 			layers.add(new MMLayer(miny, maxy, 0));
-
-			// Adds any already existing Players or Animals
-			for (final Entity entity : chunk.getEntities())
-				if (entity instanceof Player)
-				{
-					playerEntered();
-					for (final MMLayer layerIn : getLayersAt(entity.getLocation().getBlockY()))
-						layerIn.playerEntered();
-				} else if (entity instanceof Animals)
-					++numAnimals;
 		}
+		
+		// Order the layers
+		boolean ordered = false;
+		while (!ordered)
+		{
+			int numOrdered = 0;
+			for (int i = 0; i < layers.size() - 1; ++i)
+			{
+				if (layers.get(i).compare(layers.get(i+1)) <= 0)
+				{
+					++numOrdered;
+				}
+				else
+				{
+					MMLayer upperLayer = layers.get(i);
+					MMLayer lowerLayer = layers.get(i+1);
+					
+					layers.add(i, lowerLayer);
+					layers.add(i+1, upperLayer);
+				}
+			}
+			ordered = numOrdered == layers.size() - 1;
+		}
+		
+		// Adds any already existing Players or Animals
+		for (final Entity entity : chunk.getEntities())
+			if (entity instanceof Player)
+			{
+				playerEntered();
+				for (final MMLayer layerIn : getLayersAt(entity.getLocation().getBlockY()))
+					layerIn.playerEntered();
+			} else if (entity instanceof Animals)
+				++numAnimals;
 
 		this.chunk = chunk;
 		coord = new MMCoord(chunk.getX(), chunk.getZ());
@@ -95,6 +120,28 @@ public class MMChunk
 		for (final MMLayer layer : layers)
 			if (layer.insideRange(y))
 				layersAt.add(layer);
+
+		return layersAt;
+	}
+	
+	public List<MMLayer> getLayersAtAndBelow(final int y)
+	{
+		final ArrayList<MMLayer> layersAt = new ArrayList<MMLayer>();
+		
+		int checkedBelow = -1;
+		for (int i = layers.size() - 1; i >= 0; --i)
+		{
+			if (layers.get(i).insideRange(y))
+			{
+				layersAt.add(layers.get(i));
+				checkedBelow = 0;
+			}
+			else if (checkedBelow != -1)
+					if (++checkedBelow <= P.cfg.getInt("FlyingMobAditionalLayerDepth", 2))
+						layersAt.add(layers.get(i));
+					else
+						break;
+		}
 
 		return layersAt;
 	}

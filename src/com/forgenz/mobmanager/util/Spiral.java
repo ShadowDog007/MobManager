@@ -1,4 +1,6 @@
-package com.forgenz.mobmanager;
+package com.forgenz.mobmanager.util;
+
+import com.forgenz.mobmanager.world.MMCoord;
 
 /**
  * Spirals out from a center chunk fetching chunks within a radius

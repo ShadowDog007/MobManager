@@ -1,4 +1,4 @@
-package com.forgenz.mobmanager;
+package com.forgenz.mobmanager.world;
 
 /**
  * A Simple class to help with storage/fetching of MMCunck objects

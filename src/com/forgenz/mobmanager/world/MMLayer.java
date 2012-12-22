@@ -1,4 +1,6 @@
-package com.forgenz.mobmanager;
+package com.forgenz.mobmanager.world;
+
+import com.forgenz.mobmanager.P;
 
 /**
  * Keeps track of players within a given Y coordinate range
@@ -61,5 +63,10 @@ public class MMLayer
 	public boolean insideRange(final int y)
 	{
 		return miny <= y && maxy >= y;
+	}
+	
+	public int compare(MMLayer layer)
+	{
+		return this.miny + this.maxy - layer.miny - layer.maxy;
 	}
 }
