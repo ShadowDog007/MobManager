@@ -6,11 +6,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,7 +33,7 @@ import com.forgenz.mobmanager.world.MMWorld;
 public class P extends JavaPlugin implements Listener, CommandExecutor
 {
 	public static P p = null;
-	public static MemoryConfiguration cfg = null;
+	public static FileConfiguration cfg = null;
 	
 	public static HashMap<String, MMWorld> worlds = null;
 
@@ -47,9 +46,9 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 	public void onEnable()
 	{
 		p = this;
-
-		saveDefaultConfig();
 		cfg = getConfig();
+		
+		Config config = new Config();
 
 		// Makes sure the setting 'SpawnChunkDistance' is valid
 		final int searchDist = P.cfg.getInt("SpawnChunkDistance", 6);
@@ -59,24 +58,9 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		else if (searchDist == 0)
 			P.cfg.set("SpawnChunkDistance", 1);
 
+		// Setup worlds
 		worlds = new HashMap<String, MMWorld>();
-
-		// Load all the worlds required
-		for (final String worldName : cfg.getStringList("EnabledWorlds"))
-		{
-			final World world = getServer().getWorld(worldName);
-			
-			// Check the world exists
-			if (world == null)
-			{
-				getLogger().warning(String.format("Could not find world '%s'", worldName));
-				continue;
-			}
-
-			worlds.put(worldName, new MMWorld(world));
-		}
-		
-		if (worlds.size() == 0)
+		if (config.setupWorlds() == 0)
 		{
 			getLogger().warning("No valid worlds found");
 			getServer().getPluginManager().disablePlugin(this);

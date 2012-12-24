@@ -137,9 +137,6 @@ public class Spiral
 	private boolean turn()
 	{
 		qaud = Qaudrant.calculate(x, z);
-
-		// P.p.logQueue.add(new Pair<Level,String>(Level.INFO,
-		// qaud.toString()));
 		switch (qaud)
 		{
 		case BOT_RIGHT:

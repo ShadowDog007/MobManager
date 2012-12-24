@@ -7,6 +7,7 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
+import com.forgenz.mobmanager.Config.WorldConf;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
 
@@ -17,27 +18,18 @@ import com.forgenz.mobmanager.P;
  *
  */
 public class MMWorld
-{
-	private class MobSettings
-	{
-		public short mobCount;
-		public short mobMax;
-		public short mobDynMulti;
-		
-		public MobSettings(MobType mob)
-		{
-			mobCount = 0;
-			mobMax = (short) P.cfg.getInt("WorldMaximum." + world.getName() + "." + mob, Short.MAX_VALUE);
-			mobDynMulti = (short) P.cfg.getInt("ChunkCalculatedMaximum." + world.getName() + "." + mob, Short.MAX_VALUE);
-		}
-	}
-	
+{	
 	private static long ticksPerRecount = P.cfg.getLong("TicksPerRecount", 40L);
 	/**
 	 * Bukkit world this object as affiliated with
 	 */
-	private World world;
-
+	private final World world;
+	
+	/**
+	 * World settings
+	 */
+	public final WorldConf worldConf;
+	
 	/**
 	 * Loaded chunks in the world
 	 */
@@ -56,23 +48,22 @@ public class MMWorld
 	/**
 	 * Stores all mob counts
 	 */
-	private MobSettings[] mobSettings;
+	private int[] mobCounts;
 	
 	
-	public MMWorld(final World world)
+	public MMWorld(final World world, WorldConf worldConf)
 	{
 		this.world = world;
+		this.worldConf = worldConf;
 		
-		mobSettings = new MobSettings[MobType.getAll().length];
-		for (MobType mob : MobType.getAll())
-			mobSettings[mob.index] = new MobSettings(mob);
+		mobCounts = new int[worldConf.maximums.length];
 
 		chunks = new HashMap<MMCoord, MMChunk>();
 
 		// Store already loaded chunks
 		for (final Chunk chunk : world.getLoadedChunks())
 		{
-			final MMChunk mmchunk = new MMChunk(chunk);
+			final MMChunk mmchunk = new MMChunk(chunk, this);
 
 			chunks.put(mmchunk.getCoord(), mmchunk);
 			++numChunks;
@@ -86,7 +77,7 @@ public class MMWorld
 				if (mob == null)
 					continue;
 					
-				++getMobSettings(mob).mobCount;
+				++mobCounts[mob.index];
 			}
 		}
 
@@ -103,13 +94,8 @@ public class MMWorld
 	{
 		for (MobType mob : MobType.getAll())
 		{
-			getMobSettings(mob).mobCount = 0;
+			mobCounts[mob.index] = 0;
 		}
-	}
-	
-	private MobSettings getMobSettings(MobType mob)
-	{
-		return mobSettings[mob.index];
 	}
 
 	public boolean updateMobCounts()
@@ -135,7 +121,7 @@ public class MMWorld
 						continue;
 					
 					// Increment counter
-					++getMobSettings(mob).mobCount;
+					++mobCounts[mob.index];
 				}
 			}
 			// Reset 'updatedThisTick' so updates can be run again later
@@ -180,7 +166,7 @@ public class MMWorld
 
 	public void addChunk(final Chunk chunk)
 	{
-		final MMChunk mmchunk = new MMChunk(chunk);
+		final MMChunk mmchunk = new MMChunk(chunk, this);
 
 		if (chunks.put(mmchunk.getCoord(), mmchunk) != null)
 		{
@@ -207,7 +193,7 @@ public class MMWorld
 		if (mob == null)
 			return 0;
 		
-		return getMobSettings(mob).mobCount;
+		return mobCounts[mob.index];
 	}
 	
 	/**
@@ -219,9 +205,9 @@ public class MMWorld
 		if (mob == null)
 			return Short.MAX_VALUE;
 
-		short dynMax = (short) (getMobSettings(mob).mobDynMulti * numChunks >> 8);
+		short dynMax = (short) (worldConf.dynMultis[mob.index] * numChunks >> 8);
 			
-		return getMobSettings(mob).mobMax < dynMax ? getMobSettings(mob).mobMax : dynMax;
+		return worldConf.maximums[mob.index] < dynMax ? worldConf.maximums[mob.index] : dynMax;
 	}
 
 	public boolean withinMobLimit(MobType mob)
@@ -229,20 +215,20 @@ public class MMWorld
 		if (mob == null)
 			return true;
 		
-		return maxMobs(mob) > getMobSettings(mob).mobCount;
+		return maxMobs(mob) > mobCounts[mob.index];
 	}
 
 	public void incrementMobCount(MobType mob)
 	{
 		if (mob == null)
 			return;
-		++getMobSettings(mob).mobCount;
+		++mobCounts[mob.index];
 	}
 	
 	public void decrementMobCount(MobType mob)
 	{
 		if (mob == null)
 			return;
-		--getMobSettings(mob).mobCount;
+		--mobCounts[mob.index];
 	}
 }

@@ -2,13 +2,13 @@ package com.forgenz.mobmanager.world;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.bukkit.Chunk;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
 
 /**
@@ -19,10 +19,8 @@ import com.forgenz.mobmanager.P;
  *
  */
 public class MMChunk
-{
-	private static Pattern layerPattern = Pattern.compile("^\\d+:{1}\\d+$");
-	private static Pattern layerSplitPattern = Pattern.compile(":{1}");
-
+{	
+	private MMWorld mmWorld;
 	private Chunk chunk;
 	private MMCoord coord;
 	private ArrayList<MMLayer> layers;
@@ -30,8 +28,12 @@ public class MMChunk
 	private int numPlayers = 0;
 	private int numAnimals = 0;
 
-	public MMChunk(final Chunk chunk)
+	public MMChunk(final Chunk chunk, final MMWorld mmWorld)
 	{
+		this.chunk = chunk;
+		this.mmWorld = mmWorld;
+		coord = new MMCoord(chunk.getX(), chunk.getZ());
+		
 		// Fetches the layers from the config
 		final List<String> layerList = P.cfg.getStringList("Layers");
 
@@ -41,10 +43,10 @@ public class MMChunk
 		for (final String layer : layerList)
 		{
 			// Checks the layer string is value
-			if (!layerPattern.matcher(layer).matches())
+			if (!Config.layerPattern.matcher(layer).matches())
 				P.p.getLogger().warning(String.format("Found an invalid layer '%s'", layer));
 			// Splits the range string for the layer
-			final String[] range = layerSplitPattern.split(layer);
+			final String[] range = Config.layerSplitPattern.split(layer);
 
 			// Converts range into integers
 			int miny = Integer.valueOf(range[0]);
@@ -93,11 +95,12 @@ public class MMChunk
 					layerIn.playerEntered();
 			} else if (entity instanceof Animals)
 				++numAnimals;
-
-		this.chunk = chunk;
-		coord = new MMCoord(chunk.getX(), chunk.getZ());
 	}
-
+	
+	public MMWorld getMMWorld()
+	{
+		return mmWorld;
+	}
 	public Chunk getChunk()
 	{
 		return chunk;
@@ -148,7 +151,7 @@ public class MMChunk
 
 	public boolean withinBreedingLimits()
 	{
-		return numAnimals < P.cfg.getInt("BreedingMaximumsPerChunk." + chunk.getWorld().getName(), Integer.MAX_VALUE);
+		return mmWorld.worldConf.breedingLimit < 0 || numAnimals < mmWorld.worldConf.breedingLimit;
 	}
 
 	public void resetNumAnimals()

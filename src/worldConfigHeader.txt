@@ -1,0 +1,71 @@
+NOTES --------------------------------|
+MobTypes:
+   Monsters:       Blaze, Creeper, Enderman, Giant,
+                   Silverfish, Skeleton, Spider, CaveSpider,
+                   Witch, Wither, Zombie, PigZombie, Ghast,
+                   Slime, MagmaCube
+
+    Animals:       Chicken, Cow, MushroomCow, Ocelot,
+                   Pig, Sheep, Wolf, IronGolem, Snowman
+                   
+    Water_Animals: Squid
+    
+    Ambient:       Bat
+    
+    Villager:      Villager
+--------------------------------------|
+#######################################
+WorldMaximum
+#######################################
+Here you set the maximum values for each type of mob for the world
+Mob types shown above in notes
+
+To disable a mob type set their maximum to 0
+To Prevent limiting of a mob type set their maximum to something big
+    e.g. 9001 (Note: You must also set the ChunkCalculatedMaximum high)
+
+#######################################
+ChunkCalculatedMaximum
+#######################################
+Limits to the number of mobs dynamically calculated
+   by the number of loaded chunks in the world
+
+Calculated with the below formula
+maxMobs = ( Number of active chunks * Config Value ) / 256
+
+#######################################
+BreedingMaximumPerChunk
+#######################################
+MobManager keeps track of how many mobs are inside of one chunk
+If a player tries to breed an animal and there are already too
+    many animals inside the chunk it prevents the animal from spawning
+
+This is to prevent players from breeding a ridiculous number of animals
+
+#######################################
+SpawnSearchChunkDistance
+#######################################
+When a mob spawns MobManager searches for players
+    around the mob. If it finds a player within range
+    the mob is allowed to spawn.
+SpawnSearchChunkDistance is the distance in chunks around the spawned mob
+    which MobManager will check for players
+
+#######################################
+UndergroundSpawnChunkSearchDistance
+#######################################
+UndergroundSpawnChunkSearchDistance is a alternative search distance to
+    SpawnSearchChunkDistance.
+When a mob spawns undergound (Ground height determined by the setting GroundHeight)
+    The underground search radius is used.
+This setting is provided as players are less likely to meet mobs that can spawn
+    given the normal search radius while underground
+    (Assuming the player is running around in caves)
+
+#######################################
+GroundHeight
+#######################################
+This value is used to determine if a mob has spawned underground
+
+It is recommended to have a value of -1 for Nether and The_End environments
+    As these worlds tend to be much more open than normal environments.

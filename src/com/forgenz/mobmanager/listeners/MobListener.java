@@ -2,6 +2,7 @@ package com.forgenz.mobmanager.listeners;
 
 import java.util.List;
 
+import org.bukkit.World.Environment;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
@@ -12,6 +13,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
+import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.util.Spiral;
@@ -53,8 +55,13 @@ public class MobListener implements Listener
 	 */
 	public boolean playerNear(final MMWorld world, final MMCoord center, final int y, boolean flying)
 	{
+		int searchDist = Config.spawnChunkSearchDistance;
+		
+		if (world.getWorld().getEnvironment() == Environment.NORMAL && y <= world.worldConf.groundHeight)
+			searchDist = world.worldConf.undergroundSpawnChunkSearchDistance;
+		
 		// Creates a spiral generator
-		final Spiral spiral = new Spiral(center, P.cfg.getInt("SpawnChunkDistance", 6));
+		final Spiral spiral = new Spiral(center, searchDist);
 
 		// Loop through until the entire circle has been generated
 		while (!spiral.isFinished())

@@ -1,0 +1,49 @@
+#######################################
+EnabledWorlds
+#######################################
+List of all the worlds which MobManager is active in
+MobManager will not have any effect on worlds not listed here
+
+#######################################
+SpawnChunkSearchDistance
+#######################################
+The distance (in chunks) to scan for
+  nearby players when a mob spawns
+
+#######################################
+FlyingMobAditionalLayerDepth
+#######################################
+How many extra layers below normal will be checked
+  for players when a flying mob attempts to spawn
+
+This allows a higher chance for flying mobs to spawn
+
+#######################################
+TicksPerRecount
+#######################################
+How often (In ticks, 20 ticks = 1 second) the mobs
+   in a world is allowed to be recounted
+
+MobManager can only keep track of mob deaths, not mob despawns
+The lower this number the less often monsters will go above the
+  current maximum mob values
+NOTE - Mobs can be spawned over their limits by other plugins, 
+       spawn eggs as they are not prevented
+       (Perhaps an option to do so in a later version of MobManager?)
+
+NOTE - MobManager also can't count mobs which are removed
+       by other plugins (Depending on how its done)
+       So decreasing this count will also decrease the time it
+       takes for mobs to respawn
+
+#######################################
+Layers
+#######################################
+Layers to use
+Each layer stores the players within them
+Layers at the same heights are checked around mob spawns
+The mob spawn is only allowed if one of the layers
+  checked contains a player
+
+Layers should overlap to give an even distribution of mobs
+#######################################
