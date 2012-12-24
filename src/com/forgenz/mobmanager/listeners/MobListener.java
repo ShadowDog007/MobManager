@@ -93,7 +93,7 @@ public class MobListener implements Listener
 		// Checks for spawn reasons we want to limit
 		switch (event.getSpawnReason())
 		{
-		// Only spanwns with these spawn reasons will be limited
+		// Only spawns with these spawn reasons will be limited
 		// Other reasons will only be counted
 		case DEFAULT:
 		case NATURAL:
@@ -101,6 +101,9 @@ public class MobListener implements Listener
 		case CHUNK_GEN:
 		case VILLAGE_DEFENSE:
 		case VILLAGE_INVASION:
+		
+		case BREEDING:
+		case EGG:
 			break;
 		default:
 			return;
