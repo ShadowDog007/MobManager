@@ -81,11 +81,11 @@ public class MMWorld
 			}
 		}
 
-		final int maxMonsters = P.cfg.getInt("WorldMaximum." + world.getName() + "." + MobType.MONSTER, Integer.MAX_VALUE);
-		final int maxAnimals = P.cfg.getInt("WorldMaximum." + world.getName() + "." + MobType.ANIMAL, Integer.MAX_VALUE);
-		final int maxWater = P.cfg.getInt("WorldMaximum." + world.getName() + "." + MobType.WATER_ANIMAL, Integer.MAX_VALUE);
-		final int maxAmbient = P.cfg.getInt("WorldMaximum." + world.getName() + "." + MobType.AMBIENT, Integer.MAX_VALUE);
-		final int maxVillagers = P.cfg.getInt("WorldMaximum." + world.getName() + "." + MobType.VILLAGER, Integer.MAX_VALUE);
+		final int maxMonsters = mobCounts[MobType.MONSTER.index];
+		final int maxAnimals = mobCounts[MobType.ANIMAL.index];
+		final int maxWater = mobCounts[MobType.WATER_ANIMAL.index];
+		final int maxAmbient = mobCounts[MobType.AMBIENT.index];
+		final int maxVillagers = mobCounts[MobType.VILLAGER.index];
 
 		P.p.getLogger().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
 	}
