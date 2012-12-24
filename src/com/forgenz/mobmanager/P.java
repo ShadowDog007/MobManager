@@ -65,7 +65,7 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		for (final String worldName : cfg.getStringList("EnabledWorlds"))
 		{
 			final World world = getServer().getWorld(worldName);
-
+			
 			// Check the world exists
 			if (world == null)
 			{

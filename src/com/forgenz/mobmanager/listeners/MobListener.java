@@ -181,6 +181,9 @@ public class MobListener implements Listener
 		
 		// Fetch the world the creature spawned in
 		MMWorld world = P.worlds.get(event.getLocation().getWorld().getName());
+		// Do nothing if the world is inactive
+		if (world == null)
+			return;
 		
 		// Counts the mob
 		// Must count animals inside of chunks too
