@@ -23,7 +23,8 @@ public class Config
 	
 	public static short spawnChunkSearchDistance;
 	public static short flyingMobAditionalLayerDepth;
-	public static int ticksPerRecount = 40;
+	public static int ticksPerRecount;
+	public static int ticksPerDespawnScan;
 	
 	public static List<String> layers;
 	
@@ -39,7 +40,6 @@ public class Config
 		public final short[] dynMultis;
 		public final short breedingLimit;
 		public final short spawnChunkSearchDistance;
-		// TODO
 		public final int undergroundSpawnChunkSearchDistance;
 		public final int groundHeight;
 		
@@ -105,6 +105,8 @@ public class Config
 		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 6));
 		flyingMobAditionalLayerDepth = (short) P.cfg.getInt("FlyingMobAditionalLayerDepth", 2);
 		ticksPerRecount = P.cfg.getInt("TicksPerRecount", 40);
+		ticksPerDespawnScan = P.cfg.getInt("TicksPerDespawnScan", 100);
+		
 		
 		layers = new ArrayList<String>();
 		for (String layer : P.cfg.getStringList("Layers"))
@@ -152,6 +154,7 @@ public class Config
 		P.cfg.set("SpawnChunkSearchDistance", spawnChunkSearchDistance);
 		P.cfg.set("FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
 		P.cfg.set("TicksPerRecount", ticksPerRecount);
+		P.cfg.set("TicksPerDespawnScan", ticksPerDespawnScan);
 		
 		P.cfg.set("Layers", layers);
 		

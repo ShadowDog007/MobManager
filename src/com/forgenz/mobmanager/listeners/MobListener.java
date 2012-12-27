@@ -31,8 +31,11 @@ import com.forgenz.mobmanager.world.MMWorld;
  */
 public class MobListener implements Listener
 {
+	public static MobListener i = null;
+	
 	public MobListener()
 	{
+		i = this;
 	}
 	
 	public boolean mobFlys(Entity entity)

@@ -36,6 +36,8 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 	public static FileConfiguration cfg = null;
 	
 	public static HashMap<String, MMWorld> worlds = null;
+	
+	private MobDespawnTask despawner = null;
 
 	@Override
 	public void onLoad()
@@ -77,6 +79,10 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 		// Register MobManager command
 		getCommand("mm").setExecutor(this);
 		
+		// Start the despawner task
+		despawner = new MobDespawnTask();
+		despawner.runTaskTimer(this, 1L, Config.ticksPerDespawnScan);
+		
 		getLogger().info("v" + getDescription().getVersion() + " ennabled with " + worlds.size() + " worlds");
 		// And we are done :D
 	}
@@ -84,7 +90,11 @@ public class P extends JavaPlugin implements Listener, CommandExecutor
 	@Override
 	public void onDisable()
 	{
+		// This has not worked for me in the past..
 		getServer().getScheduler().cancelTasks(this);
+		// Soo....
+		despawner.cancel();
+		
 		p = null;
 		cfg = null;
 		worlds = null;

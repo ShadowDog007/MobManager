@@ -1,5 +1,7 @@
 package com.forgenz.mobmanager.world;
 
+import org.bukkit.Chunk;
+
 /**
  * A Simple class to help with storage/fetching of MMCunck objects
  * 
@@ -15,6 +17,11 @@ public class MMCoord
 	{
 		this.x = x;
 		this.z = z;
+	}
+	
+	public MMCoord(final Chunk chunk)
+	{
+		this(chunk.getX(), chunk.getZ());
 	}
 
 	public int getX()

@@ -37,6 +37,19 @@ NOTE - MobManager also can't count mobs which are removed
        takes for mobs to respawn
 
 #######################################
+TicksPerDespawnScan
+#######################################
+How often in ticks the mob despawn scan is run.
+
+The mob despawn scan checks all the mobs currently
+   currently alive in each world to check if
+   players are nearby, if they are not they are despawned
+   
+NOTE - Animals are not currently despawned
+       Animal depspawning will come into a later
+       version of MobManager
+
+#######################################
 Layers
 #######################################
 Layers to use

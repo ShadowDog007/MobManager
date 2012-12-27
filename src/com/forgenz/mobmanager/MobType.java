@@ -119,6 +119,24 @@ public enum MobType
 		return cPath;
 	}
 	
+	public boolean belongs(Entity entity)
+	{
+		if (entity instanceof LivingEntity)
+			return belongs((LivingEntity) entity);
+		return false;
+	}
+	
+	public boolean belongs(LivingEntity entity)
+	{
+		for (Class<? extends LivingEntity> mobType : mobTypes)
+		{
+			if (mobType.isAssignableFrom(entity.getClass()))
+				return true;
+		}
+		
+		return false;
+	}
+	
 	public static MobType valueOf(LivingEntity entity)
 	{
 		for (Class<? extends LivingEntity> mobType : ANIMAL.mobTypes)
