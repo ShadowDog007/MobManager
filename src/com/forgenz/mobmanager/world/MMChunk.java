@@ -153,6 +153,11 @@ public class MMChunk
 	{
 		return mmWorld.worldConf.breedingLimit < 0 || numAnimals < mmWorld.worldConf.breedingLimit;
 	}
+	
+	public int getAnimalCount()
+	{
+		return numAnimals;
+	}
 
 	public void resetNumAnimals()
 	{

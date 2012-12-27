@@ -111,6 +111,8 @@ public class MobListener implements Listener
 		case CHUNK_GEN:
 		case VILLAGE_DEFENSE:
 		case VILLAGE_INVASION:
+		case BUILD_IRONGOLEM:
+		case BUILD_SNOWMAN:
 		
 		case BREEDING:
 		case EGG:
@@ -151,6 +153,9 @@ public class MobListener implements Listener
 					event.setCancelled(true);
 					return;
 				}
+				
+				// There is probably going to be a player there? So don't bother checking for one?
+				return;
 			}
 		}
 		
@@ -172,6 +177,26 @@ public class MobListener implements Listener
 			P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
 			return;
 		}
+		
+		// Checks if a creature has spawned in this location recently
+		boolean canSpawn = false;
+		for (MMLayer layer : chunk.getLayersAt(event.getLocation().getBlockY()))
+		{
+			if (canSpawn)
+			{
+				layer.updateLastSpawn();
+				continue;
+			}
+			
+			if (layer.hadRecentSpawn())
+			{
+				canSpawn = true;
+				layer.updateLastSpawn();
+			}
+		}
+		
+		if (canSpawn)
+			return;
 		
 		// Checks that there is a player within range of the creature spawn
 		if (!playerNear(world, chunk.getCoord(), event.getLocation().getBlockY(), mobFlys(event.getEntity())))

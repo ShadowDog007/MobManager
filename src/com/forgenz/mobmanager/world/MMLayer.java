@@ -10,10 +10,11 @@ import com.forgenz.mobmanager.P;
  */
 public class MMLayer
 {
-
-	int miny;
-	int maxy;
-	int numPlayers = 0;
+	/** Indicates the last time a mob successfully spawned in this layer */
+	private long lastSpawn = 0;
+	private int miny;
+	private int maxy;
+	private int numPlayers = 0;
 
 	public MMLayer(final int miny, final int maxy, final int numPlayers)
 	{
@@ -21,6 +22,16 @@ public class MMLayer
 		this.maxy = maxy;
 		if (numPlayers > 0)
 			this.numPlayers = numPlayers;
+	}
+	
+	public boolean hadRecentSpawn()
+	{
+		return System.currentTimeMillis() - lastSpawn <= 50;
+	}
+	
+	public void updateLastSpawn()
+	{
+		lastSpawn = System.currentTimeMillis();
 	}
 
 	public int getMaxY()
