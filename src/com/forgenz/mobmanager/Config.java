@@ -50,7 +50,7 @@ public class Config
 			
 			limiterEnabled = true;
 			
-			MobType[] mobs = MobType.getAll();
+			MobType[] mobs = MobType.values();
 			
 			maximums = new short[mobs.length];
 			dynMultis = new short[mobs.length];

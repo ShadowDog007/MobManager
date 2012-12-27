@@ -119,19 +119,6 @@ public enum MobType
 		return cPath;
 	}
 	
-	public static MobType[] getAll()
-	{
-		MobType[] cTypeArray = new MobType[5];
-		
-		cTypeArray[0] = MONSTER;
-		cTypeArray[1] = ANIMAL;
-		cTypeArray[2] = WATER_ANIMAL;
-		cTypeArray[3] = AMBIENT;
-		cTypeArray[4] = VILLAGER;
-		
-		return cTypeArray;
-	}
-	
 	public static MobType valueOf(LivingEntity entity)
 	{
 		for (Class<? extends LivingEntity> mobType : ANIMAL.mobTypes)

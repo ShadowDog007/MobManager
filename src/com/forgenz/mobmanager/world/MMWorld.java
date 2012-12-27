@@ -92,7 +92,7 @@ public class MMWorld
 	
 	private void resetMobCounts()
 	{
-		for (MobType mob : MobType.getAll())
+		for (MobType mob : MobType.values())
 		{
 			mobCounts[mob.index] = 0;
 		}
