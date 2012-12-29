@@ -45,9 +45,9 @@ The mob despawn scan checks all the mobs currently
    currently alive in each world to check if
    players are nearby, if they are not they are despawned
    
-NOTE - Animals are not currently despawned
-       Animal depspawning will come into a later
-       version of MobManager
+NOTE - Animals are only despawned if there are enough animals
+       inside of the one chunk. This number can be controlled
+       via your world config files
 
 #######################################
 Layers

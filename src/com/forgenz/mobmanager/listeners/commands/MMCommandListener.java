@@ -26,74 +26,49 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.world;
+package com.forgenz.mobmanager.listeners.commands;
 
-import com.forgenz.mobmanager.P;
+import java.util.ArrayList;
 
-/**
- * Keeps track of players within a given Y coordinate range
- * 
- * @author Michael McKnight (ShadowDog007)
- *
- */
-public class MMLayer
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+
+public class MMCommandListener implements CommandExecutor
 {
-	private int miny;
-	private int maxy;
-	private int numPlayers = 0;
-
-	public MMLayer(final int miny, final int maxy, final int numPlayers)
+	private static ArrayList<MMCommand> commands = null;
+	
+	static void registerCommand(MMCommand command)
 	{
-		this.miny = miny;
-		this.maxy = maxy;
-		if (numPlayers > 0)
-			this.numPlayers = numPlayers;
-	}
-
-	public int getMaxY()
-	{
-		return maxy;
-	}
-
-	public int getMinY()
-	{
-		return miny;
-	}
-
-	public boolean isEmpty()
-	{
-		return numPlayers == 0;
-	}
-
-	public int getNumPlayers()
-	{
-		return numPlayers;
-	}
-
-	public int playerEntered()
-	{
-		return ++numPlayers;
-	}
-
-	public int playerLeft()
-	{
-		if (--numPlayers < 0)
-		{
-			numPlayers = 0;
-
-			P.p.getLogger().warning("Player left a layer with no players in it?");
-		}
-
-		return numPlayers;
-	}
-
-	public boolean insideRange(final int y)
-	{
-		return miny <= y && maxy >= y;
+		commands.add(command);
 	}
 	
-	public int compare(MMLayer layer)
+	public MMCommandListener()
 	{
-		return this.miny + this.maxy - layer.miny - layer.maxy;
+		commands = new ArrayList<MMCommand>();
+		
+		// Create Command objects
+		new MMCommandCount();
 	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	{
+		if (args.length >= 1)
+		{
+			for (MMCommand mmcommand : commands)
+			{
+				if (mmcommand.isCommand(args[0]))
+				{
+					mmcommand.run(sender, label, args);
+					return true;
+				}
+			}
+		}
+		
+		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
+		return true;
+	}
+
 }

@@ -1,3 +1,31 @@
+/*
+ * Copyright 2013 Michael McKnight. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
+ *
+ *    1. Redistributions of source code must retain the above copyright notice, this list of
+ *       conditions and the following disclaimer.
+ *
+ *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+ *       of conditions and the following disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and contributors and should not be interpreted as representing official policies,
+ * either expressed or implied, of anybody else.
+ */
+
 package com.forgenz.mobmanager;
 
 import java.io.File;
@@ -39,6 +67,7 @@ public class Config
 		public final short[] maximums;
 		public final short[] dynMultis;
 		public final short breedingLimit;
+		public final short numAnimalsForFarm;
 		public final short spawnChunkSearchDistance;
 		public final int undergroundSpawnChunkSearchDistance;
 		public final int groundHeight;
@@ -62,9 +91,10 @@ public class Config
 				dynMultis[mob.index] = (short) Math.abs(cfg.getInt("ChunkCalculatedMaximum." + mob.cPath, mob.getDefaultDynMulti(world.getEnvironment())));
 			}
 			
-			breedingLimit = (short) cfg.getInt("BreedingMaximumPerChunk", 40);
+			breedingLimit = (short) cfg.getInt("BreedingMaximumPerChunk", 15);
+			numAnimalsForFarm = (short) cfg.getInt("NumAnimalsForFarm", 3);
 			spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
-			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 3);
+			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
 			
 			int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : -1;
 			groundHeight = cfg.getInt("GroundHeight", defaultHeight);
@@ -79,6 +109,7 @@ public class Config
 			}
 			
 			cfg.set("BreedingMaximumPerChunk", breedingLimit);
+			cfg.set("NumAnimalsForFarm", numAnimalsForFarm);
 			cfg.set("SpawnSearchChunkDistance", spawnChunkSearchDistance);
 			cfg.set("UndergroundSpawnChunkSearchDistance", undergroundSpawnChunkSearchDistance);
 			cfg.set("GroundHeight", groundHeight);
@@ -102,7 +133,7 @@ public class Config
 			}
 		}
 		
-		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 6));
+		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 5));
 		flyingMobAditionalLayerDepth = (short) P.cfg.getInt("FlyingMobAditionalLayerDepth", 2);
 		ticksPerRecount = P.cfg.getInt("TicksPerRecount", 40);
 		ticksPerDespawnScan = P.cfg.getInt("TicksPerDespawnScan", 100);

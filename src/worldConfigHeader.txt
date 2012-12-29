@@ -42,6 +42,19 @@ If a player tries to breed an animal and there are already too
 
 This is to prevent players from breeding a ridiculous number of animals
 
+Set to -1 to disable
+
+#######################################
+NumAnimalsForFarm
+#######################################
+This number is used to assume if a chunk contains an animal farm in it.
+If the number of animals in the chunk is above or equal to this value
+   the animals in this chunk will not be despawned when the
+   despawn scan runs
+   
+NOTE: If this value is too low many animals may not be despawned
+      Around 3-5 'should' work fine.
+
 #######################################
 SpawnSearchChunkDistance
 #######################################
@@ -56,10 +69,10 @@ UndergroundSpawnChunkSearchDistance
 #######################################
 UndergroundSpawnChunkSearchDistance is a alternative search distance to
     SpawnSearchChunkDistance.
-When a mob spawns undergound (Ground height determined by the setting GroundHeight)
-    The underground search radius is used.
-This setting is provided as players are less likely to meet mobs that can spawn
-    given the normal search radius while underground
+When a mob spawns underground the underground search radius is used.
+    (Ground height determined by the setting GroundHeight)
+This setting is provided as players are less likely to meet mobs that
+    can spawn given the normal search radius while underground
     (Assuming the player is running around in caves)
 
 #######################################
@@ -67,5 +80,5 @@ GroundHeight
 #######################################
 This value is used to determine if a mob has spawned underground
 
-It is recommended to have a value of -1 for Nether and The_End environments
+It is recommended to set this to -1 for Nether and The_End environments
     As these worlds tend to be much more open than normal environments.
