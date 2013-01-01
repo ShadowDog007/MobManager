@@ -29,6 +29,9 @@
 package com.forgenz.mobmanager;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Zombie;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgenz.mobmanager.listeners.MobListener;
@@ -73,6 +76,23 @@ public class MobDespawnTask extends BukkitRunnable
 				else if (mob == MobType.VILLAGER)
 				{
 					if (world.withinMobLimit(mob))
+						continue;
+				}
+				// Does not despawn the entity if it carries players items
+				else if (entity instanceof Zombie || entity instanceof Skeleton)
+				{
+					EntityEquipment equipment = entity.getEquipment();
+					
+					// If any of these statements pass then the the mob carries an item dropped from a player
+					if (equipment.getBootsDropChance() == 1F)
+						continue;
+					if (equipment.getChestplateDropChance() == 1F)
+						continue;
+					if (equipment.getHelmetDropChance() == 1F)
+						continue;
+					if (equipment.getItemInHandDropChance() == 1F)
+						continue;
+					if (equipment.getLeggingsDropChance() == 1F)
 						continue;
 				}
 				

@@ -64,6 +64,8 @@ When a mob spawns MobManager searches for players
 SpawnSearchChunkDistance is the distance in chunks around the spawned mob
     which MobManager will check for players
 
+NOTE: If set to -1 the value from config.yml will be used
+
 #######################################
 UndergroundSpawnChunkSearchDistance
 #######################################
@@ -80,5 +82,7 @@ GroundHeight
 #######################################
 This value is used to determine if a mob has spawned underground
 
-It is recommended to set this to -1 for Nether and The_End environments
+It is recommended to set this to -1 for The_End environments
     As these worlds tend to be much more open than normal environments.
+For Nether environments the default value of 32 is used as this is
+    the default height of lava

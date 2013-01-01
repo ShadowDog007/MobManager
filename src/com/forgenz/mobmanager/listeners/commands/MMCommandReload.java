@@ -28,49 +28,42 @@
 
 package com.forgenz.mobmanager.listeners.commands;
 
-import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class MMCommandListener implements CommandExecutor
+import com.forgenz.mobmanager.P;
+
+public class MMCommandReload extends MMCommand
 {
-	private static ArrayList<MMCommand> commands = null;
-	
-	static void registerCommand(MMCommand command)
+
+	MMCommandReload()
 	{
-		commands.add(command);
+		super(Pattern.compile("^reload$", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"),
+				0, 0);
 	}
-	
-	public MMCommandListener()
-	{
-		commands = new ArrayList<MMCommand>();
-		
-		// Create Command objects
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-	}
-	
+
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	public void run(CommandSender sender, String maincmd, String[] args)
 	{
-		if (args.length >= 1)
-		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0]))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
-		}
+		P p = P.p;
+		p.getServer().getPluginManager().disablePlugin(p);
+		p.getServer().getPluginManager().enablePlugin(p);
 		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
-		return true;
+		sender.sendMessage(ChatColor.GRAY + "~Reload Complete");
+	}
+
+	@Override
+	public String getUsage()
+	{
+		return "%s/%s %s%s";
+	}
+
+	@Override
+	public String getDescription()
+	{
+		return "Reloads MobManager configuration";
 	}
 
 }

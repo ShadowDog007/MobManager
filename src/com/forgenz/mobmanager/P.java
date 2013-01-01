@@ -74,7 +74,7 @@ public class P extends JavaPlugin implements Listener
 		// Start Metrics gathering
 		try
 		{
-			BukkitMetricsLite metrics = new BukkitMetricsLite(this);
+			Metrics metrics = new Metrics(this);
 			metrics.start();
 		}
 		catch (IOException e)

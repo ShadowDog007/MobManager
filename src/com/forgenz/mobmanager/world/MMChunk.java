@@ -220,8 +220,9 @@ public class MMChunk
 		if (--numPlayers < 0)
 		{
 			numPlayers = 0;
-
-			P.p.getLogger().warning("Player left a chunk with no players in it?");
+			
+			if (!Config.disableWarnings)
+				P.p.getLogger().warning("Player left a chunk with no players in it?");
 		}
 	}
 

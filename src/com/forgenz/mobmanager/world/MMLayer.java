@@ -28,6 +28,7 @@
 
 package com.forgenz.mobmanager.world;
 
+import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
 
 /**
@@ -81,7 +82,8 @@ public class MMLayer
 		{
 			numPlayers = 0;
 
-			P.p.getLogger().warning("Player left a layer with no players in it?");
+			if (!Config.disableWarnings)
+				P.p.getLogger().warning("Player left a layer with no players in it?");
 		}
 
 		return numPlayers;

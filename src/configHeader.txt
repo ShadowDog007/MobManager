@@ -5,10 +5,23 @@ List of all the worlds which MobManager is active in
 MobManager will not have any effect on worlds not listed here
 
 #######################################
+DisableWarnings
+#######################################
+If true some un-important warnings are disabled
+  to prevent console from being filled
+  
+NOTE: Warnings which are removed 'should' not
+  happen at all. They also should not prevent
+  MobManger from functioning properly
+
+#######################################
 SpawnChunkSearchDistance
 #######################################
 The distance (in chunks) to scan for
   nearby players when a mob spawns
+
+Used as a default for worlds which have
+  invalid values set for the same setting
 
 #######################################
 FlyingMobAditionalLayerDepth

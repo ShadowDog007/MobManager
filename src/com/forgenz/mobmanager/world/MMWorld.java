@@ -35,6 +35,7 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
+import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.Config.WorldConf;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
@@ -109,13 +110,18 @@ public class MMWorld
 			}
 		}
 
-		final int maxMonsters = mobCounts[MobType.MONSTER.index];
-		final int maxAnimals = mobCounts[MobType.ANIMAL.index];
-		final int maxWater = mobCounts[MobType.WATER_ANIMAL.index];
-		final int maxAmbient = mobCounts[MobType.AMBIENT.index];
-		final int maxVillagers = mobCounts[MobType.VILLAGER.index];
+		final int maxMonsters = worldConf.maximums[MobType.MONSTER.index];
+		final int maxAnimals = worldConf.maximums[MobType.ANIMAL.index];
+		final int maxWater = worldConf.maximums[MobType.WATER_ANIMAL.index];
+		final int maxAmbient = worldConf.maximums[MobType.AMBIENT.index];
+		final int maxVillagers = worldConf.maximums[MobType.VILLAGER.index];
 
 		P.p.getLogger().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
+	}
+	
+	public short getSearchDistance()
+	{
+		return worldConf.spawnChunkSearchDistance > 0 ? worldConf.spawnChunkSearchDistance : Config.spawnChunkSearchDistance;
 	}
 	
 	private void resetMobCounts()

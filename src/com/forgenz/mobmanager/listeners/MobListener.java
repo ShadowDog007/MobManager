@@ -30,7 +30,6 @@ package com.forgenz.mobmanager.listeners;
 
 import java.util.List;
 
-import org.bukkit.World.Environment;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
@@ -86,9 +85,9 @@ public class MobListener implements Listener
 	 */
 	public boolean playerNear(final MMWorld world, final MMCoord center, final int y, boolean flying)
 	{
-		int searchDist = Config.spawnChunkSearchDistance;
+		int searchDist = world.getSearchDistance();
 		
-		if (world.getWorld().getEnvironment() == Environment.NORMAL && y <= world.worldConf.groundHeight)
+		if (y <= world.worldConf.groundHeight)
 			searchDist = world.worldConf.undergroundSpawnChunkSearchDistance;
 		
 		// Creates a spiral generator
@@ -179,7 +178,8 @@ public class MobListener implements Listener
 				chunk = world.getChunk(event.getLocation().getChunk());
 				if (chunk == null)
 				{
-					P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
+					if (!Config.disableWarnings)
+						P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
 					return;
 				}
 				
@@ -209,7 +209,8 @@ public class MobListener implements Listener
 		
 		if (chunk == null)
 		{
-			P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
+			if (!Config.disableWarnings)
+				P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
 			return;
 		}
 		

@@ -49,6 +49,8 @@ public class Config
 	public final static Pattern layerSplitPattern = Pattern.compile(":{1}");
 	final static String worldsFolder = "worlds";
 	
+	public static boolean disableWarnings = false;
+	
 	public static short spawnChunkSearchDistance;
 	public static short flyingMobAditionalLayerDepth;
 	public static int ticksPerRecount;
@@ -96,7 +98,7 @@ public class Config
 			spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
 			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
 			
-			int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : -1;
+			int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : (world.getEnvironment() == Environment.NETHER ? 32 : -1);
 			groundHeight = cfg.getInt("GroundHeight", defaultHeight);
 			
 			
@@ -133,6 +135,7 @@ public class Config
 			}
 		}
 		
+		disableWarnings = P.cfg.getBoolean("DisableWarnings", false);
 		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 5));
 		flyingMobAditionalLayerDepth = (short) P.cfg.getInt("FlyingMobAditionalLayerDepth", 2);
 		ticksPerRecount = P.cfg.getInt("TicksPerRecount", 40);
@@ -182,6 +185,7 @@ public class Config
 		// Set and save the config values
 		P.cfg.set("EnabledWorlds", activeWorlds);
 		
+		P.cfg.set("DisableWarnings", disableWarnings);
 		P.cfg.set("SpawnChunkSearchDistance", spawnChunkSearchDistance);
 		P.cfg.set("FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
 		P.cfg.set("TicksPerRecount", ticksPerRecount);
