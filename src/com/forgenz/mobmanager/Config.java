@@ -40,6 +40,8 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.world.MMWorld;
 
@@ -55,6 +57,8 @@ public class Config
 	public static short flyingMobAditionalLayerDepth;
 	public static int ticksPerRecount;
 	public static int ticksPerDespawnScan;
+	
+	public static List<EntityType> ignoredMobs;
 	
 	public static List<String> layers;
 	
@@ -141,6 +145,43 @@ public class Config
 		ticksPerRecount = P.cfg.getInt("TicksPerRecount", 40);
 		ticksPerDespawnScan = P.cfg.getInt("TicksPerDespawnScan", 100);
 		
+		ignoredMobs = new ArrayList<EntityType>();
+		List<?> stringIgnoredMobs = P.cfg.getList("IgnoredMobs", null);
+		if (stringIgnoredMobs != null)
+		{
+			P.p.getLogger().info("Found");
+			for (Object obj : stringIgnoredMobs)
+			{
+				if (obj instanceof String == false)
+					continue;
+				
+				String entity = (String) obj;
+				
+				// Get the entities type
+				EntityType e = EntityType.valueOf(entity.toUpperCase());
+				
+				// Check if the given entity is valid
+				if (e == null)
+				{
+					P.p.getLogger().warning("The ignoredMob '" + entity + "' is invalid");
+					continue;
+				}
+				
+				// Check if the given entity is a LivingEntity
+				if (!LivingEntity.class.isAssignableFrom(e.getEntityClass()))
+					continue;
+				
+				// Add the entity type to the list of ignored mobs
+				if (!ignoredMobs.contains(e))
+					ignoredMobs.add(e);
+			}
+		}
+		else
+		{
+			// Add default ignored mobs
+			ignoredMobs.add(EntityType.WITHER);
+		}
+		
 		
 		layers = new ArrayList<String>();
 		for (String layer : P.cfg.getStringList("Layers"))
@@ -190,6 +231,22 @@ public class Config
 		P.cfg.set("FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
 		P.cfg.set("TicksPerRecount", ticksPerRecount);
 		P.cfg.set("TicksPerDespawnScan", ticksPerDespawnScan);
+		
+		String im = "";
+		ArrayList<String> ignoredMobs_Strings = new ArrayList<String>(ignoredMobs.size());
+		for (EntityType e : ignoredMobs)
+		{
+			if (im.length() != 0)
+				im += ",";
+			im += e.toString();
+			ignoredMobs_Strings.add(e.toString());
+		}
+		
+		if (im.length() != 0);
+			P.p.getLogger().info("IgnoredMobs: " + im);
+		
+		P.cfg.set("IgnoredMobs", ignoredMobs_Strings);
+		
 		
 		P.cfg.set("Layers", layers);
 		

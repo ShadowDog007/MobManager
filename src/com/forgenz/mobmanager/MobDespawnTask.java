@@ -57,6 +57,9 @@ public class MobDespawnTask extends BukkitRunnable
 			
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
+				if (Config.ignoredMobs.contains(entity.getType()))
+					continue;
+				
 				MobType mob = MobType.valueOf(entity);
 				// If MobManager does not recognize the entity ignore it
 				if (mob == null)

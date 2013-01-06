@@ -35,6 +35,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 
+import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.world.MMChunk;
@@ -88,7 +89,7 @@ public class MMCommandButcher extends MMCommand
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
 				MobType mob = MobType.valueOf(entity);
-				if (mobTypes.contains(mob))
+				if (mobTypes.contains(mob) && !Config.ignoredMobs.contains(entity.getType()))
 				{
 					world.decrementMobCount(mob);
 					
