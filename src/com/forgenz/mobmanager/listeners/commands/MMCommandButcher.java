@@ -46,7 +46,7 @@ public class MMCommandButcher extends MMCommand
 
 	MMCommandButcher()
 	{
-		super(Pattern.compile("^butcher$", Pattern.CASE_INSENSITIVE), Pattern.compile("^[a-z ]*$", Pattern.CASE_INSENSITIVE),
+		super(Pattern.compile("^(butcher|butcherall)$", Pattern.CASE_INSENSITIVE), Pattern.compile("^[a-z ]*$", Pattern.CASE_INSENSITIVE),
 				0, 5);
 	}
 
@@ -75,12 +75,12 @@ public class MMCommandButcher extends MMCommand
 			}
 		}
 		
-		numMobs = removeMobs(toRemove);
+		numMobs = removeMobs(toRemove, args[0].equalsIgnoreCase("butcherall"));
 		
 		sender.sendMessage(ChatColor.GRAY + "~Removed " + numMobs + " mobs");
 	}
 	
-	public int removeMobs(ArrayList<MobType> mobTypes)
+	public int removeMobs(ArrayList<MobType> mobTypes, boolean removeAll)
 	{
 		int numMobs = 0;
 		
@@ -89,7 +89,7 @@ public class MMCommandButcher extends MMCommand
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
 				MobType mob = MobType.valueOf(entity);
-				if (mobTypes.contains(mob) && !Config.ignoredMobs.contains(entity.getType()))
+				if (mobTypes.contains(mob) && (removeAll && !Config.ignoredMobs.contains(entity.getType())))
 				{
 					world.decrementMobCount(mob);
 					
