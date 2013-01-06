@@ -210,7 +210,8 @@ public class MMWorld
 
 		if (chunks.put(mmchunk.getCoord(), mmchunk) != null)
 		{
-			P.p.getLogger().warning("Newly loaded chunk already existed in chunk map");
+			if (!Config.disableWarnings)
+				P.p.getLogger().warning("Newly loaded chunk already existed in chunk map");
 			return;
 		}
 
@@ -221,7 +222,8 @@ public class MMWorld
 	{
 		if (chunks.remove(new MMCoord(chunk.getX(), chunk.getZ())) == null)
 		{
-			P.p.getLogger().warning("A chunk was unloaded but no object existed for it");
+			if (!Config.disableWarnings)
+				P.p.getLogger().warning("A chunk was unloaded but no object existed for it");
 			return;
 		}
 

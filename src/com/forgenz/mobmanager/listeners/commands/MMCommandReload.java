@@ -49,6 +49,7 @@ public class MMCommandReload extends MMCommand
 	{
 		P p = P.p;
 		p.getServer().getPluginManager().disablePlugin(p);
+		p.reloadConfig();
 		p.getServer().getPluginManager().enablePlugin(p);
 		
 		sender.sendMessage(ChatColor.GRAY + "~Reload Complete");

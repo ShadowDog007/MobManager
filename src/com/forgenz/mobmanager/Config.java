@@ -49,7 +49,7 @@ public class Config
 	public final static Pattern layerSplitPattern = Pattern.compile(":{1}");
 	final static String worldsFolder = "worlds";
 	
-	public static boolean disableWarnings = false;
+	public static boolean disableWarnings;
 	
 	public static short spawnChunkSearchDistance;
 	public static short flyingMobAditionalLayerDepth;
