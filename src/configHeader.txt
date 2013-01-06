@@ -1,3 +1,19 @@
+NOTES --------------------------------|
+MobTypes:
+   Monsters:       Blaze, Creeper, Enderman, Giant,
+                   Silverfish, Skeleton, Spider, CaveSpider,
+                   Witch, Wither, Zombie, PigZombie, Ghast,
+                   Slime, MagmaCube
+
+    Animals:       Chicken, Cow, MushroomCow, Ocelot,
+                   Pig, Sheep, Wolf, IronGolem, Snowman
+                   
+    Water_Animals: Squid
+    
+    Ambient:       Bat
+    
+    Villager:      Villager
+--------------------------------------|
 #######################################
 EnabledWorlds
 #######################################
@@ -8,26 +24,26 @@ MobManager will not have any effect on worlds not listed here
 DisableWarnings
 #######################################
 If true some un-important warnings are disabled
-  to prevent console from being filled
+    to prevent console from being filled
   
 NOTE: Warnings which are removed 'should' not
-  happen at all. They also should not prevent
-  MobManger from functioning properly
+    happen at all. They also should not prevent
+    MobManger from functioning properly
 
 #######################################
 SpawnChunkSearchDistance
 #######################################
 The distance (in chunks) to scan for
-  nearby players when a mob spawns
+    nearby players when a mob spawns
 
 Used as a default for worlds which have
-  invalid values set for the same setting
+    invalid values set for the same setting
 
 #######################################
 FlyingMobAditionalLayerDepth
 #######################################
 How many extra layers below normal will be checked
-  for players when a flying mob attempts to spawn
+    for players when a flying mob attempts to spawn
 
 This allows a higher chance for flying mobs to spawn
 
@@ -35,19 +51,19 @@ This allows a higher chance for flying mobs to spawn
 TicksPerRecount
 #######################################
 How often (In ticks, 20 ticks = 1 second) the mobs
-   in a world is allowed to be recounted
+    in a world is allowed to be recounted
 
 MobManager can only keep track of mob deaths, not mob despawns
 The lower this number the less often monsters will go above the
-  current maximum mob values
-NOTE - Mobs can be spawned over their limits by other plugins, 
-       spawn eggs as they are not prevented
-       (Perhaps an option to do so in a later version of MobManager?)
+    current maximum mob values
+NOTE: Mobs can be spawned over their limits by other plugins, 
+    spawn eggs as they are not prevented
+    (Perhaps an option to do so in a later version of MobManager?)
 
-NOTE - MobManager also can't count mobs which are removed
-       by other plugins (Depending on how its done)
-       So decreasing this count will also decrease the time it
-       takes for mobs to respawn
+NOTE: MobManager also can't count mobs which are removed
+    by other plugins (Depending on how its done)
+    So decreasing this count will also decrease the time it
+    takes for mobs to respawn
 
 #######################################
 TicksPerDespawnScan
@@ -55,12 +71,28 @@ TicksPerDespawnScan
 How often in ticks the mob despawn scan is run.
 
 The mob despawn scan checks all the mobs currently
-   currently alive in each world to check if
-   players are nearby, if they are not they are despawned
+    currently alive in each world to check if
+    players are nearby, if they are not they are despawned
    
-NOTE - Animals are only despawned if there are enough animals
-       inside of the one chunk. This number can be controlled
-       via your world config files
+NOTE: Animals are only despawned if there are enough animals
+    inside of the one chunk. This number can be controlled
+    via your world config files
+       
+#######################################
+IgnoredMobs
+#######################################
+A string list of all the mobs which will be:
+    - Ignored when that mob is spawned
+      i.e. The mob will not contribute to the mob counts
+      Nor will it be prevented from spawning
+    - Ignored when a despawn task is run
+      i.e. Mobs which will not be despawned by MobManager
+    
+Valid Mobs can be found here:
+    http://jd.bukkit.org/apidocs/org/bukkit/entity/EntityType.html
+
+NOTE: Entities which are not mobs can also be found
+    in the above page. These entities will be ignored
 
 #######################################
 Layers
@@ -69,7 +101,8 @@ Layers to use
 Each layer stores the players within them
 Layers at the same heights are checked around mob spawns
 The mob spawn is only allowed if one of the layers
-  checked contains a player
+    checked contains a player
 
 Layers should overlap to give an even distribution of mobs
+
 #######################################

@@ -153,7 +153,7 @@ public class MobListener implements Listener
 		}
 		// Checks if we can ignore the creature spawn
 		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null)
+		if (mob == null || Config.ignoredMobs.contains(event.getEntityType()))
 		{
 			return;
 		}
@@ -230,7 +230,7 @@ public class MobListener implements Listener
 	{
 		// Check if we don't need to count the mob
 		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null)
+		if (mob == null || Config.ignoredMobs.contains(event.getEntityType()))
 		{
 			return;
 		}
