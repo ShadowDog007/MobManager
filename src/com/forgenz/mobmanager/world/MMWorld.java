@@ -137,14 +137,19 @@ public class MMWorld
 		if (needsUpdate)
 		{
 			resetMobCounts();
+			
+			numChunks = 0;
 
 			// Loop through each loaded chunk in the world
 			for (final Chunk chunk : world.getLoadedChunks())
 			{
-				final MMChunk mmchunk = getChunk(chunk);
+				++numChunks;
+				MMChunk mmchunk = getChunk(chunk);
 				
 				if (mmchunk == null)
-					continue;
+				{
+					mmchunk = addChunk(chunk, false);
+				}
 
 				mmchunk.resetNumAnimals();
 
@@ -204,18 +209,24 @@ public class MMWorld
 		return chunks.get(coord);
 	}
 
-	public void addChunk(final Chunk chunk)
+	public MMChunk addChunk(final Chunk chunk, boolean incrementCount)
 	{
-		final MMChunk mmchunk = new MMChunk(chunk, this);
+		if (!chunk.isLoaded())
+			return null;
+		
+		MMChunk mmchunk = new MMChunk(chunk, this);
 
-		if (chunks.put(mmchunk.getCoord(), mmchunk) != null)
+		if (chunks.get(mmchunk.getCoord()) != null)
 		{
 			if (!Config.disableWarnings)
 				P.p.getLogger().warning("Newly loaded chunk already existed in chunk map");
-			return;
+			return chunks.get(mmchunk.getCoord());
 		}
-
-		++numChunks;
+		
+		chunks.put(mmchunk.getCoord(), mmchunk);
+		if (incrementCount)
+			++numChunks;
+		return mmchunk;
 	}
 
 	public void removeChunk(final Chunk chunk)
