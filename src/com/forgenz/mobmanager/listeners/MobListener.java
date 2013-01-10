@@ -126,7 +126,8 @@ public class MobListener implements Listener
 	
 	// Event listener methods
 	/**
-	 * Checks mob limits to determine if the mob can spawn
+	 * Checks mob limits to determine if the mob can spawn </ br>
+	 * Only prevents natural spawns (Including for disabled mobs)
 	 */
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onCreatureSpawn(final CreatureSpawnEvent event)
@@ -151,6 +152,15 @@ public class MobListener implements Listener
 		default:
 			return;
 		}
+		
+		// Check if the entity is disabled
+		if (Config.disabledMobs.contains(event.getEntityType()))
+		{
+			// Prevent the entity from spawning
+			event.setCancelled(true);
+			return;
+		}
+		
 		// Checks if we can ignore the creature spawn
 		MobType mob = MobType.valueOf(event.getEntity());
 		if (mob == null || Config.ignoredMobs.contains(event.getEntityType()))

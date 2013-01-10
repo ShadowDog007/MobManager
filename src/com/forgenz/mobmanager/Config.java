@@ -59,6 +59,7 @@ public class Config
 	public static int ticksPerDespawnScan;
 	
 	public static List<EntityType> ignoredMobs;
+	public static List<EntityType> disabledMobs;
 	
 	public static List<String> layers;
 	
@@ -181,6 +182,55 @@ public class Config
 			// Add default ignored mobs
 			ignoredMobs.add(EntityType.WITHER);
 		}
+		
+		/* ################ Disabled Mobs Start ################ */
+		disabledMobs = new ArrayList<EntityType>();
+		List<?> stringDisabledMobs = P.cfg.getList("IgnoredMobs", null);
+		if (stringDisabledMobs != null)
+		{
+			P.p.getLogger().info("Found");
+			for (Object obj : stringDisabledMobs)
+			{
+				if (obj instanceof String == false)
+					continue;
+				
+				String entity = (String) obj;
+				
+				// Get the entities type
+				EntityType e = EntityType.valueOf(entity.toUpperCase());
+				
+				// Check if the given entity is valid
+				if (e == null)
+				{
+					P.p.getLogger().warning("The DisabledMob '" + entity + "' is invalid");
+					continue;
+				}
+				
+				// Check if the given entity is a LivingEntity
+				if (!LivingEntity.class.isAssignableFrom(e.getEntityClass()))
+					continue;
+				
+				// Add the entity type to the list of ignored mobs
+				if (!disabledMobs.contains(e))
+					disabledMobs.add(e);
+			}
+		}
+		
+		String dm = "";
+		ArrayList<String> disabledMobs_Strings = new ArrayList<String>(disabledMobs.size());
+		for (EntityType e : disabledMobs)
+		{
+			if (dm.length() != 0)
+				dm += ",";
+			dm += e.toString();
+			disabledMobs_Strings.add(e.toString());
+		}
+		
+		if (dm.length() != 0);
+			P.p.getLogger().info("DisabledMobs: " + dm);
+		
+		P.cfg.set("DisabledMobs", disabledMobs_Strings);
+		/* ################ Disabled Mobs End ################ */
 		
 		
 		layers = new ArrayList<String>();
