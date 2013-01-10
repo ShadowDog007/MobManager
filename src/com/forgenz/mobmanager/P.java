@@ -32,13 +32,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.forgenz.mobmanager.listeners.ChunkListener;
 import com.forgenz.mobmanager.listeners.MobListener;
 import com.forgenz.mobmanager.listeners.PlayerListener;
 import com.forgenz.mobmanager.listeners.commands.MMCommandListener;
@@ -51,7 +47,7 @@ import com.forgenz.mobmanager.world.MMWorld;
  * @author Michael McKnight (ShadowDog007)
  *
  */
-public class P extends JavaPlugin implements Listener
+public class P extends JavaPlugin
 {
 	public static P p = null;
 	public static FileConfiguration cfg = null;
@@ -99,7 +95,7 @@ public class P extends JavaPlugin implements Listener
 		// Register Player event listener
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 		// Register Chunk event listener
-		getServer().getPluginManager().registerEvents(this, this);
+		getServer().getPluginManager().registerEvents(new ChunkListener(), this);
 		
 		// Register MobManager command
 		getCommand("mm").setExecutor(new MMCommandListener());

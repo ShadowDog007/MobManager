@@ -21,7 +21,7 @@ public class ChunkListener implements Listener
 			return;
 
 		// Add the chunk to the world
-		world.addChunk(event.getChunk());
+		world.addChunk(event.getChunk(), true);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
