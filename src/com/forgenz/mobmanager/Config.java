@@ -139,7 +139,7 @@ public class Config
 			}
 		}
 		
-		disableWarnings = P.cfg.getBoolean("DisableWarnings", false);
+		disableWarnings = P.cfg.getBoolean("DisableWarnings", true);
 		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 5));
 		flyingMobAditionalLayerDepth = (short) P.cfg.getInt("FlyingMobAditionalLayerDepth", 2);
 		ticksPerRecount = P.cfg.getInt("TicksPerRecount", 40);

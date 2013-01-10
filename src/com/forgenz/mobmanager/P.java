@@ -124,35 +124,4 @@ public class P extends JavaPlugin implements Listener
 		cfg = null;
 		worlds = null;
 	}
-
-	// Events Listener Methods
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onChunkLoad(final ChunkLoadEvent event)
-	{
-		final MMWorld world = worlds.get(event.getChunk().getWorld().getName());
-
-		// If the world is not found it must be inactive
-		if (world == null)
-			return;
-
-		// Add the chunk to the world
-		world.addChunk(event.getChunk());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onChunkUnload(final ChunkUnloadEvent event)
-	{
-		if (event.isCancelled())
-			return;
-
-		final MMWorld world = worlds.get(event.getChunk().getWorld().getName());
-
-		// If the world is not found it must be inactive
-		if (world == null)
-			return;
-
-		// Remove the chunk from the world
-		world.removeChunk(event.getChunk());
-	}
 }
