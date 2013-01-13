@@ -1,6 +1,6 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 1.5b
+version: 1.6
 authors: [Michael McKnight (ShadowDog007)]
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
 

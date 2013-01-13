@@ -215,21 +215,6 @@ public class Config
 					disabledMobs.add(e);
 			}
 		}
-		
-		String dm = "";
-		ArrayList<String> disabledMobs_Strings = new ArrayList<String>(disabledMobs.size());
-		for (EntityType e : disabledMobs)
-		{
-			if (dm.length() != 0)
-				dm += ",";
-			dm += e.toString();
-			disabledMobs_Strings.add(e.toString());
-		}
-		
-		if (dm.length() != 0);
-			P.p.getLogger().info("DisabledMobs: " + dm);
-		
-		P.cfg.set("DisabledMobs", disabledMobs_Strings);
 		/* ################ Disabled Mobs End ################ */
 		
 		
@@ -281,6 +266,21 @@ public class Config
 		P.cfg.set("FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
 		P.cfg.set("TicksPerRecount", ticksPerRecount);
 		P.cfg.set("TicksPerDespawnScan", ticksPerDespawnScan);
+		
+		String dm = "";
+		ArrayList<String> disabledMobs_Strings = new ArrayList<String>(disabledMobs.size());
+		for (EntityType e : disabledMobs)
+		{
+			if (dm.length() != 0)
+				dm += ",";
+			dm += e.toString();
+			disabledMobs_Strings.add(e.toString());
+		}
+		
+		if (dm.length() != 0);
+			P.p.getLogger().info("DisabledMobs: " + dm);
+		
+		P.cfg.set("DisabledMobs", disabledMobs_Strings);
 		
 		String im = "";
 		ArrayList<String> ignoredMobs_Strings = new ArrayList<String>(ignoredMobs.size());

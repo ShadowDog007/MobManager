@@ -77,7 +77,22 @@ The mob despawn scan checks all the mobs currently
 NOTE: Animals are only despawned if there are enough animals
     inside of the one chunk. This number can be controlled
     via your world config files
-       
+    
+#######################################
+DisabledMobs
+#######################################
+A string list of all the mobs which will not be allowed to
+    spawn if they are spawning naturally
+    
+If a mob is spawned with a spawn egg or via another plugin
+    they will still be counted towards the mob cap
+    
+Valid Mobs can be found here:
+    http://jd.bukkit.org/apidocs/org/bukkit/entity/EntityType.html
+
+NOTE: Entities which are not mobs can also be found
+    in the above page. These entities will be ignored
+
 #######################################
 IgnoredMobs
 #######################################

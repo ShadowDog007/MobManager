@@ -229,6 +229,46 @@ public class PlayerListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerPortalEvent(final PlayerPortalEvent event)
 	{
-		onPlayerTeleport(event);
+		// Temporary fix for an odd problem
+		// NOTE: I had a look at how portals are handled in minecraft.
+		// It seems there is a chance that the 'To location' could be null
+		// I will handle it as a special case, and then update the players location in the next tick
+		if (event.getTo() == null)
+		{
+			MMWorld fromWorld = P.worlds.get(event.getFrom().getWorld().getName());
+			
+			// Fetch each chunk
+			MMChunk fromChunk = fromWorld != null ? fromWorld.getChunk(event.getFrom().getChunk()) : null;
+			
+			// Update player counts
+			updateChunkPlayerCount(null, 0, fromChunk, event.getFrom().getBlockY());
+			
+			P.p.getServer().getScheduler().runTaskLater(P.p, new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					if (event.getPlayer().getWorld() == event.getFrom().getWorld())
+						return;
+					
+					MMWorld toWorld = P.worlds.get(event.getPlayer().getWorld().getName());
+					
+					if (toWorld == null)
+						return;
+					
+					MMChunk toChunk = toWorld.getChunk(event.getPlayer().getLocation().getChunk());
+					
+					if (toChunk == null)
+						return;
+					
+					updateChunkPlayerCount(toChunk, event.getPlayer().getLocation().getBlockY(), null, 0);
+				}
+				
+			}, 1L);
+		}
+		else
+		{
+			onPlayerTeleport(event);
+		}
 	}
 }
