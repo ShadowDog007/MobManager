@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.MobType;
@@ -46,13 +47,22 @@ public class MMCommandButcher extends MMCommand
 
 	MMCommandButcher()
 	{
-		super(Pattern.compile("^(butcher|butcherall)$", Pattern.CASE_INSENSITIVE), Pattern.compile("^[a-z ]*$", Pattern.CASE_INSENSITIVE),
+		super(Pattern.compile("butcher|butcherall", Pattern.CASE_INSENSITIVE), Pattern.compile("^[a-z ]*$", Pattern.CASE_INSENSITIVE),
 				0, 5);
 	}
 
 	@Override
 	public void run(CommandSender sender, String maincmd, String[] args)
 	{
+		if (sender instanceof Player && !sender.hasPermission("mobmanager.butcher"))
+		{
+			sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to use /mm butcher");
+			return;
+		}
+		
+		if (!super.validArgs(sender, maincmd, args))
+			return;
+		
 		ArrayList<MobType> toRemove = new ArrayList<MobType>(1);
 		int numMobs = 0;
 		
@@ -89,7 +99,7 @@ public class MMCommandButcher extends MMCommand
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
 				MobType mob = MobType.valueOf(entity);
-				if (mobTypes.contains(mob) && (removeAll && !Config.ignoredMobs.contains(entity.getType())))
+				if (mobTypes.contains(mob) && (removeAll && !Config.ignoredMobs.containsValue(entity.getType().toString())))
 				{
 					world.decrementMobCount(mob);
 					
@@ -149,6 +159,12 @@ public class MMCommandButcher extends MMCommand
 	public String getDescription()
 	{
 		return "Despawns entities from each world managed by MobManager";
+	}
+
+	@Override
+	public String getAliases()
+	{
+		return "butcher,butcherall";
 	}
 
 }

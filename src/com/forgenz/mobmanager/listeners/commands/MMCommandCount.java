@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
@@ -47,7 +48,7 @@ class MMCommandCount extends MMCommand
 
 	MMCommandCount()
 	{
-		super(Pattern.compile("^(count)$", Pattern.CASE_INSENSITIVE),
+		super(Pattern.compile("count", Pattern.CASE_INSENSITIVE),
 				Pattern.compile("^.*$", Pattern.CASE_INSENSITIVE),
 				0, 1);
 	}
@@ -55,6 +56,12 @@ class MMCommandCount extends MMCommand
 	@Override
 	public void run(CommandSender sender, String maincmd, String[] args)
 	{
+		if (sender instanceof Player && !sender.hasPermission("mobmanager.count"))
+		{
+			sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to use /mm count");
+			return;
+		}
+		
 		if (!super.validArgs(sender, maincmd, args))
 			return;
 		
@@ -169,6 +176,12 @@ class MMCommandCount extends MMCommand
 	public String getDescription()
 	{
 		return "Displays a list of mob counts for each type of mob along with limits";
+	}
+
+	@Override
+	public String getAliases()
+	{
+		return "count";
 	}
 
 }

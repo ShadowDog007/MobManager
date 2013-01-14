@@ -1,6 +1,6 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 1.6
+version: 1.7
 authors: [Michael McKnight (ShadowDog007)]
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
 
@@ -8,9 +8,23 @@ permissions:
   mobmanager.admin:
     description: Gives access to all admin commands
     default: op
+    children:
+      mobmanager.butcher: true
+      mobmanager.count: true
+      mobmanager.reload: true
+      mobmanager.debug: true
+    
+  mobmanager.butcher:
+    description: Gives access to the /mm butcher command
+  mobmanager.count:
+    description: Gives access to the /mm count command
+  mobmanager.reload:
+    description: Gives access to the /mm reload command
+  mobmanager.debug:
+    description: Gives access to the /mm debug command
 
 commands:
   mm:
     description: 'MobManager command'
-    permission: mobmanager.admin
+    permission:
     permission-message: '[MobManager] You do not have permissions to access this command'

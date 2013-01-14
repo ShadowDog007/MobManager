@@ -32,8 +32,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.Config.WorldConf;
@@ -100,6 +102,24 @@ public class MMWorld
 			// Counts the number of living entities
 			for (final Entity entity : chunk.getEntities())
 			{
+				// Add the players already in the chunk
+				if (entity instanceof Player)
+				{
+					if (Config.ignoreCreativePlayers)
+					{
+						Player p = (Player) entity;
+						if (p.getGameMode() == GameMode.CREATIVE)
+							continue;
+					}
+					
+					mmchunk.playerEntered();
+					
+					for (MMLayer layerAt : mmchunk.getLayersAt(entity.getLocation().getBlockY()))
+						layerAt.playerEntered();
+					
+					continue;
+				}
+				
 				// Fetch the creature type
 				MobType mob = MobType.valueOf(entity);
 				// If the creature type is null we ignore the entity
@@ -152,10 +172,32 @@ public class MMWorld
 				}
 
 				mmchunk.resetNumAnimals();
+				mmchunk.resetPlayers();
+				
+				for (MMLayer layer : mmchunk.getLayers())
+					layer.resetPlayers();
 
 				// Loop through each entity in the chunk
 				for (final Entity entity : chunk.getEntities())
 				{
+					// If the entity is a player update the layers and chunk
+					if (entity instanceof Player)
+					{
+						if (Config.ignoreCreativePlayers)
+						{
+							Player p = (Player) entity;
+							if (p.getGameMode() == GameMode.CREATIVE)
+								continue;
+						}
+						
+						
+						mmchunk.playerEntered();
+						
+						for (MMLayer layersAt : mmchunk.getLayersAt(entity.getLocation().getBlockY()))
+							layersAt.playerEntered();
+						
+						continue;
+					}
 					// Fetch mob type
 					MobType mob = MobType.valueOf(entity);
 					// If the mob type is null ignore the entity

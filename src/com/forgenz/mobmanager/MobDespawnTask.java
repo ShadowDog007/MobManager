@@ -57,7 +57,16 @@ public class MobDespawnTask extends BukkitRunnable
 			
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
-				if (Config.ignoredMobs.contains(entity.getType()))
+				// Make sure the entity is alive and valid
+				if (!entity.isValid())
+					continue;
+				
+				// Check if the mob has lived long enough
+				if (entity.getTicksLived() <= Config.minTicksLivedForDespawn)
+					continue;
+				
+				// Check if the mob is being ignored
+				if (Config.ignoredMobs.containsValue(entity.getType().toString()))
 					continue;
 				
 				MobType mob = MobType.valueOf(entity);

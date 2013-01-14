@@ -204,7 +204,12 @@ public class MMChunk
 	{
 		return numPlayers > 0;
 	}
-
+	
+	public void resetPlayers()
+	{
+		numPlayers = 0;
+	}
+	
 	public int getNumPlayers()
 	{
 		return numPlayers;
@@ -222,7 +227,7 @@ public class MMChunk
 			numPlayers = 0;
 			
 			if (!Config.disableWarnings)
-				P.p.getLogger().warning("Player left a chunk with no players in it?");
+				P.p.getLogger().warning(String.format("Player left a chunk (%d,%d) without any players being in it", coord.getX(), coord.getZ()));
 		}
 	}
 

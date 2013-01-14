@@ -1,4 +1,4 @@
-NOTES --------------------------------|
+NOTES ----------------------------------------------------------------|
 MobTypes:
    Monsters:       Blaze, Creeper, Enderman, Giant,
                    Silverfish, Skeleton, Spider, CaveSpider,
@@ -13,10 +13,10 @@ MobTypes:
     Ambient:       Bat
     
     Villager:      Villager
---------------------------------------|
-#######################################
+----------------------------------------------------------------------|
+#######################################################################
 WorldMaximum
-#######################################
+#######################################################################
 Here you set the maximum values for each type of mob for the world
 Mob types shown above in notes
 
@@ -24,18 +24,18 @@ To disable a mob type set their maximum to 0
 To Prevent limiting of a mob type set their maximum to something big
     e.g. 9001 (Note: You must also set the ChunkCalculatedMaximum high)
 
-#######################################
+#######################################################################
 ChunkCalculatedMaximum
-#######################################
+#######################################################################
 Limits to the number of mobs dynamically calculated
    by the number of loaded chunks in the world
 
 Calculated with the below formula
 maxMobs = ( Number of active chunks * Config Value ) / 256
 
-#######################################
+#######################################################################
 BreedingMaximumPerChunk
-#######################################
+#######################################################################
 MobManager keeps track of how many mobs are inside of one chunk
 If a player tries to breed an animal and there are already too
     many animals inside the chunk it prevents the animal from spawning
@@ -44,9 +44,9 @@ This is to prevent players from breeding a ridiculous number of animals
 
 Set to -1 to disable
 
-#######################################
+#######################################################################
 NumAnimalsForFarm
-#######################################
+#######################################################################
 This number is used to assume if a chunk contains an animal farm in it.
 If the number of animals in the chunk is above or equal to this value
    the animals in this chunk will not be despawned when the
@@ -55,9 +55,9 @@ If the number of animals in the chunk is above or equal to this value
 NOTE: If this value is too low many animals may not be despawned
       Around 3-5 'should' work fine.
 
-#######################################
+#######################################################################
 SpawnSearchChunkDistance
-#######################################
+#######################################################################
 When a mob spawns MobManager searches for players
     around the mob. If it finds a player within range
     the mob is allowed to spawn.
@@ -66,9 +66,9 @@ SpawnSearchChunkDistance is the distance in chunks around
 
 NOTE: If set to -1 the value from config.yml will be used
 
-#######################################
+#######################################################################
 UndergroundSpawnChunkSearchDistance
-#######################################
+#######################################################################
 UndergroundSpawnChunkSearchDistance is a alternative search distance to
     SpawnSearchChunkDistance.
 When a mob spawns underground the underground search radius is used.
@@ -77,9 +77,9 @@ This setting is provided as players are less likely to meet mobs that
     can spawn given the normal search radius while underground
     (Assuming the player is running around in caves)
 
-#######################################
+#######################################################################
 GroundHeight
-#######################################
+#######################################################################
 This value is used to determine if a mob has spawned underground
 
 It is recommended to set this to -1 for The_End environments

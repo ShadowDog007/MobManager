@@ -133,28 +133,11 @@ public class MobListener implements Listener
 	public void onCreatureSpawn(final CreatureSpawnEvent event)
 	{
 		// Checks for spawn reasons we want to limit
-		switch (event.getSpawnReason())
-		{
-		// Only spawns with these spawn reasons will be limited
-		// Other reasons will only be counted
-		case DEFAULT:
-		case NATURAL:
-		case SPAWNER:
-		case CHUNK_GEN:
-		case VILLAGE_DEFENSE:
-		case VILLAGE_INVASION:
-		case BUILD_IRONGOLEM:
-		case BUILD_SNOWMAN:
-		
-		case BREEDING:
-		case EGG:
-			break;
-		default:
+		if (!Config.enabledSpawnReasons.containsValue(event.getSpawnReason().toString()))
 			return;
-		}
 		
 		// Check if the entity is disabled
-		if (Config.disabledMobs.contains(event.getEntityType()))
+		if (Config.disabledMobs.containsValue(event.getEntityType().toString()))
 		{
 			// Prevent the entity from spawning
 			event.setCancelled(true);
@@ -163,7 +146,7 @@ public class MobListener implements Listener
 		
 		// Checks if we can ignore the creature spawn
 		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null || Config.ignoredMobs.contains(event.getEntityType()))
+		if (mob == null || Config.ignoredMobs.containsValue(event.getEntityType().toString()))
 		{
 			return;
 		}
@@ -240,7 +223,7 @@ public class MobListener implements Listener
 	{
 		// Check if we don't need to count the mob
 		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null || Config.ignoredMobs.contains(event.getEntityType()))
+		if (mob == null || Config.ignoredMobs.containsValue(event.getEntityType().toString()))
 		{
 			return;
 		}

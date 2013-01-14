@@ -92,6 +92,7 @@ abstract class MMCommand
 		return true;
 	}
 	
+	public abstract String getAliases();
 	public abstract String getUsage();
 	public abstract String getDescription();
 }

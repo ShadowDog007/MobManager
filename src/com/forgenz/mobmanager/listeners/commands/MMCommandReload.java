@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
 
@@ -40,13 +41,19 @@ public class MMCommandReload extends MMCommand
 
 	MMCommandReload()
 	{
-		super(Pattern.compile("^reload$", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"),
+		super(Pattern.compile("reload", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"),
 				0, 0);
 	}
 
 	@Override
 	public void run(CommandSender sender, String maincmd, String[] args)
 	{
+		if (sender instanceof Player && !sender.hasPermission("mobmanager.reload"))
+		{
+			sender.sendMessage(ChatColor.DARK_RED + "You do not have permission to use /mm reload");
+			return;
+		}
+		
 		P p = P.p;
 		p.getServer().getPluginManager().disablePlugin(p);
 		p.reloadConfig();
@@ -65,6 +72,12 @@ public class MMCommandReload extends MMCommand
 	public String getDescription()
 	{
 		return "Reloads MobManager configuration";
+	}
+
+	@Override
+	public String getAliases()
+	{
+		return "reload";
 	}
 
 }

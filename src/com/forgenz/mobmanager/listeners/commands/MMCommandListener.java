@@ -49,9 +49,11 @@ public class MMCommandListener implements CommandExecutor
 		commands = new ArrayList<MMCommand>();
 		
 		// Create Command objects
+		new MMCommandHelp(commands);
 		new MMCommandCount();
 		new MMCommandReload();
 		new MMCommandButcher();
+		new MMCommandDebug();
 	}
 	
 	@Override

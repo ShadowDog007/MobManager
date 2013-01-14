@@ -41,7 +41,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import com.forgenz.mobmanager.world.MMWorld;
 
@@ -52,18 +52,104 @@ public class Config
 	final static String worldsFolder = "worlds";
 	
 	public static boolean disableWarnings;
+	public static boolean ignoreCreativePlayers;
 	
 	public static short spawnChunkSearchDistance;
 	public static short flyingMobAditionalLayerDepth;
 	public static int ticksPerRecount;
 	public static int ticksPerDespawnScan;
+	public static int minTicksLivedForDespawn;
 	
-	public static List<EntityType> ignoredMobs;
-	public static List<EntityType> disabledMobs;
+	public static EnumConfig ignoredMobs;
+	public static EnumConfig disabledMobs;
+	
+	public static EnumConfig enabledSpawnReasons;
 	
 	public static List<String> layers;
 	
 	public static HashMap<String, WorldConf> worldConfigs;
+	
+	public class EnumConfig
+	{
+		private ArrayList<String> contains = null;
+		
+		public EnumConfig(Class<?> enumClass, List<?> objectList, String missingEnumError)
+		{
+			if (objectList == null)
+				return;
+			
+			this.contains = new ArrayList<String>();
+			
+			Object[] enumValues = enumClass.getEnumConstants();
+			
+			for (Object obj : objectList)
+			{
+				if (obj instanceof String == false)
+					continue;
+				
+				String string = (String) obj;
+				
+				boolean found = false;
+				
+				for (Object value : enumValues)
+				{
+					if (value.toString().equalsIgnoreCase(string))
+					{
+						contains.add(value.toString());
+						found = true;
+					}
+				}
+				
+				if (!found)
+					P.p.getLogger().info(String.format(missingEnumError, string));
+			}
+		}
+		
+		public List<String> getList()
+		{
+			if (contains == null)
+				return new ArrayList<String>();
+			
+			return contains;
+		}
+		
+		public boolean containsValue(String string)
+		{
+			if (contains == null)
+				return false;
+			return contains.contains(string);
+		}
+		
+		public void addDefaults(String ...defaults)
+		{
+			if (contains != null)
+				return;
+			
+			if (defaults.length != 0)
+				contains = new ArrayList<String>();
+			
+			for (String str : defaults)
+			{
+				contains.add(str);
+			}
+		}
+		
+		public String toString()
+		{
+			if (contains == null)
+				return "";
+			
+			String str = "";
+			
+			for (String s : contains)
+			{
+				if (str.length() != 0)
+					str += ",";
+				str += s;
+			}
+			return str;
+		}
+	}
 	
 	public class WorldConf
 	{
@@ -91,44 +177,47 @@ public class Config
 			maximums = new short[mobs.length];
 			dynMultis = new short[mobs.length];
 			
-			// Attempt to fetch settings for the world
+			/* ################ MobLimits ################ */
 			for (MobType mob : mobs)
 			{
 				maximums[mob.index] = (short) Math.abs(cfg.getInt("WorldMaximum." + mob.cPath, mob.getDefaultMax(world.getEnvironment())));
 				dynMultis[mob.index] = (short) Math.abs(cfg.getInt("ChunkCalculatedMaximum." + mob.cPath, mob.getDefaultDynMulti(world.getEnvironment())));
-			}
-			
-			breedingLimit = (short) cfg.getInt("BreedingMaximumPerChunk", 15);
-			numAnimalsForFarm = (short) cfg.getInt("NumAnimalsForFarm", 3);
-			spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
-			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
-			
-			int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : (world.getEnvironment() == Environment.NETHER ? 32 : -1);
-			groundHeight = cfg.getInt("GroundHeight", defaultHeight);
-			
-			
-			
-			// Save settings, adding any missing settings with defaults
-			for (MobType mob : mobs)
-			{
+				
 				cfg.set("WorldMaximum." + mob.cPath, maximums[mob.index]);
 				cfg.set("ChunkCalculatedMaximum." + mob.cPath, dynMultis[mob.index]);
 			}
 			
+			/* ################ BreedingMaximumPerChunk ################ */
+			breedingLimit = (short) cfg.getInt("BreedingMaximumPerChunk", 15);
 			cfg.set("BreedingMaximumPerChunk", breedingLimit);
+			
+			/* ################ NumAnimalsForFarm ################ */
+			numAnimalsForFarm = (short) cfg.getInt("NumAnimalsForFarm", 3);
 			cfg.set("NumAnimalsForFarm", numAnimalsForFarm);
+			
+			/* ################ SpawnChunkSearchDistance ################ */
+			spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
 			cfg.set("SpawnSearchChunkDistance", spawnChunkSearchDistance);
+			
+			/* ################ UndergroundSpawnChunkSearchDistance ################ */
+			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
 			cfg.set("UndergroundSpawnChunkSearchDistance", undergroundSpawnChunkSearchDistance);
+			
+			
+			/* ################ GroundHeight ################ */
+			int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : (world.getEnvironment() == Environment.NETHER ? 32 : -1);
+			groundHeight = cfg.getInt("GroundHeight", defaultHeight);
 			cfg.set("GroundHeight", groundHeight);
 			
-			copyHeader(cfg, "worldConfigHeader.txt");
 			
+			copyHeader(cfg, "worldConfigHeader.txt", P.p.getDescription().getName() + " Config " + P.p.getDescription().getVersion() + "\n");
 			saveConfig(worldsFolder, worldName + ".yml", cfg);
 		}
 	}
 	
 	Config()
 	{
+		/* ################ ActiveWorlds ################ */
 		List<String> activeWorlds = P.cfg.getStringList("EnabledWorlds");
 		
 		if (activeWorlds == null || activeWorlds.size() == 0)
@@ -139,85 +228,77 @@ public class Config
 				activeWorlds.add(world.getName());
 			}
 		}
+		P.cfg.set("EnabledWorlds", activeWorlds);
 		
+		/* ################ DisableWarnings ################ */
 		disableWarnings = P.cfg.getBoolean("DisableWarnings", true);
+		P.cfg.set("DisableWarnings", disableWarnings);
+		
+		/* ################ DisableWarnings ################ */
+		ignoreCreativePlayers = P.cfg.getBoolean("IgnoreCreativePlayers", false);
+		P.cfg.set("IgnoreCreativePlayers", ignoreCreativePlayers);
+		
+		/* ################ SpawnChunkSearchDistance ################ */
 		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 5));
+		// Validate SpawnChunkSearchDistance
+		if (spawnChunkSearchDistance == 0)
+			spawnChunkSearchDistance = 1;
+		P.cfg.set("SpawnChunkSearchDistance", spawnChunkSearchDistance);
+		
+		/* ################ FlyingMobAditionalLayerDepth ################ */
 		flyingMobAditionalLayerDepth = (short) P.cfg.getInt("FlyingMobAditionalLayerDepth", 2);
+		P.cfg.set("FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
+		
+		/* ################ TicksPerRecount ################ */
 		ticksPerRecount = P.cfg.getInt("TicksPerRecount", 40);
+		P.cfg.set("TicksPerRecount", ticksPerRecount);
+		
+		/* ################ TicksPerDespawnScan ################ */
 		ticksPerDespawnScan = P.cfg.getInt("TicksPerDespawnScan", 100);
+		P.cfg.set("TicksPerDespawnScan", ticksPerDespawnScan);
 		
-		ignoredMobs = new ArrayList<EntityType>();
-		List<?> stringIgnoredMobs = P.cfg.getList("IgnoredMobs", null);
-		if (stringIgnoredMobs != null)
-		{
-			P.p.getLogger().info("Found");
-			for (Object obj : stringIgnoredMobs)
-			{
-				if (obj instanceof String == false)
-					continue;
-				
-				String entity = (String) obj;
-				
-				// Get the entities type
-				EntityType e = EntityType.valueOf(entity.toUpperCase());
-				
-				// Check if the given entity is valid
-				if (e == null)
-				{
-					P.p.getLogger().warning("The ignoredMob '" + entity + "' is invalid");
-					continue;
-				}
-				
-				// Check if the given entity is a LivingEntity
-				if (!LivingEntity.class.isAssignableFrom(e.getEntityClass()))
-					continue;
-				
-				// Add the entity type to the list of ignored mobs
-				if (!ignoredMobs.contains(e))
-					ignoredMobs.add(e);
-			}
-		}
-		else
-		{
-			// Add default ignored mobs
-			ignoredMobs.add(EntityType.WITHER);
-		}
+		/* ################ MinTicksLivedForDespawn ################ */
+		minTicksLivedForDespawn = P.cfg.getInt("MinTicksLivedForDespawn", 100);
+		P.cfg.set("MinTicksLivedForDespawn", minTicksLivedForDespawn);
 		
-		/* ################ Disabled Mobs Start ################ */
-		disabledMobs = new ArrayList<EntityType>();
-		List<?> stringDisabledMobs = P.cfg.getList("IgnoredMobs", null);
-		if (stringDisabledMobs != null)
-		{
-			P.p.getLogger().info("Found");
-			for (Object obj : stringDisabledMobs)
-			{
-				if (obj instanceof String == false)
-					continue;
-				
-				String entity = (String) obj;
-				
-				// Get the entities type
-				EntityType e = EntityType.valueOf(entity.toUpperCase());
-				
-				// Check if the given entity is valid
-				if (e == null)
-				{
-					P.p.getLogger().warning("The DisabledMob '" + entity + "' is invalid");
-					continue;
-				}
-				
-				// Check if the given entity is a LivingEntity
-				if (!LivingEntity.class.isAssignableFrom(e.getEntityClass()))
-					continue;
-				
-				// Add the entity type to the list of ignored mobs
-				if (!disabledMobs.contains(e))
-					disabledMobs.add(e);
-			}
-		}
-		/* ################ Disabled Mobs End ################ */
+		/* ################ IgnoredMobs ################ */
+		ignoredMobs = new EnumConfig(EntityType.class, P.cfg.getList("IgnoredMobs", null), "The Ignored Mob '%s' is invalid");
+		ignoredMobs.addDefaults(EntityType.WITHER.toString());
+		List<String> ignoredList = ignoredMobs.getList();
+		P.cfg.set("IgnoredMobs", ignoredList);
+		String strList = ignoredMobs.toString();
+		if (strList.length() != 0)
+			P.p.getLogger().info("IgnoredMobs: " + strList);
 		
 		
+		/* ################ DisabledMobs ################ */
+		disabledMobs = new EnumConfig(EntityType.class, P.cfg.getList("DisabledMobs", null), "The Disabled Mob '%s' is invalid");
+		List<String> disabledList = disabledMobs.getList();
+		P.cfg.set("DisabledMobs", disabledList);
+		strList = disabledMobs.toString();
+		if (strList.length() != 0)
+			P.p.getLogger().info("DisabledMobs: " + strList);
+		
+		/* ################ EnabledSpawnReasons ################ */
+		enabledSpawnReasons = new EnumConfig(SpawnReason.class, P.cfg.getList("EnabledSpawnReasons", null), "The Spawn Reason '%s' is invalid");
+		enabledSpawnReasons.addDefaults(SpawnReason.DEFAULT.toString(),
+				SpawnReason.NATURAL.toString(),
+				SpawnReason.SPAWNER.toString(),
+				SpawnReason.CHUNK_GEN.toString(),
+				SpawnReason.VILLAGE_DEFENSE.toString(),
+				SpawnReason.VILLAGE_INVASION.toString(),
+				SpawnReason.BUILD_IRONGOLEM.toString(),
+				SpawnReason.BUILD_SNOWMAN.toString(),
+				SpawnReason.BREEDING.toString(),
+				SpawnReason.EGG.toString());
+		List<String> srList = enabledSpawnReasons.getList();
+		P.cfg.set("EnabledSpawnReasons", srList);
+		strList = enabledSpawnReasons.toString();
+		if (strList.length() != 0)
+			P.p.getLogger().info("EnabledSpawnReasons: " + strList);
+		
+		
+		/* ################ Layers ################ */
 		layers = new ArrayList<String>();
 		for (String layer : P.cfg.getStringList("Layers"))
 		{
@@ -254,56 +335,12 @@ public class Config
 			}
 		}
 		
-		// Validate SpawnChunkSearchDistance
-		if (spawnChunkSearchDistance == 0)
-			spawnChunkSearchDistance = 1;
-		
-		// Set and save the config values
-		P.cfg.set("EnabledWorlds", activeWorlds);
-		
-		P.cfg.set("DisableWarnings", disableWarnings);
-		P.cfg.set("SpawnChunkSearchDistance", spawnChunkSearchDistance);
-		P.cfg.set("FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
-		P.cfg.set("TicksPerRecount", ticksPerRecount);
-		P.cfg.set("TicksPerDespawnScan", ticksPerDespawnScan);
-		
-		String dm = "";
-		ArrayList<String> disabledMobs_Strings = new ArrayList<String>(disabledMobs.size());
-		for (EntityType e : disabledMobs)
-		{
-			if (dm.length() != 0)
-				dm += ",";
-			dm += e.toString();
-			disabledMobs_Strings.add(e.toString());
-		}
-		
-		if (dm.length() != 0);
-			P.p.getLogger().info("DisabledMobs: " + dm);
-		
-		P.cfg.set("DisabledMobs", disabledMobs_Strings);
-		
-		String im = "";
-		ArrayList<String> ignoredMobs_Strings = new ArrayList<String>(ignoredMobs.size());
-		for (EntityType e : ignoredMobs)
-		{
-			if (im.length() != 0)
-				im += ",";
-			im += e.toString();
-			ignoredMobs_Strings.add(e.toString());
-		}
-		
-		if (im.length() != 0);
-			P.p.getLogger().info("IgnoredMobs: " + im);
-		
-		P.cfg.set("IgnoredMobs", ignoredMobs_Strings);
-		
-		
 		P.cfg.set("Layers", layers);
-		
-		copyHeader(P.cfg, "configHeader.txt");
-		P.p.saveConfig();
-		
 		P.p.getLogger().info(layers.size() + " layers found");
+		
+		// Copy the header to the file
+		copyHeader(P.cfg, "configHeader.txt", P.p.getDescription().getName() + " Config " + P.p.getDescription().getVersion() + "\n");
+		P.p.saveConfig();
 	}
 	
 	public FileConfiguration getConfig(String folder, String config)
@@ -377,7 +414,12 @@ public class Config
 	}
 	public void copyHeader(FileConfiguration cfg, String resource)
 	{		
-		cfg.options().header(getResourceAsString(resource));
+		copyHeader(cfg, resource, "");
+	}
+	
+	public void copyHeader(FileConfiguration cfg, String resource, String add)
+	{
+		cfg.options().header(add + getResourceAsString(resource));
 		cfg.options().copyHeader(true);
 	}
 }

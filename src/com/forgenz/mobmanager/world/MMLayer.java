@@ -60,6 +60,11 @@ public class MMLayer
 	{
 		return miny;
 	}
+	
+	public void resetPlayers()
+	{
+		numPlayers = 0;
+	}
 
 	public boolean isEmpty()
 	{
@@ -83,7 +88,7 @@ public class MMLayer
 			numPlayers = 0;
 
 			if (!Config.disableWarnings)
-				P.p.getLogger().warning("Player left a layer with no players in it?");
+				P.p.getLogger().warning(String.format("Player left the layer (%d,%d) without any players being in it?", miny, maxy));
 		}
 
 		return numPlayers;
