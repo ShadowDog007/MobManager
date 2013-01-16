@@ -99,7 +99,7 @@ public class MMCommandButcher extends MMCommand
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
 				MobType mob = MobType.valueOf(entity);
-				if (mobTypes.contains(mob) && (removeAll && !Config.ignoredMobs.containsValue(entity.getType().toString())))
+				if (mobTypes.contains(mob) && (removeAll || !Config.ignoredMobs.containsValue(entity.getType().toString())))
 				{
 					world.decrementMobCount(mob);
 					
