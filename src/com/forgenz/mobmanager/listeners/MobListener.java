@@ -92,17 +92,18 @@ public class MobListener implements Listener
 		
 		// Creates a spiral generator
 		final Spiral spiral = new Spiral(center, searchDist);
-
+		
+		MMCoord coord;
 		// Loop through until the entire circle has been generated
-		while (!spiral.isFinished())
+		while ((coord = spiral.run()) != null)
 		{
 			// Fetch the given chunk
-			final MMChunk chunk = world.getChunk(spiral.run());
-
+			final MMChunk chunk = world.getChunk(coord);
+			
 			// If the chunk is not loaded continue
 			if (chunk == null)
 				continue;
-
+			
 			// If the chunk has no players in it continue
 			if (!chunk.hasPlayers())
 				continue;

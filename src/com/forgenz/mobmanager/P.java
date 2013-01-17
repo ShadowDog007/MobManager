@@ -29,7 +29,7 @@
 package com.forgenz.mobmanager;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +38,7 @@ import com.forgenz.mobmanager.listeners.ChunkListener;
 import com.forgenz.mobmanager.listeners.MobListener;
 import com.forgenz.mobmanager.listeners.PlayerListener;
 import com.forgenz.mobmanager.listeners.commands.MMCommandListener;
+import com.forgenz.mobmanager.util.AnimalProtection;
 import com.forgenz.mobmanager.world.MMWorld;
 
 /**
@@ -52,9 +53,11 @@ public class P extends JavaPlugin
 	public static P p = null;
 	public static FileConfiguration cfg = null;
 	
-	public static HashMap<String, MMWorld> worlds = null;
+	public static ConcurrentHashMap<String, MMWorld> worlds = null;
 	
 	private MobDespawnTask despawner = null;
+	
+	public AnimalProtection animalProtection = null;
 
 	@Override
 	public void onLoad()
@@ -82,7 +85,7 @@ public class P extends JavaPlugin
 		Config config = new Config();
 
 		// Setup worlds
-		worlds = new HashMap<String, MMWorld>();
+		worlds = new ConcurrentHashMap<String, MMWorld>(2, 0.75F, 2);
 		if (config.setupWorlds() == 0)
 		{
 			getLogger().warning("No valid worlds found");
@@ -104,6 +107,17 @@ public class P extends JavaPlugin
 		despawner = new MobDespawnTask();
 		despawner.runTaskTimer(this, Config.ticksPerDespawnScan, Config.ticksPerDespawnScan);
 		
+		// Setup animal protection
+		if (Config.enableAnimalDespawning)
+		{
+			animalProtection = new AnimalProtection();
+			if (animalProtection != null)
+			{
+				getServer().getPluginManager().registerEvents(animalProtection, this);
+				animalProtection.runTaskTimerAsynchronously(this, Config.protectedFarmAnimalSaveInterval, Config.protectedFarmAnimalSaveInterval);
+			}
+		}
+		
 		getLogger().info("v" + getDescription().getVersion() + " ennabled with " + worlds.size() + " worlds");
 		// And we are done :D
 	}
@@ -115,6 +129,12 @@ public class P extends JavaPlugin
 		getServer().getScheduler().cancelTasks(this);
 		// Soo....
 		despawner.cancel();
+		
+		if (animalProtection != null)
+		{
+			animalProtection.cancel();
+			animalProtection.run();
+		}
 		
 		p = null;
 		cfg = null;

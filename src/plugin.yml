@@ -1,6 +1,6 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 1.7
+version: 1.8
 authors: [Michael McKnight (ShadowDog007)]
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
 
@@ -20,6 +20,8 @@ permissions:
     description: Gives access to the /mm count command
   mobmanager.reload:
     description: Gives access to the /mm reload command
+  mobmanager.version:
+    description: Gives access to the /mm version command
   mobmanager.debug:
     description: Gives access to the /mm debug command
 

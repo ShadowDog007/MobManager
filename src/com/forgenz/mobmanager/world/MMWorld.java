@@ -28,14 +28,16 @@
 
 package com.forgenz.mobmanager.world;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 
 import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.Config.WorldConf;
@@ -64,7 +66,7 @@ public class MMWorld
 	/**
 	 * Loaded chunks in the world
 	 */
-	private HashMap<MMCoord, MMChunk> chunks;
+	private ConcurrentHashMap<MMCoord, MMChunk> chunks;
 	/**
 	 * Count of loaded chunks in the world
 	 */
@@ -89,9 +91,12 @@ public class MMWorld
 		
 		mobCounts = new int[worldConf.maximums.length];
 
-		chunks = new HashMap<MMCoord, MMChunk>();
-
-		// Store already loaded chunks
+		chunks = new ConcurrentHashMap<MMCoord, MMChunk>(0, 0.75F, 2);
+		
+		// TEST
+		// Setup already loaded chunks
+		updateMobCounts();
+		/*// Store already loaded chunks
 		for (final Chunk chunk : world.getLoadedChunks())
 		{
 			final MMChunk mmchunk = new MMChunk(chunk, this);
@@ -128,7 +133,7 @@ public class MMWorld
 					
 				++mobCounts[mob.index];
 			}
-		}
+		}*/
 
 		final int maxMonsters = worldConf.maximums[MobType.MONSTER.index];
 		final int maxAnimals = worldConf.maximums[MobType.ANIMAL.index];
@@ -183,6 +188,7 @@ public class MMWorld
 					// If the entity is a player update the layers and chunk
 					if (entity instanceof Player)
 					{
+						// Do not add players if they are in creative mode and 'ignoreCreativePlayers' is set
 						if (Config.ignoreCreativePlayers)
 						{
 							Player p = (Player) entity;
@@ -205,7 +211,17 @@ public class MMWorld
 						continue;
 					
 					if (mob == MobType.ANIMAL)
+					{
+						// Make sure tameable animals are not counted if it is set to false
+						if (!Config.countTamedAnimals && entity instanceof Tameable)
+						{
+							Tameable tameable = (Tameable) entity;
+							
+							if (tameable.isTamed())
+								continue;
+						}
 						mmchunk.changeNumAnimals(true);
+					}
 					
 					// Increment counter
 					++mobCounts[mob.index];
@@ -243,11 +259,17 @@ public class MMWorld
 		if (!chunk.isLoaded())
 			return null;
 
-		return getChunk(new MMCoord(chunk.getX(), chunk.getZ()));
+		MMChunk mmchunk = getChunk(new MMCoord(chunk.getX(), chunk.getZ()));
+		
+		if (mmchunk == null)
+			return addChunk(chunk, false);
+		return mmchunk;
 	}
 
 	public MMChunk getChunk(final MMCoord coord)
 	{
+		if (coord == null)
+			return null;
 		return chunks.get(coord);
 	}
 

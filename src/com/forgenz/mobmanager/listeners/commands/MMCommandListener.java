@@ -53,6 +53,7 @@ public class MMCommandListener implements CommandExecutor
 		new MMCommandCount();
 		new MMCommandReload();
 		new MMCommandButcher();
+		new MMCommandVersion();
 		new MMCommandDebug();
 	}
 	

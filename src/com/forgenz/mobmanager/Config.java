@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -53,6 +54,14 @@ public class Config
 	
 	public static boolean disableWarnings;
 	public static boolean ignoreCreativePlayers;
+	public static boolean useAsyncDespawnScanner;
+	
+	public static boolean removeTamedAnimals;
+	public static boolean countTamedAnimals;
+	
+	public static boolean enableAnimalDespawning;
+	public static double daysTillFarmAnimalCleanup;
+	public static int protectedFarmAnimalSaveInterval;
 	
 	public static short spawnChunkSearchDistance;
 	public static short flyingMobAditionalLayerDepth;
@@ -66,6 +75,7 @@ public class Config
 	public static EnumConfig enabledSpawnReasons;
 	
 	public static List<String> layers;
+	public static HashSet<Integer> layerBoundaries;
 	
 	public static HashMap<String, WorldConf> worldConfigs;
 	
@@ -234,9 +244,30 @@ public class Config
 		disableWarnings = P.cfg.getBoolean("DisableWarnings", true);
 		P.cfg.set("DisableWarnings", disableWarnings);
 		
-		/* ################ DisableWarnings ################ */
+		/* ################ UseAsyncDespawnScanner ################ */
+		useAsyncDespawnScanner = P.cfg.getBoolean("UseAsyncDespawnScanner", false);
+		P.cfg.set("UseAsyncDespawnScanner", useAsyncDespawnScanner);
+		
+		/* ################ IgnoreCreativePlayers ################ */
 		ignoreCreativePlayers = P.cfg.getBoolean("IgnoreCreativePlayers", false);
 		P.cfg.set("IgnoreCreativePlayers", ignoreCreativePlayers);
+		
+		/* ################ TamedAnimals ################ */
+		removeTamedAnimals = P.cfg.getBoolean("RemoveTamedAnimals", false);
+		P.cfg.set("RemoveTamedAnimals", removeTamedAnimals);
+		
+		countTamedAnimals = P.cfg.getBoolean("CountTamedAnimals", true);
+		P.cfg.set("CountTamedAnimals", countTamedAnimals);
+		
+		/* ################ Animal Despawning Stuff ################ */
+		enableAnimalDespawning = P.cfg.getBoolean("EnableAnimalDespawning", true);
+		P.cfg.set("EnableAnimalDespawning", enableAnimalDespawning);
+		
+		daysTillFarmAnimalCleanup = P.cfg.getDouble("DaysTillFarmAnimalCleanup", 15.0D);
+		P.cfg.set("DaysTillFarmAnimalCleanup", daysTillFarmAnimalCleanup);
+		
+		protectedFarmAnimalSaveInterval = P.cfg.getInt("ProtectedFarmAnimalSaveInterval", 6000);
+		P.cfg.set("ProtectedFarmAnimalSaveInterval", protectedFarmAnimalSaveInterval);
 		
 		/* ################ SpawnChunkSearchDistance ################ */
 		spawnChunkSearchDistance = (short) Math.abs(P.cfg.getInt("SpawnChunkSearchDistance", 5));
@@ -300,6 +331,7 @@ public class Config
 		
 		/* ################ Layers ################ */
 		layers = new ArrayList<String>();
+		layerBoundaries = new HashSet<Integer>();
 		for (String layer : P.cfg.getStringList("Layers"))
 		{
 			if (!layerPattern.matcher(layer).matches())
@@ -324,6 +356,9 @@ public class Config
 			}
 			
 			layer = miny + ":" + maxy;
+			// Add the boundaries of the layer
+			layerBoundaries.add(miny);
+			layerBoundaries.add(maxy);
 			layers.add(layer);
 		}
 		
