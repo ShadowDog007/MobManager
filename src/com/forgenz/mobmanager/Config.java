@@ -294,7 +294,7 @@ public class Config
 		
 		/* ################ IgnoredMobs ################ */
 		ignoredMobs = new EnumConfig(EntityType.class, P.cfg.getList("IgnoredMobs", null), "The Ignored Mob '%s' is invalid");
-		ignoredMobs.addDefaults(EntityType.WITHER.toString());
+		ignoredMobs.addDefaults(EntityType.WITHER.toString(), EntityType.VILLAGER.toString());
 		List<String> ignoredList = ignoredMobs.getList();
 		P.cfg.set("IgnoredMobs", ignoredList);
 		String strList = ignoredMobs.toString();
