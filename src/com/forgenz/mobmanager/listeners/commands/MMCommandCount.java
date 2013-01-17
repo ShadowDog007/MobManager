@@ -137,7 +137,7 @@ class MMCommandCount extends MMCommand
 				totalMaxAnimals += world.maxMobs(MobType.ANIMAL);
 				totalMaxWaterAnimals += world.maxMobs(MobType.WATER_ANIMAL);
 				totalMaxAmbient += world.maxMobs(MobType.AMBIENT);
-				totalMaxVillagers += world.getMobCount(MobType.VILLAGER);
+				totalMaxVillagers += world.maxMobs(MobType.VILLAGER);
 				
 				++totalWorlds;
 				totalChunks += world.getChunks().size();
