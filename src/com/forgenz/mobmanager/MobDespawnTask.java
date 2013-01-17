@@ -191,8 +191,8 @@ public class MobDespawnTask extends BukkitRunnable
 				// Note the time we start
 				long start = System.nanoTime();
 				LivingEntity entity;
-				// Iterate through each entity until there are none left or the task has run for 0.1ms
-				while ((entity = it.next()) != null && (System.nanoTime() - start) < 100000L)
+				// Iterate through each entity until there are none left or the task has run for 0.2ms
+				while ((entity = it.next()) != null && (System.nanoTime() - start) < 200000L)
 				{
 					// Make sure the entity is alive and valid
 					if (!entity.isValid())

@@ -13,6 +13,7 @@ permissions:
       mobmanager.count: true
       mobmanager.reload: true
       mobmanager.debug: true
+      mobmanager.version: true
     
   mobmanager.butcher:
     description: Gives access to the /mm butcher command

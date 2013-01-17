@@ -288,9 +288,13 @@ public class PlayerListener implements Listener
 			// Update chunks player count
 			updateChunkPlayerCount(toChunk, event.getTo().getBlockY(), fromChunk, event.getFrom().getBlockY());
 		}
-		// Check if the player is only moving up or down and away from a layer boundary
-		else if (event.getTo().getBlockY() != event.getFrom().getBlockY() && Config.layerBoundaries.contains(event.getFrom().getBlockY()))
+		// Check if the player is only moving up or down
+		else if (event.getTo().getBlockY() != event.getFrom().getBlockY())
 		{
+			// Check that the player is moving to or from a layer boundary
+			if (!Config.layerBoundaries.contains(event.getFrom().getBlockY()) || !Config.layerBoundaries.contains(event.getTo().getBlockY()))
+				return;
+			
 			// Fetch the world the player is moving in
 			final MMWorld world = P.worlds.get(event.getTo().getWorld().getName());
 
