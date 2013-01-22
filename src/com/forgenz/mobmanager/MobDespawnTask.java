@@ -191,6 +191,7 @@ public class MobDespawnTask extends BukkitRunnable
 				// Note the time we start
 				long start = System.nanoTime();
 				LivingEntity entity;
+				
 				// Iterate through each entity until there are none left or the task has run for 0.2ms
 				while ((entity = it.next()) != null && (System.nanoTime() - start) < 200000L)
 				{
@@ -210,7 +211,7 @@ public class MobDespawnTask extends BukkitRunnable
 					// If MobManager does not recognize the entity ignore it
 					if (mob == null)
 						continue;
-
+					
 					// Check if the mob is an animal
 					if (mob == MobType.ANIMAL)
 					{
@@ -260,7 +261,7 @@ public class MobDespawnTask extends BukkitRunnable
 						if (equipment.getLeggingsDropChance() == 1F)
 							continue;
 					}
-
+					
 					// Search for a nearby player
 					if (!MobListener.i.playerNear(it.getWorld(), new MMCoord(entity.getLocation().getChunk()), entity.getLocation().getBlockY(), MobListener.i.mobFlys(entity)))
 					{
@@ -289,14 +290,7 @@ public class MobDespawnTask extends BukkitRunnable
 				else if (P.p != null)
 				{
 					if (Config.useAsyncDespawnScanner)
-						P.p.getServer().getScheduler().runTask(P.p, new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								it.removeEntities();
-							}
-						});
+						it.removeEntities();
 					
 					/* ######## END TASK ######## */
 					running.compareAndSet(true, false);

@@ -93,47 +93,7 @@ public class MMWorld
 
 		chunks = new ConcurrentHashMap<MMCoord, MMChunk>(0, 0.75F, 2);
 		
-		// TEST
-		// Setup already loaded chunks
 		updateMobCounts();
-		/*// Store already loaded chunks
-		for (final Chunk chunk : world.getLoadedChunks())
-		{
-			final MMChunk mmchunk = new MMChunk(chunk, this);
-
-			chunks.put(mmchunk.getCoord(), mmchunk);
-			++numChunks;
-
-			// Counts the number of living entities
-			for (final Entity entity : chunk.getEntities())
-			{
-				// Add the players already in the chunk
-				if (entity instanceof Player)
-				{
-					if (Config.ignoreCreativePlayers)
-					{
-						Player p = (Player) entity;
-						if (p.getGameMode() == GameMode.CREATIVE)
-							continue;
-					}
-					
-					mmchunk.playerEntered();
-					
-					for (MMLayer layerAt : mmchunk.getLayersAt(entity.getLocation().getBlockY()))
-						layerAt.playerEntered();
-					
-					continue;
-				}
-				
-				// Fetch the creature type
-				MobType mob = MobType.valueOf(entity);
-				// If the creature type is null we ignore the entity
-				if (mob == null)
-					continue;
-					
-				++mobCounts[mob.index];
-			}
-		}*/
 
 		final int maxMonsters = worldConf.maximums[MobType.MONSTER.index];
 		final int maxAnimals = worldConf.maximums[MobType.ANIMAL.index];
@@ -164,7 +124,7 @@ public class MMWorld
 			resetMobCounts();
 			
 			numChunks = 0;
-
+			
 			// Loop through each loaded chunk in the world
 			for (final Chunk chunk : world.getLoadedChunks())
 			{
@@ -204,11 +164,17 @@ public class MMWorld
 						
 						continue;
 					}
+					
+					// Check if the mob should be ignored
+					if (Config.ignoredMobs.containsValue(entity.getType().toString()))
+						continue;
+					
 					// Fetch mob type
 					MobType mob = MobType.valueOf(entity);
 					// If the mob type is null ignore the entity
 					if (mob == null)
 						continue;
+					
 					
 					if (mob == MobType.ANIMAL)
 					{

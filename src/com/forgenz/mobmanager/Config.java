@@ -207,7 +207,7 @@ public class Config
 			
 			/* ################ SpawnChunkSearchDistance ################ */
 			spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
-			cfg.set("SpawnSearchChunkDistance", spawnChunkSearchDistance);
+			cfg.set("SpawnChunkSearchDistance", spawnChunkSearchDistance);
 			
 			/* ################ UndergroundSpawnChunkSearchDistance ################ */
 			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
