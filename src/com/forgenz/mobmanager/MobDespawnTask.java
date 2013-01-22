@@ -29,10 +29,8 @@
 package com.forgenz.mobmanager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.entity.LivingEntity;
@@ -62,8 +60,6 @@ public class MobDespawnTask extends BukkitRunnable
 		private final ArrayList<MMWorld> worlds;
 		private final ArrayList<Iterator<LivingEntity>> iterators;
 		
-		private final HashMap<MMWorld, HashSet<LivingEntity>> mobsToDespawn;
-		
 		/**
 		 * Sets up the iterators required
 		 */
@@ -72,52 +68,33 @@ public class MobDespawnTask extends BukkitRunnable
 			worlds = new ArrayList<MMWorld>(P.worlds.size());
 			iterators = new ArrayList<Iterator<LivingEntity>>(P.worlds.size());
 			
-			mobsToDespawn = Config.useAsyncDespawnScanner ? new HashMap<MMWorld, HashSet<LivingEntity>>() : null;
-			
 			for (MMWorld world : P.worlds.values())
 			{
 				worlds.add(world);
-				iterators.add(world.getWorld().getLivingEntities().iterator());
-				if (mobsToDespawn != null)
-					mobsToDespawn.put(world, new HashSet<LivingEntity>());
-				
-				world.updateMobCounts();
 			}
 		}
 		
 		/**
-		 * Adds the entity to the list of entities to be removed
+		 * Sets up iterators for entities in each world one by one
+		 * @return False when there are no more worlds to setup
 		 */
-		public void addEntity(LivingEntity entity)
-		{
-			if (!Config.useAsyncDespawnScanner)
-				return;
-			mobsToDespawn.get(getWorld()).add(entity);
-		}
-		
-		/**
-		 * Creates the task which removes any entities which have been marked for removal
-		 */
-		public void removeEntities()
-		{
-			if (!Config.useAsyncDespawnScanner)
-				return;
+		public boolean setupNextWorld()
+		{			
+			MMWorld world = worlds.get(currentIndex);
 			
-			P.p.getServer().getScheduler().runTask(P.p, new Runnable()
+			List<LivingEntity> entities = world.getWorld().getLivingEntities();
+			
+			iterators.add(entities.iterator());
+			
+			world.updateMobCounts(entities);
+			
+			if (++currentIndex >= worlds.size())
 			{
-				@Override
-				public void run()
-				{
-					for (Entry<MMWorld, HashSet<LivingEntity>> e : mobsToDespawn.entrySet())
-					{
-						for (LivingEntity entity : e.getValue())
-						{
-							e.getKey().decrementMobCount(MobType.valueOf(entity));
-							entity.remove();
-						}
-					}
-				}
-			});
+				currentIndex = 0;
+				return false;
+			}
+			
+			return true;
 		}
 		
 		/**
@@ -136,6 +113,12 @@ public class MobDespawnTask extends BukkitRunnable
 		{
 			if (currentIndex >= iterators.size())
 				return false;
+			
+			if (iterators.get(currentIndex) == null)
+			{
+				++currentIndex;
+				return hasNext();
+			}
 			
 			if (iterators.get(currentIndex).hasNext())
 				return true;
@@ -179,9 +162,13 @@ public class MobDespawnTask extends BukkitRunnable
 		// Create the entity iterator object
 		final EntityIterator it = new EntityIterator();
 		
+		final List<LivingEntity> mobsToDespawn = Config.useAsyncDespawnScanner ? new ArrayList<LivingEntity>() : null;
+		
+		/* ######## SCANNER CREATION ######## */
 		// Create the despawner task
 		final Runnable removeQueueFillTask = new Runnable()
 		{
+			
 			/**
 			 * Scans for and removes entities which are not required
 			 */
@@ -272,7 +259,7 @@ public class MobDespawnTask extends BukkitRunnable
 						}
 						else
 						{
-							it.addEntity(entity);
+							mobsToDespawn.add(entity);
 						}
 					}
 				}
@@ -290,7 +277,27 @@ public class MobDespawnTask extends BukkitRunnable
 				else if (P.p != null)
 				{
 					if (Config.useAsyncDespawnScanner)
-						it.removeEntities();
+					{
+						final LivingEntity[] entities = mobsToDespawn.toArray(new LivingEntity[0]);
+						mobsToDespawn.clear();
+						
+						P.p.getServer().getScheduler().runTaskLater(P.p, new Runnable()
+						{
+
+							@Override
+							public void run()
+							{
+								for (int i = 0; i < entities.length; ++i)
+								{
+									if (entities[i].isValid())
+									{
+										entities[i].remove();
+									}
+								}
+							}
+							
+						}, 1L);
+					}
 					
 					/* ######## END TASK ######## */
 					running.compareAndSet(true, false);
@@ -298,10 +305,25 @@ public class MobDespawnTask extends BukkitRunnable
 			}
 		};
 		
-		// Run the despawner task
-		if (Config.useAsyncDespawnScanner)
-			P.p.getServer().getScheduler().runTaskLaterAsynchronously(P.p, removeQueueFillTask, 1L);
-		else
-			P.p.getServer().getScheduler().runTaskLater(P.p, removeQueueFillTask, 1L);
+		/* ######## SETUP TASK START ######## */
+		// Setups up each world, one per tick then starts the despawn scanner
+		P.p.getServer().getScheduler().runTaskLater(P.p, new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (it.setupNextWorld())
+					P.p.getServer().getScheduler().runTaskLater(P.p, this, 1L);
+				else
+				{
+					/* ######## SCAN START ######## */
+					// Run the despawner task
+					if (Config.useAsyncDespawnScanner)
+						P.p.getServer().getScheduler().runTaskLaterAsynchronously(P.p, removeQueueFillTask, 1L);
+					else
+						P.p.getServer().getScheduler().runTaskLater(P.p, removeQueueFillTask, 1L);
+				}	
+			}
+		}, 1L);
 	}
 }

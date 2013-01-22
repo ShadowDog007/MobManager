@@ -28,6 +28,8 @@
 
 package com.forgenz.mobmanager.world;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 
@@ -116,83 +118,100 @@ public class MMWorld
 			mobCounts[mob.index] = 0;
 		}
 	}
-
+	
 	public boolean updateMobCounts()
+	{
+		return updateMobCounts(null);
+	}
+	
+	/**
+	 * Used in the despawn task so an entity list does not need to be generated twice
+	 * @param entities - List of entities in the world
+	 */
+	public boolean updateMobCounts(List<LivingEntity> entities)
 	{
 		if (needsUpdate)
 		{
 			resetMobCounts();
 			
-			numChunks = 0;
+			numChunks = world.getLoadedChunks().length;
+			
+			Iterator<MMChunk> it = chunks.values().iterator();
+			while (it.hasNext())
+			{
+				MMChunk chunk = it.next();
+				
+				// Check if the chunk is still required
+				if (!chunk.getChunk().isLoaded())
+				{
+					it.remove();
+					continue;
+				}
+				// Reset chunks counts
+				chunk.resetNumAnimals();
+				chunk.resetPlayers();
+				
+				for (MMLayer layer : chunk.getLayers())
+					layer.resetPlayers();
+			}
+			
+			// Fetches the list of entities if it was not given
+			if (entities == null)
+				entities = world.getLivingEntities();
 			
 			// Loop through each loaded chunk in the world
-			for (final Chunk chunk : world.getLoadedChunks())
+			for (final LivingEntity entity : entities)
 			{
-				++numChunks;
-				MMChunk mmchunk = getChunk(chunk);
+				MMChunk mmchunk = getChunk(entity.getLocation().getChunk());
 				
-				if (mmchunk == null)
+				// If the entity is a player update the layers and chunk
+				if (entity instanceof Player)
 				{
-					mmchunk = addChunk(chunk, false);
+					// Do not add players if they are in creative mode and 'ignoreCreativePlayers' is set
+					if (Config.ignoreCreativePlayers)
+					{
+						Player p = (Player) entity;
+						if (p.getGameMode() == GameMode.CREATIVE)
+							continue;
+					}
+
+
+					mmchunk.playerEntered();
+
+					for (MMLayer layersAt : mmchunk.getLayersAt(entity.getLocation().getBlockY()))
+						layersAt.playerEntered();
+
+					continue;
 				}
 
-				mmchunk.resetNumAnimals();
-				mmchunk.resetPlayers();
-				
-				for (MMLayer layer : mmchunk.getLayers())
-					layer.resetPlayers();
+				// Check if the mob should be ignored
+				if (Config.ignoredMobs.containsValue(entity.getType().toString()))
+					continue;
 
-				// Loop through each entity in the chunk
-				for (final Entity entity : chunk.getEntities())
+				// Fetch mob type
+				MobType mob = MobType.valueOf(entity);
+				// If the mob type is null ignore the entity
+				if (mob == null)
+					continue;
+
+
+				if (mob == MobType.ANIMAL)
 				{
-					// If the entity is a player update the layers and chunk
-					if (entity instanceof Player)
+					// Make sure tameable animals are not counted if it is set to false
+					if (!Config.countTamedAnimals && entity instanceof Tameable)
 					{
-						// Do not add players if they are in creative mode and 'ignoreCreativePlayers' is set
-						if (Config.ignoreCreativePlayers)
-						{
-							Player p = (Player) entity;
-							if (p.getGameMode() == GameMode.CREATIVE)
-								continue;
-						}
-						
-						
-						mmchunk.playerEntered();
-						
-						for (MMLayer layersAt : mmchunk.getLayersAt(entity.getLocation().getBlockY()))
-							layersAt.playerEntered();
-						
-						continue;
+						Tameable tameable = (Tameable) entity;
+
+						if (tameable.isTamed())
+							continue;
 					}
-					
-					// Check if the mob should be ignored
-					if (Config.ignoredMobs.containsValue(entity.getType().toString()))
-						continue;
-					
-					// Fetch mob type
-					MobType mob = MobType.valueOf(entity);
-					// If the mob type is null ignore the entity
-					if (mob == null)
-						continue;
-					
-					
-					if (mob == MobType.ANIMAL)
-					{
-						// Make sure tameable animals are not counted if it is set to false
-						if (!Config.countTamedAnimals && entity instanceof Tameable)
-						{
-							Tameable tameable = (Tameable) entity;
-							
-							if (tameable.isTamed())
-								continue;
-						}
-						mmchunk.changeNumAnimals(true);
-					}
-					
-					// Increment counter
-					++mobCounts[mob.index];
+					mmchunk.changeNumAnimals(true);
 				}
+
+				// Increment counter
+				++mobCounts[mob.index];
 			}
+			
 			// Reset 'updatedThisTick' so updates can be run again later
 			P.p.getServer().getScheduler().runTaskLater(P.p,
 				new Runnable()
@@ -262,11 +281,7 @@ public class MMWorld
 	public void removeChunk(final Chunk chunk)
 	{
 		if (chunks.remove(new MMCoord(chunk.getX(), chunk.getZ())) == null)
-		{
-			if (!Config.disableWarnings)
-				P.p.getLogger().warning("A chunk was unloaded but no object existed for it");
 			return;
-		}
 
 		--numChunks;
 	}

@@ -270,7 +270,7 @@ public class PlayerListener implements Listener
 		// First we make sure there is actually any point in doing anything
 
 		// Check if the player is moving between chunks
-		if (event.getTo().getBlockX() >> 3 != event.getFrom().getBlockX() >> 3 || event.getTo().getBlockZ() >> 3 != event.getFrom().getBlockZ() >> 3)
+		if (event.getTo().getBlockX() >> 4 != event.getFrom().getBlockX() >> 4 || event.getTo().getBlockZ() >> 4 != event.getFrom().getBlockZ() >> 4)
 		{
 			// Fetch the world the player is moving in
 			final MMWorld world = P.worlds.get(event.getTo().getWorld().getName());
@@ -290,14 +290,14 @@ public class PlayerListener implements Listener
 		}
 		// Check if the player is only moving up or down
 		else if (event.getTo().getBlockY() != event.getFrom().getBlockY())
-		{
+		{		
 			// Check that the player is moving to or from a layer boundary
-			if (!Config.layerBoundaries.contains(event.getFrom().getBlockY()) || !Config.layerBoundaries.contains(event.getTo().getBlockY()))
+			if (!Config.layerBoundaries.contains(event.getFrom().getBlockY()) && !Config.layerBoundaries.contains(event.getTo().getBlockY()))
 				return;
-			
+		
 			// Fetch the world the player is moving in
 			final MMWorld world = P.worlds.get(event.getTo().getWorld().getName());
-
+			
 			// If the world is not active ignore the movement
 			if (world == null)
 			{

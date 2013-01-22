@@ -105,7 +105,7 @@ public class P extends JavaPlugin
 		
 		// Start the despawner task
 		despawner = new MobDespawnTask();
-		despawner.runTaskTimer(this, Config.ticksPerDespawnScan, Config.ticksPerDespawnScan);
+		despawner.runTaskTimer(this, 1L, Config.ticksPerDespawnScan);
 		
 		// Setup animal protection
 		if (Config.enableAnimalDespawning)

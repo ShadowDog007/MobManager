@@ -58,6 +58,11 @@ public class MMChunk
 
 	public MMChunk(final Chunk chunk, final MMWorld mmWorld)
 	{
+		this(chunk, mmWorld, false);
+	}
+	
+	public MMChunk(final Chunk chunk, final MMWorld mmWorld, boolean count)
+	{
 		this.chunk = chunk;
 		this.mmWorld = mmWorld;
 		coord = new MMCoord(chunk.getX(), chunk.getZ());
@@ -114,15 +119,18 @@ public class MMChunk
 			ordered = numOrdered == layers.size() - 1;
 		}
 		
-		// Adds any already existing Players or Animals
-		for (final Entity entity : chunk.getEntities())
-			if (entity instanceof Player)
-			{
-				playerEntered();
-				for (final MMLayer layerIn : getLayersAt(entity.getLocation().getBlockY()))
-					layerIn.playerEntered();
-			} else if (entity instanceof Animals)
-				++numAnimals;
+		if (count)
+		{
+			// Adds any already existing Players or Animals
+			for (final Entity entity : chunk.getEntities())
+				if (entity instanceof Player)
+				{
+					playerEntered();
+					for (final MMLayer layerIn : getLayersAt(entity.getLocation().getBlockY()))
+						layerIn.playerEntered();
+				} else if (entity instanceof Animals)
+					++numAnimals;
+		}
 	}
 	
 	public MMWorld getMMWorld()

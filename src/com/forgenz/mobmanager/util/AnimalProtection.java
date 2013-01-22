@@ -85,7 +85,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			catch (Exception e)
 			{
 				P.p.getLogger().severe("Failed to load current protected animals");
-				P.p.animalProtection = null;
+				protectedAnimals = new ConcurrentHashMap<UUID,Long>(0, 0.75F, 2);
 				
 				return;
 			}

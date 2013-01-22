@@ -20,8 +20,7 @@ public class ChunkListener implements Listener
 		if (world == null)
 			return;
 
-		// Add the chunk to the world
-		world.addChunk(event.getChunk(), true);
+		world.updateMobCounts();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
