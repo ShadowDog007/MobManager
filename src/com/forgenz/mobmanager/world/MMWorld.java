@@ -238,6 +238,11 @@ public class MMWorld
 	{
 		return chunks.entrySet();
 	}
+	
+	public int getNumChunks()
+	{
+		return numChunks;
+	}
 
 	public MMChunk getChunk(final Chunk chunk)
 	{

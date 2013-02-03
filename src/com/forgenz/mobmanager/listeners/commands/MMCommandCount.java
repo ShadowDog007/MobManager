@@ -115,7 +115,7 @@ class MMCommandCount extends MMCommand
 				numPlayers += chunk.getValue().getNumPlayers();
 								
 			sender.sendMessage(String.format("%1$sWorld:%2$s%3$s, %1$sChunks:%2$s%4$d, %1$sPlayers:%2$s%5$d",
-					ChatColor.DARK_GREEN, ChatColor.AQUA, world.getWorld().getName(), world.getChunks().size(), numPlayers));
+					ChatColor.DARK_GREEN, ChatColor.AQUA, world.getWorld().getName(), world.getNumChunks(), numPlayers));
 			
 			sender.sendMessage(String.format("%1$sM:%2$s%4$d%3$s/%2$s%5$d, %1$sA:%2$s%6$d%3$s/%2$s%7$d, %1$sW:%2$s%8$d%3$s/%2$s%9$d, %1$sAm:%2$s%10$d%3$s/%2$s%11$d, %1$sV:%2$s%12$d%3$s/%2$s%13$d",
 					ChatColor.GREEN, ChatColor.AQUA, ChatColor.YELLOW,
@@ -140,7 +140,7 @@ class MMCommandCount extends MMCommand
 				totalMaxVillagers += world.maxMobs(MobType.VILLAGER);
 				
 				++totalWorlds;
-				totalChunks += world.getChunks().size();
+				totalChunks += world.getNumChunks();
 			}
 		}
 		
