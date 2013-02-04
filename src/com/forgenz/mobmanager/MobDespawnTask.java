@@ -40,6 +40,7 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.forgenz.mobmanager.config.Config;
 import com.forgenz.mobmanager.listeners.MobListener;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMCoord;

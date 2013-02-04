@@ -36,8 +36,8 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
 
 /**
  * Keeps track of players within a given chunk </br>

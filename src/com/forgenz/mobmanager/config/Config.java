@@ -26,31 +26,31 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager;
+package com.forgenz.mobmanager.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
+import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.world.MMWorld;
 
-public class Config
+public class Config extends AbstractConfig
 {
+	public final static Random rand = new Random();
+	
 	public final static Pattern layerPattern = Pattern.compile("^\\d+:{1}\\d+$");
 	public final static Pattern layerSplitPattern = Pattern.compile(":{1}");
-	final static String worldsFolder = "worlds";
 	
 	public static boolean disableWarnings;
 	public static boolean ignoreCreativePlayers;
@@ -69,164 +69,20 @@ public class Config
 	public static int ticksPerDespawnScan;
 	public static int minTicksLivedForDespawn;
 	
-	public static EnumConfig ignoredMobs;
-	public static EnumConfig disabledMobs;
+	public static EnumSettingContainer ignoredMobs;
+	public static EnumSettingContainer disabledMobs;
 	
-	public static EnumConfig enabledSpawnReasons;
+	public static EnumSettingContainer enabledSpawnReasons;
 	
 	public static List<String> layers;
 	public static HashSet<Integer> layerBoundaries;
 	
-	public static HashMap<String, WorldConf> worldConfigs;
+	public static HashMap<EntityType, MobAttributes> mobAttributes;
 	
-	public class EnumConfig
-	{
-		private ArrayList<String> contains = null;
-		
-		public EnumConfig(Class<?> enumClass, List<?> objectList, String missingEnumError)
-		{
-			if (objectList == null)
-				return;
-			
-			this.contains = new ArrayList<String>();
-			
-			Object[] enumValues = enumClass.getEnumConstants();
-			
-			for (Object obj : objectList)
-			{
-				if (obj instanceof String == false)
-					continue;
-				
-				String string = (String) obj;
-				
-				boolean found = false;
-				
-				for (Object value : enumValues)
-				{
-					if (value.toString().equalsIgnoreCase(string))
-					{
-						contains.add(value.toString());
-						found = true;
-					}
-				}
-				
-				if (!found)
-					P.p.getLogger().info(String.format(missingEnumError, string));
-			}
-		}
-		
-		public List<String> getList()
-		{
-			if (contains == null)
-				return new ArrayList<String>();
-			
-			return contains;
-		}
-		
-		public boolean containsValue(String string)
-		{
-			if (contains == null)
-				return false;
-			return contains.contains(string);
-		}
-		
-		public void addDefaults(String ...defaults)
-		{
-			if (contains != null)
-				return;
-			
-			if (defaults.length != 0)
-				contains = new ArrayList<String>();
-			
-			for (String str : defaults)
-			{
-				contains.add(str);
-			}
-		}
-		
-		public String toString()
-		{
-			if (contains == null)
-				return "";
-			
-			String str = "";
-			
-			for (String s : contains)
-			{
-				if (str.length() != 0)
-					str += ",";
-				str += s;
-			}
-			return str;
-		}
-	}
+	public static HashMap<String, WorldConfig> worldConfigs;
 	
-	public class WorldConf
-	{
-		public final FileConfiguration cfg;
-		public final String worldName;
-		
-		public final boolean limiterEnabled;
-		public final short[] maximums;
-		public final short[] dynMultis;
-		public final short breedingLimit;
-		public final short numAnimalsForFarm;
-		public final short spawnChunkSearchDistance;
-		public final int undergroundSpawnChunkSearchDistance;
-		public final int groundHeight;
-		
-		public WorldConf(World world)
-		{
-			cfg = getConfig(worldsFolder, world.getName() + ".yml");
-			this.worldName = world.getName();
-			
-			limiterEnabled = true;
-			
-			MobType[] mobs = MobType.values();
-			
-			maximums = new short[mobs.length];
-			dynMultis = new short[mobs.length];
-			
-			/* ################ MobLimits ################ */
-			for (MobType mob : mobs)
-			{
-				maximums[mob.index] = (short) Math.abs(cfg.getInt("WorldMaximum." + mob.cPath, mob.getDefaultMax(world.getEnvironment())));
-				dynMultis[mob.index] = (short) Math.abs(cfg.getInt("ChunkCalculatedMaximum." + mob.cPath, mob.getDefaultDynMulti(world.getEnvironment())));
-				
-				cfg.set("WorldMaximum." + mob.cPath, maximums[mob.index]);
-				cfg.set("ChunkCalculatedMaximum." + mob.cPath, dynMultis[mob.index]);
-			}
-			
-			/* ################ BreedingMaximumPerChunk ################ */
-			breedingLimit = (short) cfg.getInt("BreedingMaximumPerChunk", 15);
-			cfg.set("BreedingMaximumPerChunk", breedingLimit);
-			
-			/* ################ NumAnimalsForFarm ################ */
-			numAnimalsForFarm = (short) cfg.getInt("NumAnimalsForFarm", 3);
-			cfg.set("NumAnimalsForFarm", numAnimalsForFarm);
-			
-			/* ################ SpawnChunkSearchDistance ################ */
-			spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
-			cfg.set("SpawnChunkSearchDistance", spawnChunkSearchDistance);
-			
-			/* ################ UndergroundSpawnChunkSearchDistance ################ */
-			undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
-			cfg.set("UndergroundSpawnChunkSearchDistance", undergroundSpawnChunkSearchDistance);
-			
-			
-			/* ################ GroundHeight ################ */
-			int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : (world.getEnvironment() == Environment.NETHER ? 32 : -1);
-			groundHeight = cfg.getInt("GroundHeight", defaultHeight);
-			cfg.set("GroundHeight", groundHeight);
-			
-			
-			copyHeader(cfg, "worldConfigHeader.txt", P.p.getDescription().getName() + " Config " + P.p.getDescription().getVersion() + "\n");
-			saveConfig(worldsFolder, worldName + ".yml", cfg);
-		}
-	}
-	
-	Config()
-	{
+	public Config()
+	{		
 		/* ################ ActiveWorlds ################ */
 		List<String> activeWorlds = P.cfg.getStringList("EnabledWorlds");
 		
@@ -293,7 +149,7 @@ public class Config
 		P.cfg.set("MinTicksLivedForDespawn", minTicksLivedForDespawn);
 		
 		/* ################ IgnoredMobs ################ */
-		ignoredMobs = new EnumConfig(EntityType.class, P.cfg.getList("IgnoredMobs", null), "The Ignored Mob '%s' is invalid");
+		ignoredMobs = new EnumSettingContainer(EntityType.class, P.cfg.getList("IgnoredMobs", null), "The Ignored Mob '%s' is invalid");
 		ignoredMobs.addDefaults(EntityType.WITHER.toString(), EntityType.VILLAGER.toString());
 		List<String> ignoredList = ignoredMobs.getList();
 		P.cfg.set("IgnoredMobs", ignoredList);
@@ -303,7 +159,7 @@ public class Config
 		
 		
 		/* ################ DisabledMobs ################ */
-		disabledMobs = new EnumConfig(EntityType.class, P.cfg.getList("DisabledMobs", null), "The Disabled Mob '%s' is invalid");
+		disabledMobs = new EnumSettingContainer(EntityType.class, P.cfg.getList("DisabledMobs", null), "The Disabled Mob '%s' is invalid");
 		List<String> disabledList = disabledMobs.getList();
 		P.cfg.set("DisabledMobs", disabledList);
 		strList = disabledMobs.toString();
@@ -311,7 +167,7 @@ public class Config
 			P.p.getLogger().info("DisabledMobs: " + strList);
 		
 		/* ################ EnabledSpawnReasons ################ */
-		enabledSpawnReasons = new EnumConfig(SpawnReason.class, P.cfg.getList("EnabledSpawnReasons", null), "The Spawn Reason '%s' is invalid");
+		enabledSpawnReasons = new EnumSettingContainer(SpawnReason.class, P.cfg.getList("EnabledSpawnReasons", null), "The Spawn Reason '%s' is invalid");
 		enabledSpawnReasons.addDefaults(SpawnReason.DEFAULT.toString(),
 				SpawnReason.NATURAL.toString(),
 				SpawnReason.SPAWNER.toString(),
@@ -373,32 +229,51 @@ public class Config
 		P.cfg.set("Layers", layers);
 		P.p.getLogger().info(layers.size() + " layers found");
 		
+		/* ######## Global Mob Attributes ######## */
+		mobAttributes = new HashMap<EntityType, MobAttributes>();
+		ConfigurationSection cfg = P.cfg.getConfigurationSection("MobAttributes");
+		
+		if (cfg == null)
+			cfg = P.cfg.createSection("MobAttributes");
+		
+		Set<String> keys = cfg.getKeys(false);
+		
+		for (String key : keys)
+		{
+			EntityType mob = null; 
+			try
+			{
+				mob = EntityType.valueOf(key.toUpperCase());
+			}
+			catch (IllegalArgumentException e)
+			{
+				P.p.getLogger().warning("The mob " + key + " is invalid for the MobAttributes");
+				continue;
+			}
+			if (mob == null || !LivingEntity.class.isAssignableFrom(mob.getEntityClass()))
+			{
+				P.p.getLogger().warning("The mob " + key + " is invalid for the MobAttributes");
+				continue;
+			}
+			
+			ConfigurationSection mobCfg = cfg.getConfigurationSection(key);
+			if (mobCfg == null)
+			{
+				P.p.getLogger().warning("Error loading MobAttributes for " + key);
+				continue;
+			}
+			mobAttributes.put(mob, new MobAttributes(mob, mobCfg));
+		}
+		
 		// Copy the header to the file
 		copyHeader(P.cfg, "configHeader.txt", P.p.getDescription().getName() + " Config " + P.p.getDescription().getVersion() + "\n");
 		P.p.saveConfig();
 	}
 	
-	public FileConfiguration getConfig(String folder, String config)
-	{
-		return YamlConfiguration.loadConfiguration(new File(P.p.getDataFolder(), folder + File.separator + config));
-	}
-	
-	public void saveConfig(String folder, String config, FileConfiguration cfg)
-	{
-		try
-		{
-			cfg.save(new File(P.p.getDataFolder(), folder + File.separator + config));
-		}
-		catch (IOException exception)
-		{
-			P.p.getLogger().severe("Unable to write to config file at \"" + folder + File.separator + config + "\"");
-		}
-	}
-	
-	int setupWorlds()
+	public int setupWorlds()
 	{
 		int numWorlds = 0;
-		worldConfigs = new HashMap<String, WorldConf>();
+		worldConfigs = new HashMap<String, WorldConfig>();
 		
 		for (String worldName : P.cfg.getStringList("EnabledWorlds"))
 		{
@@ -407,7 +282,7 @@ public class Config
 			if (world == null)
 				continue;
 			
-			WorldConf wc = new WorldConf(world);
+			WorldConfig wc = new WorldConfig(world);
 			
 			worldConfigs.put(world.getName(), wc);
 			P.worlds.put(world.getName(), new MMWorld(world, wc));
@@ -416,45 +291,5 @@ public class Config
 		}
 		
 		return numWorlds;
-	}
-	
-	public String getResourceAsString(String resource)
-	{
-		InputStream headerStream = P.p.getResource(resource);
-		if (headerStream == null)
-			return "";
-		
-		String header = "";
-		int numBytes = 1;
-		while (numBytes > 0)
-		{
-			byte[] bytes = new byte[64];
-			
-			try
-			{
-				numBytes = headerStream.read(bytes);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			for (int i = 0; i < numBytes; ++i)
-			{
-				header += (char) bytes[i];
-			}
-		}
-		
-		return header;
-	}
-	public void copyHeader(FileConfiguration cfg, String resource)
-	{		
-		copyHeader(cfg, resource, "");
-	}
-	
-	public void copyHeader(FileConfiguration cfg, String resource, String add)
-	{
-		cfg.options().header(add + getResourceAsString(resource));
-		cfg.options().copyHeader(true);
 	}
 }

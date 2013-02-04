@@ -36,9 +36,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMWorld;
 

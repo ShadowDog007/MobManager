@@ -41,10 +41,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 
-import com.forgenz.mobmanager.Config;
-import com.forgenz.mobmanager.Config.WorldConf;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
+import com.forgenz.mobmanager.config.WorldConfig;
 
 /**
  * Keeps track of the number of mobs of different types within a world
@@ -63,7 +63,7 @@ public class MMWorld
 	/**
 	 * World settings
 	 */
-	public final WorldConf worldConf;
+	public final WorldConfig worldConf;
 	
 	/**
 	 * Loaded chunks in the world
@@ -86,7 +86,7 @@ public class MMWorld
 	private int[] mobCounts;
 	
 	
-	public MMWorld(final World world, WorldConf worldConf)
+	public MMWorld(final World world, WorldConfig worldConf)
 	{
 		this.world = world;
 		this.worldConf = worldConf;

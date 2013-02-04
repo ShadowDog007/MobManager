@@ -28,8 +28,8 @@
 
 package com.forgenz.mobmanager.world;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
 
 /**
  * Keeps track of players within a given Y coordinate range

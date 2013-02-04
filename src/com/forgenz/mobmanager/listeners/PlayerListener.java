@@ -30,6 +30,7 @@ package com.forgenz.mobmanager.listeners;
 
 
 import org.bukkit.GameMode;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -42,8 +43,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
+import com.forgenz.mobmanager.config.MobAttributes;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMLayer;
 import com.forgenz.mobmanager.world.MMWorld;
@@ -78,56 +80,6 @@ public class PlayerListener implements Listener
 			
 			for (MMLayer layer : toChunk.getLayersAt(toY))
 				layer.playerEntered();
-		}
-	}
-	
-	// NOTE: May not use this
-	@SuppressWarnings("unused")
-	private boolean checkSpecialCase(final PlayerMoveEvent event)
-	{
-		return event.getFrom() == null || event.getTo() == null;
-	}
-	
-	// NOTE: May not use this
-	@SuppressWarnings("unused")
-	private void handleSpecialCase(final PlayerMoveEvent event)
-	{
-		if (event.getTo() == null && event.getPlayer() != null)
-		{
-			P.p.getServer().getScheduler().runTaskLater(P.p, new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					MMWorld toWorld = P.worlds.get(event.getPlayer().getWorld().getName());
-					
-					if (toWorld == null)
-						return;
-					
-					MMChunk toChunk = toWorld.getChunk(event.getPlayer().getLocation().getChunk());
-					
-					if (toChunk == null)
-						return;
-					
-					updateChunkPlayerCount(toChunk, event.getPlayer().getLocation().getBlockY(), null, 0);
-				}
-				
-			}, 1L);
-		}
-		
-		if (event.getFrom() == null && event.getPlayer() != null)
-		{
-			MMWorld fromWorld = P.worlds.get(event.getPlayer().getWorld().getName());
-			
-			if (fromWorld == null)
-				return;
-			
-			MMChunk fromChunk = fromWorld.getChunk(event.getPlayer().getLocation().getChunk());
-			
-			if (fromChunk == null)
-				return;
-			
-			updateChunkPlayerCount(null, 0, fromChunk, event.getPlayer().getLocation().getBlockY());
 		}
 	}
 	
@@ -220,6 +172,26 @@ public class PlayerListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerRespawn(final PlayerRespawnEvent event)
 	{
+		// Set players Max health if it is defined in config
+		MobAttributes playerAttributes = Config.mobAttributes.get(EntityType.PLAYER);
+		
+		if (playerAttributes != null)
+		{
+			// Add the players bonus health
+			int bonusHealth = playerAttributes.bonusHealth.getBonus();
+			
+			event.getPlayer().resetMaxHealth();
+			
+			if (bonusHealth != 0)
+			{
+				bonusHealth += event.getPlayer().getMaxHealth();
+				
+				if (bonusHealth <= 0)
+					bonusHealth = 1;
+				
+				event.getPlayer().setMaxHealth(bonusHealth);
+			}
+		}
 		// Check if we can ignore creative players and the player is in creative mode
 		if (Config.ignoreCreativePlayers && event.getPlayer().getGameMode() == GameMode.CREATIVE)
 			return;

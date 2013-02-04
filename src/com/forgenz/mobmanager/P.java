@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.forgenz.mobmanager.config.Config;
 import com.forgenz.mobmanager.listeners.ChunkListener;
 import com.forgenz.mobmanager.listeners.MobListener;
 import com.forgenz.mobmanager.listeners.PlayerListener;

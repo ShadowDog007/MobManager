@@ -33,16 +33,20 @@ import java.util.List;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
+import com.forgenz.mobmanager.config.MobAttributes;
 import com.forgenz.mobmanager.util.Spiral;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMCoord;
@@ -127,7 +131,7 @@ public class MobListener implements Listener
 	
 	// Event listener methods
 	/**
-	 * Checks mob limits to determine if the mob can spawn </ br>
+	 * Checks mob limits to determine if the mob can spawn </br>
 	 * Only prevents natural spawns (Including for disabled mobs)
 	 */
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -159,7 +163,29 @@ public class MobListener implements Listener
 			return;
 		}
 		
+		// Check SpawnRate to see if the mob can be spawned
+		MobAttributes mobAttributes = Config.mobAttributes.get(event.getEntityType());
+		
+		if (mobAttributes != null)
+		{
+			if (mobAttributes.spawnRate == 0.0)
+			{
+				event.setCancelled(true);
+				return;
+			}
+			
+			if (mobAttributes.spawnRate < 1.0)
+			{
+				if (Config.rand.nextFloat() >= mobAttributes.spawnRate)
+				{
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+		
 		MMChunk chunk = null;
+		
 		
 		// Animals need to be counted per chunk as well
 		if (mob == MobType.ANIMAL)
@@ -213,6 +239,23 @@ public class MobListener implements Listener
 		{
 			event.setCancelled(true);
 			return;
+		}
+		
+		// Add the mobs bonus health
+		if (mobAttributes != null)
+		{
+			int bonusHealth = mobAttributes.bonusHealth.getBonus();
+			
+			if (bonusHealth != 0)
+			{
+				bonusHealth += event.getEntity().getMaxHealth();
+				
+				if (bonusHealth <= 0)
+					bonusHealth = 1;
+				
+				event.getEntity().setMaxHealth(bonusHealth);
+				event.getEntity().setHealth(bonusHealth);
+			}
 		}
 	}
 	
@@ -286,5 +329,46 @@ public class MobListener implements Listener
 		}
 		
 		world.decrementMobCount(mob);
+	}
+	
+	/**
+	 * Adds bonus damage for entities
+	 */
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	public void onEntityDamage(EntityDamageByEntityEvent event)
+	{
+		LivingEntity damager = null;
+		
+		if (event.getDamager() instanceof Projectile)
+		{
+			Projectile entity = (Projectile) event.getDamager();
+			
+			damager = entity.getShooter();
+		}
+		else if (event.getDamager() instanceof LivingEntity)
+		{
+			damager = (LivingEntity) event.getDamager();
+		}
+		else
+		{
+			return;
+		}
+		
+		MobAttributes mobAttributes = Config.mobAttributes.get(damager.getType());
+		
+		if (mobAttributes == null)
+			return;
+		
+		int bonusDamage = mobAttributes.bonusDamage.getBonus();
+		
+		if (bonusDamage != 0)
+		{
+			bonusDamage += event.getDamage();
+			
+			if (bonusDamage < 0)
+				bonusDamage = 0;
+			
+			event.setDamage(bonusDamage);
+		}
 	}
 }

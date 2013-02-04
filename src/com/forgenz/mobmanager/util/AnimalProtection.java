@@ -55,8 +55,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
 
 public class AnimalProtection extends BukkitRunnable implements Listener
 {

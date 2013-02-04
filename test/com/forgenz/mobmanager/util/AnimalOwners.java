@@ -27,8 +27,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.forgenz.mobmanager.Config;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.Config;
 
 public class AnimalOwners extends BukkitRunnable
 {
