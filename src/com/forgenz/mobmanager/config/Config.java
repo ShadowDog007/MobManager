@@ -270,6 +270,20 @@ public class Config extends AbstractConfig
 		P.p.saveConfig();
 	}
 	
+	/**
+	 * Fetches mob attributes from the given world or from global settings if no world config is found
+	 */
+	public static MobAttributes getMobAttributes(MMWorld world, EntityType type)
+	{
+		if (world == null)
+			return null;
+		
+		MobAttributes ma = world.worldConf.mobAttributes.get(type);
+		
+		return ma != null ? ma : mobAttributes.get(type);
+		
+	}
+	
 	public int setupWorlds()
 	{
 		int numWorlds = 0;

@@ -105,14 +105,23 @@ public class MMCommandVersion extends MMCommand
 			if (split.length != 2)
 				return;
 			
-			String[] latestVersion = dotSplit.split(split[0]);
-			String[] currentVersion = dotSplit.split(P.p.getDescription().getVersion());
+			String[] versionL = dotSplit.split(split[0]);
+			String[] versionC = dotSplit.split(P.p.getDescription().getVersion());
+			
+			int majorL = Integer.valueOf(versionL[0]);
+			int majorC = Integer.valueOf(versionC[0]);
+			
+			int minorL = Integer.valueOf(versionL[1].replaceAll("[_A-Za-z]", ""));
+			int minorC = Integer.valueOf(versionC[1].replaceAll("[_A-Za-z]", ""));
 			//if (latestVersion.length != 2 || currentVersion.length != 2)
 			//	return;
 			
-			if (Integer.valueOf(latestVersion[0]) > Integer.valueOf(currentVersion[0])
-					|| (Integer.valueOf(latestVersion[0]) == Integer.valueOf(currentVersion[0]) && compareSubVersion(latestVersion[1], currentVersion[1]))
-					|| compareLetters(latestVersion[1], currentVersion[1]))
+			// Check if the major version is old
+			if (majorL > majorC
+					// Check if the minor version is old
+					|| (majorL == majorC && minorL > minorC)
+					//  Check if the sub version is old
+					|| (majorL == majorC && minorL == minorC && compareLetters(versionL[1], versionC[1])))
 				sender.sendMessage(ChatColor.DARK_GREEN + "There is a new version of MobManager: v" + split[0] + " for " + split[1]);
 			else
 				sender.sendMessage(ChatColor.DARK_GREEN + "MobManager is up to date");
@@ -121,13 +130,6 @@ public class MMCommandVersion extends MMCommand
 			sender.sendMessage(ChatColor.DARK_GREEN + "Failed to check for updates");
 	}
 	
-	private boolean compareSubVersion(String latest, String current)
-	{
-		int l = Integer.valueOf(latest.replaceAll("[_A-Za-z]", ""));
-		int c = Integer.valueOf(current.replaceAll("[_A-Za-z]", ""));
-		
-		return l > c;
-	}
 	private boolean compareLetters(String latest, String current)
 	{
 		latest = latest.replaceAll("[0-9]", "");

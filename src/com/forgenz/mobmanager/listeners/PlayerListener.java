@@ -30,7 +30,6 @@ package com.forgenz.mobmanager.listeners;
 
 
 import org.bukkit.GameMode;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,7 +44,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.config.Config;
-import com.forgenz.mobmanager.config.MobAttributes;
+import com.forgenz.mobmanager.util.EntityMaxHealthSetup;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMLayer;
 import com.forgenz.mobmanager.world.MMWorld;
@@ -139,6 +138,9 @@ public class PlayerListener implements Listener
 		// If the world is inactive do nothing
 		if (world == null)
 			return;
+		
+		// Set players Max health if it is defined in config
+		EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(world, event.getPlayer().getType()));
 
 		// Fetch the chunk the player logged into
 		final MMChunk chunk = world.getChunk(event.getPlayer().getLocation().getChunk());
@@ -171,36 +173,19 @@ public class PlayerListener implements Listener
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerRespawn(final PlayerRespawnEvent event)
-	{
-		// Set players Max health if it is defined in config
-		MobAttributes playerAttributes = Config.mobAttributes.get(EntityType.PLAYER);
-		
-		if (playerAttributes != null)
-		{
-			// Add the players bonus health
-			int bonusHealth = playerAttributes.bonusHealth.getBonus();
-			
-			event.getPlayer().resetMaxHealth();
-			
-			if (bonusHealth != 0)
-			{
-				bonusHealth += event.getPlayer().getMaxHealth();
-				
-				if (bonusHealth <= 0)
-					bonusHealth = 1;
-				
-				event.getPlayer().setMaxHealth(bonusHealth);
-			}
-		}
-		// Check if we can ignore creative players and the player is in creative mode
-		if (Config.ignoreCreativePlayers && event.getPlayer().getGameMode() == GameMode.CREATIVE)
-			return;
-		
+	{		
 		// Fetch the world the player spawned in
 		final MMWorld world = P.worlds.get(event.getRespawnLocation().getWorld().getName());
 		
 		// If the world is inactive do nothing
 		if (world == null)
+			return;
+		
+		// Set players Max health if it is defined in config
+		EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(world, event.getPlayer().getType()));
+		
+		// Check if we can ignore creative players and the player is in creative mode
+		if (Config.ignoreCreativePlayers && event.getPlayer().getGameMode() == GameMode.CREATIVE)
 			return;
 		
 		// Fetch the chunk the player spawned in
@@ -296,10 +281,13 @@ public class PlayerListener implements Listener
 		
 		// Check if the worlds differ
 		if (!event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName()))
-		{
+		{			
 			// Fetch each world
 			MMWorld toWorld = P.worlds.get(event.getTo().getWorld().getName());
 			MMWorld fromWorld = P.worlds.get(event.getFrom().getWorld().getName());
+			
+			// Set players Max health if it is defined in config for the new world
+			EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(toWorld, event.getPlayer().getType()));
 			
 			// Fetch each chunk
 			MMChunk toChunk = toWorld != null ? toWorld.getChunk(event.getTo().getChunk()) : null;
@@ -348,6 +336,9 @@ public class PlayerListener implements Listener
 
 				if (toWorld == null)
 					return;
+				
+				// Set players Max health if it is defined in config for the new world
+				EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(toWorld, event.getPlayer().getType()));
 
 				MMChunk toChunk = toWorld.getChunk(event.getPlayer().getLocation().getChunk());
 

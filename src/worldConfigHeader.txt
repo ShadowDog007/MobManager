@@ -86,3 +86,47 @@ It is recommended to set this to -1 for The_End environments
     As these worlds tend to be much more open than normal environments.
 For Nether environments the default value of 32 is used as this is
     the default height of lava
+    
+#######################################################################
+MobAttributes (World)
+#######################################################################
+Contains settings you can use to edit mob attributes.
+
+Mob settings here will override global settings
+
+Mob names must be acquired from here:
+    http://jd.bukkit.org/apidocs/org/bukkit/entity/EntityType.html
+    And should be in all upper-case
+    
+Read more about MobAttributes here:
+    http://dev.bukkit.org/server-mods/mobmanager/pages/explanations/mob-attributes/
+
+################
+SpawnRate
+################
+A number between 0 and 1. Represents the chance a mob will be
+    allowed to spawn.
+E.G. if SpawnRate was 0.5 there would be a 50% chance that any mob
+    which attempts to spawn will be allowed to spawn
+This setting can be used to reduce the number of certain mobs on your
+    server. (Possibly Freeing up space for other mobs)
+################
+BonusHealth
+################
+A list of chances + bonus health for the mob
+Written in this format:
+
+BonusHealth:
+- <Chance>:<BonusHealth>
+- <Chance>:<OtherBonusHealth>
+################
+BonusDamage
+################
+A list of chances + bonus damage for the mob
+Written in this format:
+
+BonusHealth:
+- <Chance>:<BonusDamage>
+- <Chance>:<OtherBonusDamage>
+
+#######################################################################

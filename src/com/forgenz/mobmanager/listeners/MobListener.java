@@ -47,6 +47,7 @@ import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.config.Config;
 import com.forgenz.mobmanager.config.MobAttributes;
+import com.forgenz.mobmanager.util.EntityMaxHealthSetup;
 import com.forgenz.mobmanager.util.Spiral;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMCoord;
@@ -163,24 +164,22 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		// Check SpawnRate to see if the mob can be spawned
-		MobAttributes mobAttributes = Config.mobAttributes.get(event.getEntityType());
+		// Fetch MobAttributes
+		MobAttributes mobAttributes = Config.getMobAttributes(world, event.getEntityType());
 		
-		if (mobAttributes != null)
+		// Check spawn-rate and choose if mob can spawn 
+		if (mobAttributes != null && mobAttributes.spawnRate < 1.0)
 		{
 			if (mobAttributes.spawnRate == 0.0)
 			{
 				event.setCancelled(true);
 				return;
 			}
-			
-			if (mobAttributes.spawnRate < 1.0)
+			// If the random number is higher than the spawn chance we disallow the spawn
+			if (Config.rand.nextFloat() >= mobAttributes.spawnRate)
 			{
-				if (Config.rand.nextFloat() >= mobAttributes.spawnRate)
-				{
-					event.setCancelled(true);
-					return;
-				}
+				event.setCancelled(true);
+				return;
 			}
 		}
 		
@@ -243,20 +242,7 @@ public class MobListener implements Listener
 		
 		// Add the mobs bonus health
 		if (mobAttributes != null)
-		{
-			int bonusHealth = mobAttributes.bonusHealth.getBonus();
-			
-			if (bonusHealth != 0)
-			{
-				bonusHealth += event.getEntity().getMaxHealth();
-				
-				if (bonusHealth <= 0)
-					bonusHealth = 1;
-				
-				event.getEntity().setMaxHealth(bonusHealth);
-				event.getEntity().setHealth(bonusHealth);
-			}
-		}
+			EntityMaxHealthSetup.setMaxHealth(event.getEntity(), mobAttributes);
 	}
 	
 	/**
@@ -337,6 +323,7 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageByEntityEvent event)
 	{
+		// Get the entity which dealt the damage
 		LivingEntity damager = null;
 		
 		if (event.getDamager() instanceof Projectile)
@@ -354,20 +341,40 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		MobAttributes mobAttributes = Config.mobAttributes.get(damager.getType());
+		MobAttributes mobAttributes = null;
 		
+		// Get the world the damage is occuring in
+		MMWorld world = P.worlds.get(damager.getWorld().getName());
+		
+		// If the world is not enabled we ignore the damage
+		if (world == null)
+			return;
+		
+		// Check world config
+		mobAttributes = world.worldConf.mobAttributes.get(damager.getType());
+		
+		// Check Global if no world conifg was found
+		if (mobAttributes == null)
+			mobAttributes = Config.mobAttributes.get(damager.getType());
+		
+		// If there is still no config for the mob return
 		if (mobAttributes == null)
 			return;
 		
+		// Fetch the bonus damage caused by the mob
 		int bonusDamage = mobAttributes.bonusDamage.getBonus();
 		
+		// If the bonus is 0 we don't do anything
 		if (bonusDamage != 0)
 		{
+			// Add the actual damage to the bonus
 			bonusDamage += event.getDamage();
 			
+			// If the total damage is less than 0 we make it a valid value
 			if (bonusDamage < 0)
 				bonusDamage = 0;
 			
+			// Set the new damage
 			event.setDamage(bonusDamage);
 		}
 	}

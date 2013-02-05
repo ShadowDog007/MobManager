@@ -26,91 +26,40 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.config;
+package com.forgenz.mobmanager.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.entity.Damageable;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.config.MobAttributes;
 
-public class EnumSettingContainer
+public class EntityMaxHealthSetup
 {
-	private ArrayList<String> contains = null;
-	
-	public EnumSettingContainer(Class<?> enumClass, List<?> objectList, String missingEnumError)
+	public static void setMaxHealth(Damageable entity, MobAttributes mobAttributes)
 	{
-		if (objectList == null)
+		if (mobAttributes == null || entity == null)
 			return;
 		
-		this.contains = new ArrayList<String>();
+		// Add the players bonus health
+		int bonusHealth = mobAttributes.bonusHealth.getBonus();
 		
-		Object[] enumValues = enumClass.getEnumConstants();
-		
-		for (Object obj : objectList)
-		{
-			if (obj instanceof String == false)
-				continue;
-			
-			String string = (String) obj;
-			
-			boolean found = false;
-			
-			for (Object value : enumValues)
-			{
-				if (value.toString().equalsIgnoreCase(string))
-				{
-					contains.add(value.toString());
-					found = true;
-				}
-			}
-			
-			if (!found)
-				P.p.getLogger().info(String.format(missingEnumError, string));
-		}
-	}
-	
-	public List<String> getList()
-	{
-		if (contains == null)
-			return new ArrayList<String>();
-		
-		return contains;
-	}
-	
-	public boolean containsValue(String string)
-	{
-		if (contains == null)
-			return false;
-		return contains.contains(string);
-	}
-	
-	public void addDefaults(String ...defaults)
-	{
-		if (contains != null)
-			return;
-		
-		if (defaults.length != 0)
-			contains = new ArrayList<String>();
-		
-		for (String str : defaults)
-		{
-			contains.add(str);
-		}
-	}
-	
-	public String toString()
-	{
-		if (contains == null)
-			return "";
-		
-		String str = "";
-		
-		for (String s : contains)
-		{
-			if (str.length() != 0)
-				str += ",";
-			str += s;
-		}
-		return str;
+		// Fetch the entities old max/actual health (Used for HP scaling)
+		int oldHp = entity.getHealth();
+		int oldMax = entity.getMaxHealth();
+
+		// Make sure we do not add too much HP to the entity
+		entity.resetMaxHealth();
+
+		// Calculate the new maximum value
+		int newMax = bonusHealth + entity.getMaxHealth();
+
+		// Validate the new maximum
+		if (newMax <= 0)
+			newMax = 1;
+
+		// Set the new maximum
+		entity.setMaxHealth(newMax);
+
+		// Scale the entities HP relative to its old/new maximum
+		entity.setHealth(oldHp * newMax / oldMax);
 	}
 }

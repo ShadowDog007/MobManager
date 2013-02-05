@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.forgenz.mobmanager.config.Config;
@@ -40,6 +41,7 @@ import com.forgenz.mobmanager.listeners.MobListener;
 import com.forgenz.mobmanager.listeners.PlayerListener;
 import com.forgenz.mobmanager.listeners.commands.MMCommandListener;
 import com.forgenz.mobmanager.util.AnimalProtection;
+import com.forgenz.mobmanager.util.EntityMaxHealthSetup;
 import com.forgenz.mobmanager.world.MMWorld;
 
 /**
@@ -116,6 +118,41 @@ public class P extends JavaPlugin
 			{
 				getServer().getPluginManager().registerEvents(animalProtection, this);
 				animalProtection.runTaskTimerAsynchronously(this, Config.protectedFarmAnimalSaveInterval, Config.protectedFarmAnimalSaveInterval);
+			}
+		}
+		
+		// Sets already living mob HP to config settings
+		boolean hasGlobal = Config.mobAttributes.size() != 0;
+		boolean changeHP = hasGlobal;
+		
+		// If there are no global configs we check if there are any world configs
+		if (!hasGlobal)
+		{
+			for (MMWorld world : worlds.values())
+			{
+				if (world.worldConf.mobAttributes.size() != 0)
+				{
+					changeHP = true;
+					break;
+				}
+			}
+		}
+		
+		// Check if we should bother iterating through entities
+		if (changeHP)
+		{
+			// Iterate through each enabled world
+			for (MMWorld world : worlds.values())
+			{
+				// If there are no global configs and the world has no configs, check next world
+				if (!hasGlobal && world.worldConf.mobAttributes.size() == 0)
+					continue;
+				
+				// Iterate through each entity in the world and set their max HP accordingly
+				for (LivingEntity entity : world.getWorld().getLivingEntities())
+				{
+					EntityMaxHealthSetup.setMaxHealth(entity, Config.getMobAttributes(world, entity.getType()));
+				}
 			}
 		}
 		

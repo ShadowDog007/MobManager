@@ -29,88 +29,51 @@
 package com.forgenz.mobmanager.config;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import com.forgenz.mobmanager.P;
-
-public class EnumSettingContainer
+public class MobIntChance
 {
-	private ArrayList<String> contains = null;
-	
-	public EnumSettingContainer(Class<?> enumClass, List<?> objectList, String missingEnumError)
+	private class Chance
 	{
-		if (objectList == null)
-			return;
+		final int min;
+		final int max;
 		
-		this.contains = new ArrayList<String>();
+		final int value;
 		
-		Object[] enumValues = enumClass.getEnumConstants();
-		
-		for (Object obj : objectList)
+		private Chance(int min, int max, int bonus)
 		{
-			if (obj instanceof String == false)
-				continue;
-			
-			String string = (String) obj;
-			
-			boolean found = false;
-			
-			for (Object value : enumValues)
-			{
-				if (value.toString().equalsIgnoreCase(string))
-				{
-					contains.add(value.toString());
-					found = true;
-				}
-			}
-			
-			if (!found)
-				P.p.getLogger().info(String.format(missingEnumError, string));
+			this.min = min;
+			this.max = max;
+			this.value = bonus;
 		}
 	}
 	
-	public List<String> getList()
+	private int totalChance = 0;
+	private ArrayList<Chance> chances = new ArrayList<Chance>();
+	
+	public void addChance(int chance, int value)
 	{
-		if (contains == null)
-			return new ArrayList<String>();
+		int min = totalChance;
 		
-		return contains;
+		totalChance += chance;
+		
+		int max = totalChance;
+		
+		chances.add(new Chance(min, max, value));
 	}
 	
-	public boolean containsValue(String string)
+	public int getBonus()
 	{
-		if (contains == null)
-			return false;
-		return contains.contains(string);
-	}
-	
-	public void addDefaults(String ...defaults)
-	{
-		if (contains != null)
-			return;
+		if (chances.size() == 0)
+			return 0;
 		
-		if (defaults.length != 0)
-			contains = new ArrayList<String>();
+		int chance = Config.rand.nextInt(totalChance);
 		
-		for (String str : defaults)
+		for (Chance c : chances)
 		{
-			contains.add(str);
+			if (c.min <= chance && c.max > chance)
+				return c.value;
 		}
-	}
-	
-	public String toString()
-	{
-		if (contains == null)
-			return "";
 		
-		String str = "";
-		
-		for (String s : contains)
-		{
-			if (str.length() != 0)
-				str += ",";
-			str += s;
-		}
-		return str;
+		return 0;
 	}
 }
