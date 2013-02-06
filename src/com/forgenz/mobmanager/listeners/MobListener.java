@@ -39,9 +39,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import com.forgenz.mobmanager.MobType;
 import com.forgenz.mobmanager.P;
@@ -336,10 +336,9 @@ public class MobListener implements Listener
 		{
 			damager = (LivingEntity) event.getDamager();
 		}
-		else
-		{
+		
+		if (damager == null)
 			return;
-		}
 		
 		MobAttributes mobAttributes = null;
 		
