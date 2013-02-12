@@ -28,14 +28,24 @@
 
 package com.forgenz.mobmanager.listeners.commands;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.attributes.abilities.Ability;
+import com.forgenz.mobmanager.config.Config;
+import com.forgenz.mobmanager.config.MobAttributes;
+import com.forgenz.mobmanager.util.ValueChance;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMCoord;
 import com.forgenz.mobmanager.world.MMLayer;
@@ -46,7 +56,7 @@ public class MMCommandDebug extends MMCommand
 
 	MMCommandDebug()
 	{
-		super(Pattern.compile("debug", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"), 0, 0);
+		super(Pattern.compile("debug", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"), 0, 1);
 	}
 
 	@Override
@@ -60,6 +70,69 @@ public class MMCommandDebug extends MMCommand
 		
 		if (!super.validArgs(sender, maincmd, args))
 			return;
+		
+		if (args.length >= 2 && args[1].equalsIgnoreCase("entitypotions"))
+		{
+			if (sender instanceof Player == false)
+				return;
+			
+			Player player = (Player) sender;
+			
+			HashMap<PotionEffectType, Integer> effectCounts = new HashMap<PotionEffectType, Integer>();
+			
+			for (LivingEntity entity : player.getWorld().getLivingEntities())
+			{
+				for (PotionEffect effect : entity.getActivePotionEffects())
+				{
+					Integer count = effectCounts.get(effect.getType());
+					
+					if (count == null)
+					{
+						count = new Integer(0);
+						effectCounts.put(effect.getType(), count);
+					}
+					
+					++count;
+				}
+			}
+			
+			Iterator<Entry<PotionEffectType, Integer>> it = effectCounts.entrySet().iterator();
+			
+			while (it.hasNext())
+			{
+				Entry<PotionEffectType, Integer> e = it.next();
+				
+				player.sendMessage(String.format("Effect: %s, Count: %d", e.getKey().getName(), e.getValue()));
+			}
+			return;
+		}
+		
+		if (args.length >= 2 && args[1].equalsIgnoreCase("zombieabilities"))
+		{
+			if (sender instanceof Player == false)
+				return;
+			
+			Player player = (Player) sender;
+			
+			MMWorld world = P.worlds.get(player.getWorld().getName());
+			
+			MobAttributes ma = Config.getMobAttributes(world, EntityType.ZOMBIE);
+			
+			if (ma == null)
+			{
+				player.sendMessage("No config found");
+				return;
+			}
+			
+			player.sendMessage(ma.attributes.size() + " attributes");
+			int count = 0;
+			
+			for (ValueChance<Ability> vc : ma.attributes.values())
+				count += vc.getNumChances();
+			
+			player.sendMessage(count + " individual chances");
+			return;
+		}
 		
 		int numPlayers = 0;
 		int numPlayersLayers = 0;

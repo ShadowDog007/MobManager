@@ -77,12 +77,15 @@ public class Config extends AbstractConfig
 	public static List<String> layers;
 	public static HashSet<Integer> layerBoundaries;
 	
-	public static HashMap<EntityType, MobAttributes> mobAttributes;
+	public static HashMap<EntityType, MobAttributes> mobAbilities;
 	
 	public static HashMap<String, WorldConfig> worldConfigs;
 	
 	public Config()
-	{		
+	{
+		/* ################ ConfigVersion ################ */
+		//String configVersion = P.cfg.getString("ConfigVersion", null);
+		//P.cfg.set("ConfigVersion", P.p.getDescription().getVersion());
 		/* ################ ActiveWorlds ################ */
 		List<String> activeWorlds = P.cfg.getStringList("EnabledWorlds");
 		
@@ -230,11 +233,11 @@ public class Config extends AbstractConfig
 		P.p.getLogger().info(layers.size() + " layers found");
 		
 		/* ######## Global Mob Attributes ######## */
-		mobAttributes = new HashMap<EntityType, MobAttributes>();
-		ConfigurationSection cfg = P.cfg.getConfigurationSection("MobAttributes");
+		mobAbilities = new HashMap<EntityType, MobAttributes>();
+		ConfigurationSection cfg = P.cfg.getConfigurationSection("MobAbilities");
 		
 		if (cfg == null)
-			cfg = P.cfg.createSection("MobAttributes");
+			cfg = P.cfg.createSection("MobAbilities");
 		
 		Set<String> keys = cfg.getKeys(false);
 		
@@ -247,22 +250,22 @@ public class Config extends AbstractConfig
 			}
 			catch (IllegalArgumentException e)
 			{
-				P.p.getLogger().warning("The mob " + key + " is invalid for the MobAttributes");
+				P.p.getLogger().warning("The mob " + key + " is invalid for the MobAbilities");
 				continue;
 			}
 			if (mob == null || !LivingEntity.class.isAssignableFrom(mob.getEntityClass()))
 			{
-				P.p.getLogger().warning("The mob " + key + " is invalid for the MobAttributes");
+				P.p.getLogger().warning("The mob " + key + " is invalid for the MobAbilities");
 				continue;
 			}
 			
 			ConfigurationSection mobCfg = cfg.getConfigurationSection(key);
 			if (mobCfg == null)
 			{
-				P.p.getLogger().warning("Error loading MobAttributes for " + key);
+				P.p.getLogger().warning("Error loading MobAbilities for " + key);
 				continue;
 			}
-			mobAttributes.put(mob, new MobAttributes(mob, mobCfg));
+			mobAbilities.put(mob, new MobAttributes(mob, mobCfg));
 		}
 		
 		// Copy the header to the file
@@ -274,13 +277,10 @@ public class Config extends AbstractConfig
 	 * Fetches mob attributes from the given world or from global settings if no world config is found
 	 */
 	public static MobAttributes getMobAttributes(MMWorld world, EntityType type)
-	{
-		if (world == null)
-			return null;
+	{		
+		MobAttributes ma = world != null ? world.worldConf.mobAbilities.get(type) : null;
 		
-		MobAttributes ma = world.worldConf.mobAttributes.get(type);
-		
-		return ma != null ? ma : mobAttributes.get(type);
+		return ma != null ? ma : mobAbilities.get(type);
 		
 	}
 	

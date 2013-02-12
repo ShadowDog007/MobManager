@@ -26,31 +26,33 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.config;
+package com.forgenz.mobmanager.util;
 
 import java.util.ArrayList;
 
-public class MobIntChance
+import com.forgenz.mobmanager.config.Config;
+
+public class ValueChance<T extends Object>
 {
 	private class Chance
 	{
 		final int min;
 		final int max;
 		
-		final int value;
+		final T value;
 		
-		private Chance(int min, int max, int bonus)
+		private Chance(int min, int max, T value)
 		{
 			this.min = min;
 			this.max = max;
-			this.value = bonus;
+			this.value = value;
 		}
 	}
 	
 	private int totalChance = 0;
 	private ArrayList<Chance> chances = new ArrayList<Chance>();
 	
-	public void addChance(int chance, int value)
+	public void addChance(int chance, T value)
 	{
 		int min = totalChance;
 		
@@ -61,10 +63,10 @@ public class MobIntChance
 		chances.add(new Chance(min, max, value));
 	}
 	
-	public int getBonus()
+	public T getBonus()
 	{
 		if (chances.size() == 0)
-			return 0;
+			return null;
 		
 		int chance = Config.rand.nextInt(totalChance);
 		
@@ -74,6 +76,11 @@ public class MobIntChance
 				return c.value;
 		}
 		
-		return 0;
+		return null;
+	}
+	
+	public int getNumChances()
+	{
+		return chances.size();
 	}
 }

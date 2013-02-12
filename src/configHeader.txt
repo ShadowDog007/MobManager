@@ -53,7 +53,7 @@ WARNING: This feature is in beta, it has not been thoroughly tested
 #######################################################################
 RemoveTamedAnimals
 #######################################################################
-If true MobManager will never despawn any animals which have been
+If false MobManager will never despawn any animals which have been
     tamed by a player.
 	
 #######################################################################
@@ -218,21 +218,38 @@ The mob spawn is only allowed if one of the layers
 Layers should overlap to give an even distribution of mobs
 
 #######################################################################
-MobAttributes (Global)
+MobAbilities (Global)
 #######################################################################
-Contains settings you can use to edit mob attributes.
+Contains settings you can use to edit mob abilities.
 
 Mob settings here will be used in all enabled worlds
 
 Mob names must be acquired from here:
     http://jd.bukkit.org/apidocs/org/bukkit/entity/EntityType.html
     And should be in all upper-case
+
+There are currently two types of mob Attributes/Abilities:
+1) Rate: These have a single fixed chance of doing something
+
+    rates are written as a simple number between 1.0 and 0.0
+
+2) ChanceList: These are a list of chances with values associated
+    with each chance. The chance of a given value being selected is
+    (chance) / (Sum of all chances)
     
-Read more about MobAttributes here:
-    http://dev.bukkit.org/server-mods/mobmanager/pages/explanations/mob-attributes/
+    ChanceLists are written as below
+    <OPTION>:
+    - '<CHANCE>:<OPTIONS_VALUE>'
+    - '<CHANCE>:<OPTIONS_VALUE>'  
+    
+    Be sure to use quote marks when you add or edit any chances
+    as sometimes errors can occur when you do not.
+
+Read more about MobAbilities here:
+    http://dev.bukkit.org/server-mods/mobmanager/pages/explanations/mob-abilities/
 
 ################
-SpawnRate
+SpawnRate (Rate)
 ################
 A number between 0 and 1. Represents the chance a mob will be
     allowed to spawn.
@@ -240,24 +257,102 @@ E.G. if SpawnRate was 0.5 there would be a 50% chance that any mob
     which attempts to spawn will be allowed to spawn
 This setting can be used to reduce the number of certain mobs on your
     server. (Possibly Freeing up space for other mobs)
+
 ################
-BonusHealth
+BabyRate (Rate)
+################
+A number between 0 and 1. Represents the chance a mob will be
+    turned into a baby.
+E.G. if SpawnRate was 0.5 there would be a 50% chance that any mob
+    which attempts to spawn will be allowed to spawn
+This setting only works for Animals and Zombies
+
+################
+PotionEffects (ChanceList)
+################
+This is a list of potion effects which will be added to an mob
+These potion effects will last the duration of the entities life.
+Potion effects currently only supports one effect per mob
+
+NOTE: You can use AbilitySets to give entities more than one potion effect
+
+Valid potion effects can be found here:
+    http://jd.bukkit.org/rb/apidocs/org/bukkit/potion/PotionEffectType.html
+NOTE: You can also use NONE as a potion effect, which essentially means
+    no potion effect will be added to the mob if it gets this ability
+
+################
+HealthBonus
 ################
 A list of chances + bonus health for the mob
-Written in this format:
+Health Bonuses are added on to the mobs normal health
 
-BonusHealth:
-- <Chance>:<BonusHealth>
-- <Chance>:<OtherBonusHealth>
 ################
-BonusDamage
+DamageMulti
 ################
-A list of chances + bonus damage for the mob
-Written in this format:
+A list of chances + damage multipliers for the mob
+When a mob does damage it multiplies the normal damage
+     with the multiplier.
+NOTE: Multipliers can stack with damage multipliers from AbilitySets
 
-BonusHealth:
-- <Chance>:<BonusDamage>
-- <Chance>:<OtherBonusDamage>
+################
+ArmourSets
+################
+ArmourSets is a list of armour materials to be put on a mob
+
+Valid armour materials are:
+- DIAMOND
+- IRON
+- CHAIN
+- GOLD
+- LEATHER
+- NONE
+
+The chosen armour is put on the mob when it spawns. It always uses
+    a full set of armour.
+
+################
+StartingItem
+################
+This is a list of items mobs can start with.
+Items are given by their ID number and are placed in the mobs hand
+
+Check here for item id's: http://www.minecraftwiki.net/wiki/Data_values
+
+For no item use the ID for Air (Which is 0)
+
+################
+AbilitySets
+################
+AbilitySets allow you to combine all of the above abilities together
+    to create special mobs.
+NOTE: AbilitySets stack with the above abilities as well
+
+AbilitySets are formatted like so (Using Zombie as an example)
+
+ZOMBIE:
+  AbilitySets:
+  - '10:HEALTH_BONUS=5,BABY,ARMOUR=DIAMOND,POTION=SPEED,POTION=POISON'
+  - '6:DAMAGE_MULTI=2.0'
+  
+Ability sets can only contain one of each ability
+     with the exception of POTION abilities
+
+Options for each ability are given their values by putting an ='s
+    after the ability name then putting their values
+    (e.g. ARMOUR=DIAMOND)
+     
+Valid ability's:
+- POTION=<Potion Effect>
+- HEALTH_BONUS=<Bonus Health>
+- DAMAGE_MULTI=<Damage Multiplier>
+- ARMOUR=<Armour material type>
+- ITEM_HAND=<Item ID>
+- BABY
+- NONE
+
+NOTE: The 'NONE' Ability is only there so you can keep a chance for
+    normal mobs. It has no effect on sets with other abilities
 
 #######################################################################
 

@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager;
+package com.forgenz.mobmanager.tasks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,16 +34,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Zombie;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.forgenz.mobmanager.MobType;
+import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.config.Config;
-import com.forgenz.mobmanager.listeners.MobListener;
-import com.forgenz.mobmanager.world.MMChunk;
-import com.forgenz.mobmanager.world.MMCoord;
+import com.forgenz.mobmanager.util.MobDespawnCheck;
 import com.forgenz.mobmanager.world.MMWorld;
 
 
@@ -183,76 +179,10 @@ public class MobDespawnTask extends BukkitRunnable
 				// Iterate through each entity until there are none left or the task has run for 0.2ms
 				while ((entity = it.next()) != null && (System.nanoTime() - start) < 200000L)
 				{
-					// Make sure the entity is alive and valid
-					if (!entity.isValid())
-						continue;
-
-					// Check if the mob has lived long enough
-					if (entity.getTicksLived() <= Config.minTicksLivedForDespawn)
-						continue;
-
-					// Check if the mob is being ignored
-					if (Config.ignoredMobs.containsValue(entity.getType().toString()))
-						continue;
-
-					MobType mob = MobType.valueOf(entity);
-					// If MobManager does not recognize the entity ignore it
-					if (mob == null)
-						continue;
-					
-					// Check if the mob is an animal
-					if (mob == MobType.ANIMAL)
+					// Check if the mob should be despawned
+					if (MobDespawnCheck.shouldDespawn(it.getWorld(), entity))
 					{
-						// If animal protection is off then despawning of animals is disabled
-						if (P.p.animalProtection == null)
-							continue;
-						
-						// Check if the animal is tamed
-						if (!Config.removeTamedAnimals && entity instanceof Tameable)
-						{
-							Tameable tameable = (Tameable) entity;
-							
-							if (tameable.isTamed())
-								continue;
-						}
-						
-						// Check if the animal is being protected
-						if (P.p.animalProtection.checkUUID(entity.getUniqueId()))
-							continue;
-
-						// TODO Remove this feature completely
-						// If the chunk has more than 'numAnimalsForFarm' then animals are not despawned
-						MMChunk chunk = it.getWorld().getChunk(entity.getLocation().getChunk());
-						if (chunk.getAnimalCount() >= it.getWorld().worldConf.numAnimalsForFarm)
-							continue;
-					}
-					// Only despawn villagers if they are over their limits
-					else if (mob == MobType.VILLAGER)
-					{
-						if (it.getWorld().withinMobLimit(mob))
-							continue;
-					}
-					// Does not despawn the entity if it carries players items
-					else if (entity instanceof Zombie || entity instanceof Skeleton)
-					{
-						EntityEquipment equipment = entity.getEquipment();
-
-						// If any of these statements pass then the the mob carries an item dropped from a player
-						if (equipment.getBootsDropChance() == 1F)
-							continue;
-						if (equipment.getChestplateDropChance() == 1F)
-							continue;
-						if (equipment.getHelmetDropChance() == 1F)
-							continue;
-						if (equipment.getItemInHandDropChance() == 1F)
-							continue;
-						if (equipment.getLeggingsDropChance() == 1F)
-							continue;
-					}
-					
-					// Search for a nearby player
-					if (!MobListener.i.playerNear(it.getWorld(), new MMCoord(entity.getLocation().getChunk()), entity.getLocation().getBlockY(), MobListener.i.mobFlys(entity)))
-					{
+						// Make sure we don't use bukkit methods in async
 						if (!Config.useAsyncDespawnScanner)
 						{
 							entity.remove();

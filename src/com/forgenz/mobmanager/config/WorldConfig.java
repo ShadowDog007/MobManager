@@ -57,7 +57,7 @@ public class WorldConfig extends AbstractConfig
 	public final int undergroundSpawnChunkSearchDistance;
 	public final int groundHeight;
 	
-	public final HashMap<EntityType, MobAttributes> mobAttributes;
+	public final HashMap<EntityType, MobAttributes> mobAbilities;
 	
 	public WorldConfig(World world)
 	{
@@ -104,11 +104,11 @@ public class WorldConfig extends AbstractConfig
 		cfg.set("GroundHeight", groundHeight);
 		
 		/* ######## World Mob Attributes ######## */
-		mobAttributes = new HashMap<EntityType, MobAttributes>();
-		ConfigurationSection mobsCfg = cfg.getConfigurationSection("MobAttributes");
+		mobAbilities = new HashMap<EntityType, MobAttributes>();
+		ConfigurationSection mobsCfg = cfg.getConfigurationSection("MobAbilities");
 		
 		if (mobsCfg == null)
-			mobsCfg = cfg.createSection("MobAttributes");
+			mobsCfg = cfg.createSection("MobAbilities");
 		
 		Set<String> keys = mobsCfg.getKeys(false);
 		
@@ -136,7 +136,7 @@ public class WorldConfig extends AbstractConfig
 				P.p.getLogger().warning("Error loading MobAttributes for " + key);
 				continue;
 			}
-			mobAttributes.put(mob, new MobAttributes(mob, mobCfg));
+			mobAbilities.put(mob, new MobAttributes(mob, mobCfg));
 		}
 		
 		

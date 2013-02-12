@@ -36,12 +36,13 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.forgenz.mobmanager.config.Config;
+import com.forgenz.mobmanager.listeners.AttributeMobListener;
 import com.forgenz.mobmanager.listeners.ChunkListener;
 import com.forgenz.mobmanager.listeners.MobListener;
 import com.forgenz.mobmanager.listeners.PlayerListener;
 import com.forgenz.mobmanager.listeners.commands.MMCommandListener;
+import com.forgenz.mobmanager.tasks.MobDespawnTask;
 import com.forgenz.mobmanager.util.AnimalProtection;
-import com.forgenz.mobmanager.util.EntityMaxHealthSetup;
 import com.forgenz.mobmanager.world.MMWorld;
 
 /**
@@ -96,8 +97,9 @@ public class P extends JavaPlugin
 			return;
 		}
 		
-		// Register Mob event listener
+		// Register Mob event listeners
 		getServer().getPluginManager().registerEvents(new MobListener(), this);
+		getServer().getPluginManager().registerEvents(new AttributeMobListener(), this);
 		// Register Player event listener
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 		// Register Chunk event listener
@@ -122,36 +124,36 @@ public class P extends JavaPlugin
 		}
 		
 		// Sets already living mob HP to config settings
-		boolean hasGlobal = Config.mobAttributes.size() != 0;
-		boolean changeHP = hasGlobal;
+		boolean hasGlobal = Config.mobAbilities.size() != 0;
+		boolean addAbilities = hasGlobal;
 		
 		// If there are no global configs we check if there are any world configs
 		if (!hasGlobal)
 		{
 			for (MMWorld world : worlds.values())
 			{
-				if (world.worldConf.mobAttributes.size() != 0)
+				if (world.worldConf.mobAbilities.size() != 0)
 				{
-					changeHP = true;
+					addAbilities = true;
 					break;
 				}
 			}
 		}
 		
 		// Check if we should bother iterating through entities
-		if (changeHP)
+		if (addAbilities)
 		{
 			// Iterate through each enabled world
 			for (MMWorld world : worlds.values())
 			{
 				// If there are no global configs and the world has no configs, check next world
-				if (!hasGlobal && world.worldConf.mobAttributes.size() == 0)
+				if (!hasGlobal && world.worldConf.mobAbilities.size() == 0)
 					continue;
 				
 				// Iterate through each entity in the world and set their max HP accordingly
 				for (LivingEntity entity : world.getWorld().getLivingEntities())
 				{
-					EntityMaxHealthSetup.setMaxHealth(entity, Config.getMobAttributes(world, entity.getType()));
+					AttributeMobListener.addAbilities(entity);
 				}
 			}
 		}
@@ -163,10 +165,47 @@ public class P extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
+		// Resets mob abilities
+		boolean hasGlobal = Config.mobAbilities.size() != 0;
+		boolean removeAbilities = hasGlobal;
+		
+		// If there are no global configs we check if there are any world configs
+		if (!hasGlobal)
+		{
+			for (MMWorld world : worlds.values())
+			{
+				if (world.worldConf.mobAbilities.size() != 0)
+				{
+					removeAbilities = true;
+					break;
+				}
+			}
+		}
+		
+		// Check if we should bother iterating through entities
+		if (removeAbilities)
+		{
+			// Iterate through each enabled world
+			for (MMWorld world : worlds.values())
+			{
+				// If there are no global configs and the world has no configs, check next world
+				if (!hasGlobal && world.worldConf.mobAbilities.size() == 0)
+					continue;
+				
+				// Iterate through each entity in the world and set their max HP accordingly
+				for (LivingEntity entity : world.getWorld().getLivingEntities())
+				{
+					AttributeMobListener.removeAbilities(entity);
+				}
+			}
+		}
+		
+		
 		// This has not worked for me in the past..
 		getServer().getScheduler().cancelTasks(this);
 		// Soo....
-		despawner.cancel();
+		if (despawner != null)
+			despawner.cancel();
 		
 		if (animalProtection != null)
 		{

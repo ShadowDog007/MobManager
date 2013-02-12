@@ -28,6 +28,8 @@
 
 package com.forgenz.mobmanager.listeners;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -35,6 +37,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.util.MobDespawnCheck;
 import com.forgenz.mobmanager.world.MMWorld;
 
 public class ChunkListener implements Listener
@@ -62,5 +65,15 @@ public class ChunkListener implements Listener
 
 		// Remove the chunk from the world
 		world.removeChunk(event.getChunk());
+		
+		// Remove monsters and whatnot from the unloading chunk
+		for (Entity entity : event.getChunk().getEntities())
+		{
+			if (entity instanceof LivingEntity == false)
+				continue;
+			
+			if (MobDespawnCheck.shouldDespawn(world, (LivingEntity) entity, true))
+				entity.remove();
+		}
 	}
 }

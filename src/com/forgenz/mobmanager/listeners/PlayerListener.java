@@ -44,7 +44,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.config.Config;
-import com.forgenz.mobmanager.util.EntityMaxHealthSetup;
 import com.forgenz.mobmanager.world.MMChunk;
 import com.forgenz.mobmanager.world.MMLayer;
 import com.forgenz.mobmanager.world.MMWorld;
@@ -139,8 +138,8 @@ public class PlayerListener implements Listener
 		if (world == null)
 			return;
 		
-		// Set players Max health if it is defined in config
-		EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(world, event.getPlayer().getType()));
+		// Add player abilities TESTING
+		AttributeMobListener.addAbilities(event.getPlayer());
 
 		// Fetch the chunk the player logged into
 		final MMChunk chunk = world.getChunk(event.getPlayer().getLocation().getChunk());
@@ -181,8 +180,8 @@ public class PlayerListener implements Listener
 		if (world == null)
 			return;
 		
-		// Set players Max health if it is defined in config
-		EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(world, event.getPlayer().getType()));
+		// Add player abilities TESTING
+		AttributeMobListener.addAbilities(event.getPlayer());
 		
 		// Check if we can ignore creative players and the player is in creative mode
 		if (Config.ignoreCreativePlayers && event.getPlayer().getGameMode() == GameMode.CREATIVE)
@@ -286,9 +285,6 @@ public class PlayerListener implements Listener
 			MMWorld toWorld = P.worlds.get(event.getTo().getWorld().getName());
 			MMWorld fromWorld = P.worlds.get(event.getFrom().getWorld().getName());
 			
-			// Set players Max health if it is defined in config for the new world
-			EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(toWorld, event.getPlayer().getType()));
-			
 			// Fetch each chunk
 			MMChunk toChunk = toWorld != null ? toWorld.getChunk(event.getTo().getChunk()) : null;
 			MMChunk fromChunk = fromWorld != null ? fromWorld.getChunk(event.getFrom().getChunk()) : null;
@@ -336,9 +332,6 @@ public class PlayerListener implements Listener
 
 				if (toWorld == null)
 					return;
-				
-				// Set players Max health if it is defined in config for the new world
-				EntityMaxHealthSetup.setMaxHealth(event.getPlayer(), Config.getMobAttributes(toWorld, event.getPlayer().getType()));
 
 				MMChunk toChunk = toWorld.getChunk(event.getPlayer().getLocation().getChunk());
 
