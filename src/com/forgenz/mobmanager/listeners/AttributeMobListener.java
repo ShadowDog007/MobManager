@@ -9,8 +9,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.attributes.AbilityTypes;
 import com.forgenz.mobmanager.attributes.abilities.Ability;
 import com.forgenz.mobmanager.attributes.abilities.DamageAbility;
 import com.forgenz.mobmanager.config.Config;
@@ -79,9 +81,18 @@ public class AttributeMobListener implements Listener
 		if (ma == null)
 			return;
 		
-		for (ValueChance<Ability> abilityChances : ma.attributes.values())
+		AbilityTypes[] types = AbilityTypes.values();
+		for (int i = 0; i < types.length; ++i)
 		{
-			Ability ability = abilityChances.getBonus();
+			if (!types[i].isValueChanceAbility())
+				continue;
+			
+			ValueChance<Ability> abilityChance = ma.attributes.get(types[i]);
+			
+			if (abilityChance == null)
+				continue;
+			
+			Ability ability = abilityChance.getBonus();
 			
 			if (ability == null)
 				continue;
@@ -99,14 +110,23 @@ public class AttributeMobListener implements Listener
 		if (ma == null)
 			return;
 		
-		for (ValueChance<Ability> abilityChances : ma.attributes.values())
+		AbilityTypes[] types = AbilityTypes.values();
+		for (int i = types.length - 1; i >= 0; --i)
 		{
-			Ability ability = abilityChances.getBonus();
+			if (!types[i].isValueChanceAbility())
+				continue;
+			
+			ValueChance<Ability> abilityChance = ma.attributes.get(types[i]);
+			
+			if (abilityChance == null)
+				continue;
+			
+			Ability ability = abilityChance.getBonus();
 			
 			if (ability == null)
 				continue;
 			
-			ability.removeAbility(entity);
+			ability.addAbility(entity);
 		}
 	}
 	
@@ -116,6 +136,10 @@ public class AttributeMobListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void setDamageMulti(EntityDamageByEntityEvent event)
 	{
+		// We are only interested in these three damage types
+		if (event.getCause() != DamageCause.ENTITY_ATTACK && event.getCause() != DamageCause.PROJECTILE && event.getCause() != DamageCause.ENTITY_EXPLOSION)
+			return;
+		
 		// Get the entity which dealt the damage
 		LivingEntity damager = null;
 		

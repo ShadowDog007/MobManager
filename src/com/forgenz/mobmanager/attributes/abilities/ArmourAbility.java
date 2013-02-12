@@ -23,7 +23,8 @@ public class ArmourAbility extends Ability
 		CHAIN(Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS, Material.CHAINMAIL_BOOTS),
 		GOLD(Material.GOLD_HELMET, Material.GOLD_CHESTPLATE, Material.GOLD_LEGGINGS, Material.GOLD_BOOTS),
 		LEATHER(Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS),
-		NONE(Material.AIR, Material.AIR, Material.AIR, Material.AIR);
+		NONE(Material.AIR, Material.AIR, Material.AIR, Material.AIR),
+		DEFAULT(null, null, null, null);
 		
 		private ArmourAbility ability = null;
 		private final Material head;
@@ -41,28 +42,32 @@ public class ArmourAbility extends Ability
 		
 		public void setHead(LivingEntity entity)
 		{
-			entity.getEquipment().setHelmet(new ItemStack(head));
+			if (head != null)
+				entity.getEquipment().setHelmet(new ItemStack(head));
 		}
 		
 		public void setChest(LivingEntity entity)
 		{
-			entity.getEquipment().setChestplate(new ItemStack(chest));
+			if (head != null)
+				entity.getEquipment().setChestplate(new ItemStack(chest));
 		}
 		
 		public void setLegs(LivingEntity entity)
 		{
-			entity.getEquipment().setLeggings(new ItemStack(legs));
+			if (head != null)
+				entity.getEquipment().setLeggings(new ItemStack(legs));
 		}
 		
 		public void setFeet(LivingEntity entity)
 		{
-			entity.getEquipment().setBoots(new ItemStack(feet));
+			if (head != null)
+				entity.getEquipment().setBoots(new ItemStack(feet));
 		}
 		
 		public ArmourAbility getAbility()
 		{
 			if (ability == null)
-				ability = new  ArmourAbility(this);
+				ability = new ArmourAbility(this);
 			return ability;
 		}
 	}
@@ -89,6 +94,16 @@ public class ArmourAbility extends Ability
 	@Override
 	public void removeAbility(LivingEntity entity)
 	{
+		for (ItemStack mat : entity.getEquipment().getArmorContents())
+		{
+			if (mat.getType() != material.head && mat.getType() != material.chest && mat.getType() != material.legs && mat.getType() != material.feet)
+				return;
+		}
+		
+		ArmourMaterials.NONE.setHead(entity);
+		ArmourMaterials.NONE.setChest(entity);
+		ArmourMaterials.NONE.setLegs(entity);
+		ArmourMaterials.NONE.setFeet(entity);
 		
 	}
 	

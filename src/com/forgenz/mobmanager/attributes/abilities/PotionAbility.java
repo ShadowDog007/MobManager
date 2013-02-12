@@ -33,7 +33,7 @@ public class PotionAbility extends Ability
 		if (potionEffect == null)
 			return;
 		
-		PotionEffect effect = new PotionEffect(potionEffect, Integer.MAX_VALUE, 1);
+		PotionEffect effect = new PotionEffect(potionEffect, Integer.MAX_VALUE, 0);
 		
 		entity.addPotionEffect(effect);
 	}
@@ -67,6 +67,9 @@ public class PotionAbility extends Ability
 		for (PotionEffectType effect : PotionEffectType.values())
 		{
 			if (effect == null)
+				continue;
+			
+			if (effect.isInstant())
 				continue;
 			
 			if (list.length() != 0)
@@ -118,6 +121,9 @@ public class PotionAbility extends Ability
 			P.p.getLogger().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityTypes.POTION);
 			return null;
 		}
+		
+		if (optVal.equalsIgnoreCase("NONE"))
+			return nullPotion;
 		
 		PotionEffectType potionEffect = null;
 		

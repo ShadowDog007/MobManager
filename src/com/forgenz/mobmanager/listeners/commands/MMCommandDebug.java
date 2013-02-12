@@ -43,6 +43,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.attributes.abilities.Ability;
+import com.forgenz.mobmanager.attributes.abilities.PotionAbility;
 import com.forgenz.mobmanager.config.Config;
 import com.forgenz.mobmanager.config.MobAttributes;
 import com.forgenz.mobmanager.util.ValueChance;
@@ -104,6 +105,12 @@ public class MMCommandDebug extends MMCommand
 				
 				player.sendMessage(String.format("Effect: %s, Count: %d", e.getKey().getName(), e.getValue()));
 			}
+			return;
+		}
+		
+		if (args.length >= 2 && args[1].equalsIgnoreCase("potionlist"))
+		{
+			sender.sendMessage("PotionList: " + PotionAbility.getPotionEffectList());
 			return;
 		}
 		

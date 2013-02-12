@@ -286,6 +286,7 @@ HealthBonus
 ################
 A list of chances + bonus health for the mob
 Health Bonuses are added on to the mobs normal health
+They can be negative (So they reduce the mobs normal health)
 
 ################
 DamageMulti
@@ -296,9 +297,9 @@ When a mob does damage it multiplies the normal damage
 NOTE: Multipliers can stack with damage multipliers from AbilitySets
 
 ################
-ArmourSets
+Armour
 ################
-ArmourSets is a list of armour materials to be put on a mob
+Armour is a list of armour materials to be put on a mob
 
 Valid armour materials are:
 - DIAMOND
@@ -307,9 +308,12 @@ Valid armour materials are:
 - GOLD
 - LEATHER
 - NONE
+- DEFAULT
 
 The chosen armour is put on the mob when it spawns. It always uses
     a full set of armour.
+NOTE: NONE means that the mob will have NO armour. DEFAULT will leave
+    the mob with whatever armour it had beforehand
 
 ################
 StartingItem
@@ -320,6 +324,8 @@ Items are given by their ID number and are placed in the mobs hand
 Check here for item id's: http://www.minecraftwiki.net/wiki/Data_values
 
 For no item use the ID for Air (Which is 0)
+
+To not replace the item a mob spawns with use -1
 
 ################
 AbilitySets

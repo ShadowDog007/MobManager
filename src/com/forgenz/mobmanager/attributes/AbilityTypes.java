@@ -22,13 +22,13 @@ public enum AbilityTypes
 	
 	POTION("PotionEffects", PotionAbility.class, Pattern.compile("^" + PotionAbility.getPotionEffectList() + "$", Pattern.CASE_INSENSITIVE)),
 	
-	HEALTH_BONUS("HealthBonus", HealthAbility.class, Pattern.compile("^\\d+$")),
+	HEALTH_BONUS("HealthBonus", HealthAbility.class, Pattern.compile("^-?\\d+$")),
 	
 	DAMAGE_MULTI("DamageMulti", DamageAbility.class, Pattern.compile("^[0-9]+\\.[0-9]+$")),
 	
-	ARMOUR("ArmourSets", ArmourAbility.class, Pattern.compile("^(DIAMOND|IRON|CHAIN|GOLD|LEATHER|NONE)$", Pattern.CASE_INSENSITIVE)),
+	ARMOUR("Armour", ArmourAbility.class, Pattern.compile("^(DIAMOND|IRON|CHAIN|GOLD|LEATHER|NONE|DEFAULT)$", Pattern.CASE_INSENSITIVE)),
 	
-	ITEM_HAND("StartingItem", ItemAbility.class, Pattern.compile("^\\d+$")),
+	ITEM_HAND("StartingItem", ItemAbility.class, Pattern.compile("^-1|\\d+$")),
 	
 	BABY("BabyRate", false, BabyAbility.class, Pattern.compile("^$")),
 	

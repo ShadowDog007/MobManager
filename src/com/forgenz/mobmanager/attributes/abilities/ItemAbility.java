@@ -16,6 +16,7 @@ import com.forgenz.mobmanager.util.ValueChance;
 public class ItemAbility extends Ability
 {
 	private final static HashMap<Material, ItemAbility> itemAbilities = new HashMap<Material, ItemAbility>();
+	private final static ItemAbility nullItem = new ItemAbility(null);
 	
 	public final Material item;
 	
@@ -87,6 +88,11 @@ public class ItemAbility extends Ability
 			return null;
 		}
 		
+		int itemId = Integer.valueOf(optVal);
+		
+		if (itemId < 0)
+			return nullItem;
+			
 		Material material = Material.getMaterial(Integer.valueOf(optVal));
 		if (material == null)
 			material = Material.AIR;
