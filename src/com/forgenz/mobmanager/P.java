@@ -31,19 +31,24 @@ package com.forgenz.mobmanager;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.forgenz.mobmanager.config.Config;
-import com.forgenz.mobmanager.listeners.AttributeMobListener;
-import com.forgenz.mobmanager.listeners.ChunkListener;
-import com.forgenz.mobmanager.listeners.MobListener;
-import com.forgenz.mobmanager.listeners.PlayerListener;
-import com.forgenz.mobmanager.listeners.commands.MMCommandListener;
-import com.forgenz.mobmanager.tasks.MobDespawnTask;
-import com.forgenz.mobmanager.util.AnimalProtection;
-import com.forgenz.mobmanager.world.MMWorld;
+import com.forgenz.mobmanager.abilities.config.AbilityConfig;
+import com.forgenz.mobmanager.abilities.config.WorldAbilityConfig;
+import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
+import com.forgenz.mobmanager.commands.MMCommandListener;
+import com.forgenz.mobmanager.common.config.AbstractConfig;
+import com.forgenz.mobmanager.common.listeners.CommonMobListener;
+import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.Config_Old;
+import com.forgenz.mobmanager.limiter.listeners.ChunkListener;
+import com.forgenz.mobmanager.limiter.listeners.MobListener;
+import com.forgenz.mobmanager.limiter.listeners.PlayerListener;
+import com.forgenz.mobmanager.limiter.tasks.MobDespawnTask;
+import com.forgenz.mobmanager.limiter.util.AnimalProtection;
+import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 /**
  * <b>MobManager</b> </br>
@@ -55,13 +60,28 @@ import com.forgenz.mobmanager.world.MMWorld;
 public class P extends JavaPlugin
 {
 	public static P p = null;
-	public static FileConfiguration cfg = null;
 	
 	public static ConcurrentHashMap<String, MMWorld> worlds = null;
 	
 	private MobDespawnTask despawner = null;
 	
 	public AnimalProtection animalProtection = null;
+	
+	public AbilityConfig abilityCfg = null;
+	
+	
+	private boolean limiterEnabled;
+	private boolean abilitiesEnabled;
+	
+	public boolean isLimiterEnabled()
+	{
+		return limiterEnabled;
+	}
+	
+	public boolean isAbiltiesEnabled()
+	{
+		return abilitiesEnabled;
+	}
 
 	@Override
 	public void onLoad()
@@ -72,7 +92,6 @@ public class P extends JavaPlugin
 	public void onEnable()
 	{
 		p = this;
-		cfg = getConfig();
 		
 		// Start Metrics gathering
 		try
@@ -85,8 +104,63 @@ public class P extends JavaPlugin
 			getLogger().info("Failed to start metrics gathering..  :(");
 		}
 		
-		// Load config
-		Config config = new Config();
+		getServer().getPluginManager().registerEvents(new CommonMobListener(), this);
+		
+		getConfig();
+		
+		limiterEnabled = true;
+		abilitiesEnabled = false;
+		
+		limiterEnabled = getConfig().getBoolean("EnableLimiter", limiterEnabled);
+		abilitiesEnabled = getConfig().getBoolean("EnableAbilities", abilitiesEnabled);
+		
+		getConfig().set("EnableLimiter", limiterEnabled);
+		getConfig().set("EnableAbilities", abilitiesEnabled);
+		
+		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"
+				+ "\n\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList());
+		
+		if (!limiterEnabled && !abilitiesEnabled)
+		{
+			getLogger().warning("No components enabled, disabling");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		
+		// Enable each component
+		if (limiterEnabled)
+			enableLimiter();
+		if (abilitiesEnabled)
+			enableAbilities();
+		
+		getCommand("mm").setExecutor(new MMCommandListener());
+		
+		getConfig().set("Version", getDescription().getVersion());
+		saveConfig();
+	}
+
+	@Override
+	public void onDisable()
+	{		
+		// 'Attempt to' Cancel all tasks
+		getServer().getScheduler().cancelTasks(this);
+		
+		// Disable each component
+		if (limiterEnabled)
+			disableLimiter();
+		if (abilitiesEnabled)
+			disableAbilities();
+	}
+	
+	private void enableLimiter()
+	{
+		// Load Config's (Convert old config's to new format + location)
+		Config config;
+		
+		if (!getConfig().contains("Version"))
+			config = new Config_Old();
+		else
+			config = new Config();
 
 		// Setup worlds
 		worlds = new ConcurrentHashMap<String, MMWorld>(2, 0.75F, 2);
@@ -96,22 +170,18 @@ public class P extends JavaPlugin
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
-		
+
 		// Register Mob event listeners
 		getServer().getPluginManager().registerEvents(new MobListener(), this);
-		getServer().getPluginManager().registerEvents(new AttributeMobListener(), this);
 		// Register Player event listener
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 		// Register Chunk event listener
 		getServer().getPluginManager().registerEvents(new ChunkListener(), this);
-		
-		// Register MobManager command
-		getCommand("mm").setExecutor(new MMCommandListener());
-		
+
 		// Start the despawner task
 		despawner = new MobDespawnTask();
 		despawner.runTaskTimer(this, 1L, Config.ticksPerDespawnScan);
-		
+
 		// Setup animal protection
 		if (Config.enableAnimalDespawning)
 		{
@@ -123,16 +193,41 @@ public class P extends JavaPlugin
 			}
 		}
 		
+		getLogger().info("v" + getDescription().getVersion() + " ennabled with " + worlds.size() + " worlds");
+	}
+	
+	private void disableLimiter()
+	{
+		if (despawner != null)
+			despawner.cancel();
+		
+		if (animalProtection != null)
+		{
+			animalProtection.cancel();
+			animalProtection.run();
+		}
+		
+		p = null;
+	}
+	
+	private void enableAbilities()
+	{
+		abilityCfg = new AbilityConfig();
+		
+		// Register Mob event listeners
+		getServer().getPluginManager().registerEvents(new AbilitiesMobListener(), this);
+		
 		// Sets already living mob HP to config settings
-		boolean hasGlobal = Config.mobAbilities.size() != 0;
+		boolean hasGlobal = abilityCfg.globalCfg.mobs.size() != 0;
 		boolean addAbilities = hasGlobal;
 		
 		// If there are no global configs we check if there are any world configs
 		if (!hasGlobal)
 		{
-			for (MMWorld world : worlds.values())
+			for (String world : abilityCfg.enabledWorlds)
 			{
-				if (world.worldConf.mobAbilities.size() != 0)
+				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
+				if (worldCfg != null && worldCfg.mobs.size() != 0)
 				{
 					addAbilities = true;
 					break;
@@ -144,77 +239,93 @@ public class P extends JavaPlugin
 		if (addAbilities)
 		{
 			// Iterate through each enabled world
-			for (MMWorld world : worlds.values())
+			for (String world : abilityCfg.enabledWorlds)
 			{
+				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
+				
 				// If there are no global configs and the world has no configs, check next world
-				if (!hasGlobal && world.worldConf.mobAbilities.size() == 0)
+				if (!hasGlobal && worldCfg != null && worldCfg.mobs.size() == 0)
 					continue;
 				
 				// Iterate through each entity in the world and set their max HP accordingly
-				for (LivingEntity entity : world.getWorld().getLivingEntities())
+				for (LivingEntity entity : getServer().getWorld(world).getLivingEntities())
 				{
-					AttributeMobListener.addAbilities(entity);
+					AbilitiesMobListener.addAbilities(entity);
 				}
 			}
 		}
-		
-		getLogger().info("v" + getDescription().getVersion() + " ennabled with " + worlds.size() + " worlds");
-		// And we are done :D
 	}
-
-	@Override
-	public void onDisable()
-	{
+	
+	private void disableAbilities()
+	{		
 		// Resets mob abilities
-		boolean hasGlobal = Config.mobAbilities.size() != 0;
-		boolean removeAbilities = hasGlobal;
+		boolean hasGlobal = abilityCfg.globalCfg.mobs.size() != 0;
+		boolean addAbilities = hasGlobal;
 		
 		// If there are no global configs we check if there are any world configs
 		if (!hasGlobal)
 		{
-			for (MMWorld world : worlds.values())
+			for (String world : abilityCfg.enabledWorlds)
 			{
-				if (world.worldConf.mobAbilities.size() != 0)
+				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
+				if (worldCfg != null && worldCfg.mobs.size() != 0)
 				{
-					removeAbilities = true;
+					addAbilities = true;
 					break;
 				}
 			}
 		}
 		
 		// Check if we should bother iterating through entities
-		if (removeAbilities)
+		if (addAbilities)
 		{
 			// Iterate through each enabled world
-			for (MMWorld world : worlds.values())
+			for (String world : abilityCfg.enabledWorlds)
 			{
+				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
+				
 				// If there are no global configs and the world has no configs, check next world
-				if (!hasGlobal && world.worldConf.mobAbilities.size() == 0)
+				if (!hasGlobal && worldCfg != null && worldCfg.mobs.size() == 0)
 					continue;
 				
 				// Iterate through each entity in the world and set their max HP accordingly
-				for (LivingEntity entity : world.getWorld().getLivingEntities())
+				for (LivingEntity entity : getServer().getWorld(world).getLivingEntities())
 				{
-					AttributeMobListener.removeAbilities(entity);
+					AbilitiesMobListener.removeAbilities(entity);
 				}
 			}
 		}
 		
-		
-		// This has not worked for me in the past..
-		getServer().getScheduler().cancelTasks(this);
-		// Soo....
-		if (despawner != null)
-			despawner.cancel();
-		
-		if (animalProtection != null)
-		{
-			animalProtection.cancel();
-			animalProtection.run();
-		}
-		
-		p = null;
-		cfg = null;
-		worlds = null;
+
+		abilityCfg = null;
+	}
+	
+	/* #### IgnoreSpawn Flags #### */
+	private boolean ignoreNextSpawn = false;
+	public void ignoreNextSpawn(boolean value)
+	{
+		ignoreNextSpawn = value;
+	}
+	public boolean shouldIgnoreNextSpawn()
+	{
+		return ignoreNextSpawn;
+	}
+	private boolean limiterIgnoreNextSpawn = false;
+	public void limiterIgnoreNextSpawn(boolean value)
+	{
+		limiterIgnoreNextSpawn = value;
+	}
+	public boolean shouldLimiterIgnoreNextSpawn()
+	{
+		return limiterIgnoreNextSpawn;
+	}
+	private boolean abilitiesIgnoreNextSpawn = false;
+	public void abilitiesIgnoreNextSpawn(boolean value)
+	{
+		abilitiesIgnoreNextSpawn = value;
+	}
+	public boolean shouldAbilitiesIgnoreNextSpawn()
+	{
+		return abilitiesIgnoreNextSpawn;
 	}
 }

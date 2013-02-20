@@ -1,0 +1,42 @@
+#######################################################################
+EnabledWorlds
+#######################################################################
+List of all the worlds which MobManagers Abilities is active in
+MobManager Abilities will not have any effect on worlds not listed here
+
+#######################################################################
+AbilitySets
+#######################################################################
+Here you define your ability sets for each mob type, giving them names
+    which are used in MobAbilities.
+Names must be totally unique (Different case does not count)
+
+EXAMPLE:
+AbilitySets:
+- Name: SteveTheZombie
+  MobType: ZOMBIE
+  Options:
+  - POTION:
+    - SPEED
+    - REGENERATION
+    - JUMP
+  - DAMAGE_MULTI: 10.0
+  - HEALTH_BONUS: 10
+- Name: StevesSon
+  MobType: ZOMBIE
+  Options:
+  - BABY: null
+  - POTION:
+    - SPEED
+    - REGENERATION
+    - JUMP
+  - DAMAGE_MULTI: 5.0
+  - HEALTH_BONUS: 5
+   
+Valid Abilities:
+POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, BABY, ANGRY, CHARGED, NONE
+
+NOTE: The MobType Key is only used in /mm spawnset to determine
+    which mob should be spawned along with a given AbilitySet
+    (If a MobType is not provided)
+
