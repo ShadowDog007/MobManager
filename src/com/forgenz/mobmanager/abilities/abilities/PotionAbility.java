@@ -28,10 +28,11 @@
 
 package com.forgenz.mobmanager.abilities.abilities;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.bukkit.entity.LivingEntity;
@@ -46,15 +47,16 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
 public class PotionAbility extends Ability
 {
-	public static final Pattern potionMatcher = Pattern.compile("^(" + PotionAbility.getPotionEffectList() + ")$", Pattern.CASE_INSENSITIVE);
+	public static final Pattern potionMatcher = Pattern.compile("^(" + PotionAbility.getPotionEffectList() + ")(:[0-3])?$", Pattern.CASE_INSENSITIVE);
 	
 	private static final PotionAbility nullPotion = new PotionAbility(null);
 	
 	public static final AbilityTypes effect = AbilityTypes.POTION;
 	
-	public final ArrayList<PotionEffectType> potionEffects;
 	
-	private PotionAbility(ArrayList<PotionEffectType> potionEffects)
+	public final HashMap<PotionEffectType, Integer> potionEffects;
+	
+	private PotionAbility(HashMap<PotionEffectType, Integer> potionEffects)
 	{		
 		this.potionEffects = potionEffects;
 	}
@@ -65,10 +67,11 @@ public class PotionAbility extends Ability
 		if (potionEffects == null)
 			return;
 		
-		for (PotionEffectType potionEffect : potionEffects)
+		for (Entry<PotionEffectType, Integer> e : potionEffects.entrySet())
 		{
+			PotionEffectType potionEffect = e.getKey();
 		
-			PotionEffect effect = new PotionEffect(potionEffect, Integer.MAX_VALUE, 0);
+			PotionEffect effect = new PotionEffect(potionEffect, Integer.MAX_VALUE, e.getValue());
 		
 			entity.addPotionEffect(effect, true);
 		}
@@ -82,7 +85,7 @@ public class PotionAbility extends Ability
 		
 		for (PotionEffect effect : entity.getActivePotionEffects())
 		{
-			if (!potionEffects.contains(effect.getType()))
+			if (!potionEffects.containsKey(effect.getType()) || potionEffects.get(effect.getType()) != effect.getAmplifier())
 				continue;
 			
 			if (effect.getDuration() > Integer.MAX_VALUE >> 1)
@@ -148,7 +151,7 @@ public class PotionAbility extends Ability
 		if (optList == null)
 			return null;
 		
-		ArrayList<PotionEffectType> potionEffects = null;
+		HashMap<PotionEffectType, Integer> potionEffects = null;
 		
 		for (Object obj : optList)
 		{
@@ -168,12 +171,17 @@ public class PotionAbility extends Ability
 			
 			PotionEffectType potionEffect = null;
 			
+			String[] potionSplit = optVal.split(":");
+			
+			if (potionSplit.length != 2 && potionSplit.length != 1)
+				continue;
+			
 			for (PotionEffectType effect : PotionEffectType.values())
 			{
 				if (effect == null)
 					continue;
 				
-				if (effect.getName().equalsIgnoreCase(optVal))
+				if (effect.getName().equalsIgnoreCase(potionSplit[0]))
 				{
 					potionEffect = effect;
 					break;
@@ -186,9 +194,11 @@ public class PotionAbility extends Ability
 				continue;
 			}
 			
+			Integer potency = potionSplit.length == 2 ? Integer.valueOf(potionSplit[1]) : 0;
+			
 			if (potionEffects == null)
-				potionEffects = new ArrayList<PotionEffectType>();
-			potionEffects.add(potionEffect);
+				potionEffects = new HashMap<PotionEffectType, Integer>();
+			potionEffects.put(potionEffect, potency);
 		}
 		
 		if (potionEffects == null || potionEffects.size() == 0)

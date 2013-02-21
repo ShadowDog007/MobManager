@@ -46,6 +46,7 @@ import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
+import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 
@@ -58,6 +59,9 @@ public class AbilitiesMobListener implements Listener
 	public void rates(CreatureSpawnEvent event)
 	{
 		if (P.p.shouldIgnoreNextSpawn() || P.p.shouldAbilitiesIgnoreNextSpawn())
+			return;
+		
+		if (!PluginIntegration.getInstance().canApplyAbilities(event.getEntity()))
 			return;
 		
 		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.get(event.getEntity()));
@@ -100,6 +104,9 @@ public class AbilitiesMobListener implements Listener
 	
 	public static void addAbilities(LivingEntity entity)
 	{
+		if (!PluginIntegration.getInstance().canApplyAbilities(entity))
+			return;
+		
 		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
 		
 		if (ma == null)
@@ -127,6 +134,9 @@ public class AbilitiesMobListener implements Listener
 	
 	public static void removeAbilities(LivingEntity entity)
 	{
+		if (!PluginIntegration.getInstance().canApplyAbilities(entity))
+			return;
+		
 		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
 		
 		if (ma == null)
@@ -172,11 +182,14 @@ public class AbilitiesMobListener implements Listener
 			damager = entity.getShooter();
 		}
 		else if (event.getDamager() instanceof LivingEntity)
-		{
+		{			
 			damager = (LivingEntity) event.getDamager();
 		}
 		
 		if (damager == null)
+			return;
+		
+		if (!PluginIntegration.getInstance().canApplyAbilities(damager))
 			return;
 		
 		// Fetch the multiplier for damage caused by the mob

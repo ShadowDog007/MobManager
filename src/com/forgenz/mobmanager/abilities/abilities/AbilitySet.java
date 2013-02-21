@@ -50,6 +50,8 @@ public class AbilitySet extends Ability
 	public static void resetAbilitySets()
 	{
 		abilitySets.clear();
+		// Add default none ability
+		abilitySets.put("none", new AbilitySet(new HashSet<Ability>(), null));
 	}
 	
 	private final HashSet<Ability> abilities;

@@ -35,6 +35,7 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EntityEquipment;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.listeners.MobListener;
@@ -85,6 +86,10 @@ public class MobDespawnCheck
 
 		// Check if the mob has lived long enough
 		if (entity.getTicksLived() <= Config.minTicksLivedForDespawn)
+			return false;
+		
+		// Check if other plugins will allow the mob to be despawned
+		if (!PluginIntegration.getInstance().canDespawn(entity))
 			return false;
 
 		// Check if the mob is being ignored

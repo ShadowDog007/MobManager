@@ -1,9 +1,11 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 2.2
+version: 2.2a
 website: http://dev.bukkit.org/server-mods/mobmanager/
 authors: [Michael McKnight (ShadowDog007)]
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
+
+softdepend: [EpicMobsRecoded]
 
 permissions:
   mobmanager.admin:
@@ -41,6 +43,7 @@ permissions:
 
 commands:
   mm:
+    aliases: [mobmanager]
     description: 'MobManager command'
     permission:
     permission-message: '[MobManager] You do not have permissions to access this command'

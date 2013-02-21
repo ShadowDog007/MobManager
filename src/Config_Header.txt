@@ -1,0 +1,17 @@
+
+
+#######################################################################
+EnableLimiter
+#######################################################################
+Enables the limiter component of MobManager
+
+#######################################################################
+EnableAbilities
+#######################################################################
+Enables the abilities component of MobManager
+
+#######################################################################
+Integration.EpicBossRecoded
+#######################################################################
+Enables integration of EpicBossRecoded to prevent EpicBosses from
+    having their abilities messed up or from being de-spawned

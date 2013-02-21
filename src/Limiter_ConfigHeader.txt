@@ -49,6 +49,9 @@ WARNING: This feature is in beta, it has not been thoroughly tested
     for bugs.
     It may produce some errors (Should only effect Mob despawning)
     Use at your own risk.
+    
+WARNING: If this is enabled Plugin Integration with EpicBossRecoded
+    will not work.
 
 #######################################################################
 RemoveTamedAnimals

@@ -10,6 +10,7 @@ AbilitySets
 Here you define your ability sets for each mob type, giving them names
     which are used in MobAbilities.
 Names must be totally unique (Different case does not count)
+Names must not contain spaces
 
 EXAMPLE:
 AbilitySets:
@@ -34,9 +35,12 @@ AbilitySets:
   - HEALTH_BONUS: 5
    
 Valid Abilities:
-POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, BABY, ANGRY, CHARGED, NONE
+POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, BABY, ANGRY, CHARGED
 
 NOTE: The MobType Key is only used in /mm spawnset to determine
     which mob should be spawned along with a given AbilitySet
     (If a MobType is not provided)
+    
+NOTE: A default AbilitySet exists with no abilities. To use this call
+    The AbilitySet 'NONE' under 'ApplySets' for your mob
 

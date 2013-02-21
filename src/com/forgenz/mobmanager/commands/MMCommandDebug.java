@@ -88,12 +88,9 @@ public class MMCommandDebug extends MMCommand
 					Integer count = effectCounts.get(effect.getType());
 					
 					if (count == null)
-					{
-						count = new Integer(0);
-						effectCounts.put(effect.getType(), count);
-					}
+						count = 0;
 					
-					++count;
+					effectCounts.put(effect.getType(), count + 1);
 				}
 			}
 			

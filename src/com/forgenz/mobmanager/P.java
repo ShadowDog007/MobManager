@@ -39,6 +39,7 @@ import com.forgenz.mobmanager.abilities.config.WorldAbilityConfig;
 import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
 import com.forgenz.mobmanager.commands.MMCommandListener;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
+import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.listeners.CommonMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
@@ -104,26 +105,29 @@ public class P extends JavaPlugin
 			getLogger().info("Failed to start metrics gathering..  :(");
 		}
 		
+		// Register common listeners
 		getServer().getPluginManager().registerEvents(new CommonMobListener(), this);
 		
+		/* #### CONFIG #### */
 		getConfig();
 		
+		// Check which components should be enabled
 		limiterEnabled = true;
 		abilitiesEnabled = false;
 		
 		limiterEnabled = getConfig().getBoolean("EnableLimiter", limiterEnabled);
 		abilitiesEnabled = getConfig().getBoolean("EnableAbilities", abilitiesEnabled);
 		
-		getConfig().set("EnableLimiter", limiterEnabled);
-		getConfig().set("EnableAbilities", abilitiesEnabled);
+		AbstractConfig.set(getConfig(), "EnableLimiter", limiterEnabled);
+		AbstractConfig.set(getConfig(), "EnableAbilities", abilitiesEnabled);
 		
+		// Copy the Config header into config.yml
 		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"
-				+ "\n\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList());
+				+ "\n\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList() + AbstractConfig.getResourceAsString("Config_Header.txt"));
 		
 		if (!limiterEnabled && !abilitiesEnabled)
 		{
-			getLogger().warning("No components enabled, disabling");
-			getServer().getPluginManager().disablePlugin(this);
+			getLogger().warning("No components enabled :(");
 			return;
 		}
 		
@@ -135,7 +139,13 @@ public class P extends JavaPlugin
 		
 		getCommand("mm").setExecutor(new MMCommandListener());
 		
-		getConfig().set("Version", getDescription().getVersion());
+		// Create PluginIntegration
+		new PluginIntegration();
+		
+		AbstractConfig.set(getConfig(), "Integration", getConfig().getConfigurationSection("Integration"));
+		
+		// Save the config with the current version
+		AbstractConfig.set(getConfig(), "Version", getDescription().getVersion());
 		saveConfig();
 	}
 
