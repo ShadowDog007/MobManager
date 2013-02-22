@@ -70,7 +70,7 @@ public class P extends JavaPlugin
 	
 	public AbilityConfig abilityCfg = null;
 	
-	
+	/* Enabled Components */
 	private boolean limiterEnabled;
 	private boolean abilitiesEnabled;
 	
@@ -82,6 +82,13 @@ public class P extends JavaPlugin
 	public boolean isAbiltiesEnabled()
 	{
 		return abilitiesEnabled;
+	}
+	
+	private boolean biomeSpecificMobs;
+	
+	public boolean isBioemSpeicficMobsEnabled()
+	{
+		return biomeSpecificMobs;
 	}
 
 	@Override
@@ -120,6 +127,11 @@ public class P extends JavaPlugin
 		
 		AbstractConfig.set(getConfig(), "EnableLimiter", limiterEnabled);
 		AbstractConfig.set(getConfig(), "EnableAbilities", abilitiesEnabled);
+		
+		// Check if Biome Specific Mobs are enabled
+		biomeSpecificMobs = false;
+		biomeSpecificMobs = getConfig().getBoolean("BiomeSpecificMobs", biomeSpecificMobs);
+		AbstractConfig.set(getConfig(), "BiomeSpecificMobs", biomeSpecificMobs);
 		
 		// Copy the Config header into config.yml
 		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"

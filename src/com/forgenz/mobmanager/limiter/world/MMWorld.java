@@ -149,8 +149,8 @@ public class MMWorld
 					continue;
 				}
 				// Reset chunks counts
-				//chunk.resetNumAnimals();
-				//chunk.resetPlayers();
+				chunk.resetNumAnimals();
+				chunk.resetPlayers();
 				
 				for (MMLayer layer : chunk.getLayers())
 					layer.resetPlayers();

@@ -59,12 +59,16 @@ public class EpicBossRecoded implements Protector
 	@Override
 	public boolean canDespawn(LivingEntity entity)
 	{
+		if (epicboss.api == null)
+			return true;
 		return !epicboss.api.isBoss(entity);
 	}
 
 	@Override
 	public boolean canApplyAbilities(LivingEntity entity)
 	{
+		if (epicboss.api == null)
+			return true;
 		return !epicboss.api.isBoss(entity);
 	}
 

@@ -104,20 +104,31 @@ public class PluginIntegration implements Protector
 	@Override
 	public boolean canDespawn(LivingEntity entity)
 	{
+		if (entity == null)
+			return true;
+		
 		final boolean async = !P.p.getServer().isPrimaryThread();
 		
-		for (Entry<Plugin, Protector> e : protectors.entrySet())
+		for (Entry<Plugin, Protector> entry : protectors.entrySet())
 		{
-			if (!e.getKey().isEnabled())
+			if (!entry.getKey().isEnabled())
 				continue;
 			
-			Protector protector = e.getValue();
+			Protector protector = entry.getValue();
 			
-			if (async && !protector.supportsAsynchronousUsage())
-				continue;
+			try
+			{
+				if (async && !protector.supportsAsynchronousUsage())
+					continue;
 			
-			if (!protector.canDespawn(entity))
-				return false;
+				if (!protector.canDespawn(entity))
+					return false;
+			}
+			catch (Exception e)
+			{
+				P.p.getLogger().severe("Caught Exception while checking if a mob could despawn");
+				e.printStackTrace();
+			}
 		}
 		
 		return true;
@@ -126,20 +137,31 @@ public class PluginIntegration implements Protector
 	@Override
 	public boolean canApplyAbilities(LivingEntity entity)
 	{
+		if (entity == null)
+			return true;
+		
 		final boolean async = !P.p.getServer().isPrimaryThread();
 		
-		for (Entry<Plugin, Protector> e : protectors.entrySet())
+		for (Entry<Plugin, Protector> entry : protectors.entrySet())
 		{
-			if (!e.getKey().isEnabled())
+			if (!entry.getKey().isEnabled())
 				continue;
 			
-			Protector protector = e.getValue();
+			Protector protector = entry.getValue();
 			
-			if (async && !protector.supportsAsynchronousUsage())
-				continue;
-			
-			if (!protector.canApplyAbilities(entity))
-				return false;
+			try
+			{
+				if (async && !protector.supportsAsynchronousUsage())
+					continue;
+				
+				if (!protector.canApplyAbilities(entity))
+					return false;
+			}
+			catch (Exception e)
+			{
+				P.p.getLogger().severe("Caught Exception while checking if a mob could have abilities");
+				e.printStackTrace();
+			}
 		}
 		
 		return true;
