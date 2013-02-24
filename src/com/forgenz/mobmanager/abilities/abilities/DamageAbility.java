@@ -37,7 +37,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -95,9 +95,9 @@ public class DamageAbility extends Ability
 	}
 	
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.DAMAGE_MULTI;
+		return AbilityType.DAMAGE_MULTI;
 	}
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)

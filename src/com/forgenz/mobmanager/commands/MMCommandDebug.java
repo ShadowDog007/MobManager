@@ -47,10 +47,6 @@ import com.forgenz.mobmanager.abilities.abilities.PotionAbility;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.world.MMChunk;
-import com.forgenz.mobmanager.limiter.world.MMCoord;
-import com.forgenz.mobmanager.limiter.world.MMLayer;
-import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class MMCommandDebug extends MMCommand
 {
@@ -136,34 +132,7 @@ public class MMCommandDebug extends MMCommand
 			return;
 		}
 		
-		int numPlayers = 0;
-		int numPlayersLayers = 0;
-		
-		for (MMWorld world : P.worlds.values())
-		{			
-			for (Entry<MMCoord, MMChunk> e : world.getChunks())
-			{
-				MMChunk chunk = e.getValue();
-				
-				numPlayers += chunk.getNumPlayers();
-				
-				if (chunk.getNumPlayers() > 0)
-					sender.sendMessage(String.format("%d players found in chunk (%d,%d)", chunk.getNumPlayers(), chunk.getCoord().getX(), chunk.getCoord().getZ()));
-				
-				for (MMLayer layer : chunk.getLayers())
-				{
-					numPlayersLayers += layer.getNumPlayers();
-					if (layer.getNumPlayers() > 0)
-					{
-						if (chunk.getNumPlayers() <= 0)
-							sender.sendMessage("ERROR, Players found in layer, but not its chunk");
-						sender.sendMessage(String.format("%d players found in layer (%d-%d):(%d,%d)", layer.getNumPlayers(), layer.getMinY(), layer.getMaxY(), chunk.getCoord().getX(), chunk.getCoord().getZ()));
-					}
-				}
-			}
-		}
-		
-		sender.sendMessage(String.format("Found %d players, and %d players in layers", numPlayers, numPlayersLayers));
+		sender.sendMessage("This does nothing without arguments");
 	}
 
 	@Override

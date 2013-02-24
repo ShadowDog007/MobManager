@@ -33,6 +33,7 @@ import java.util.HashMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 
@@ -177,12 +178,12 @@ public class ExtendedEntityType
 		return getTypeData();
 	}
 	
-	public Entity spawnMob(Location loc)
+	public LivingEntity spawnMob(Location loc)
 	{
 		if (loc == null || loc.getWorld() == null)
 			return null;
 		
-		Entity entity = loc.getWorld().spawnEntity(loc, eType);
+		LivingEntity entity = (LivingEntity) loc.getWorld().spawnEntity(loc, eType);
 		
 		if (entity == null)
 			return null;

@@ -37,7 +37,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -60,7 +62,12 @@ public class ItemAbility extends Ability
 		if (item == null)
 			return;
 		
+		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		
+		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
+		
 		entity.getEquipment().setItemInHand(new ItemStack(item));
+		entity.getEquipment().setItemInHandDropChance(dropChance);
 	}
 
 	@Override
@@ -72,14 +79,14 @@ public class ItemAbility extends Ability
 		if (entity.getEquipment().getItemInHand().getType() == item)
 		{
 			entity.getEquipment().setItemInHand(new ItemStack(Material.AIR));
-			entity.getEquipment().setItemInHandDropChance(0.5F);
+			entity.getEquipment().setItemInHandDropChance(0.15F);
 		}
 	}
 	
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.ITEM_HAND;
+		return AbilityType.ITEM_HAND;
 	}
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)

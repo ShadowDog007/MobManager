@@ -26,63 +26,34 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.limiter.world;
+package com.forgenz.mobmanager.abilities.abilities;
 
-import org.bukkit.Chunk;
+import org.bukkit.entity.LivingEntity;
 
-/**
- * A Simple class to help with storage/fetching of MMCunck objects
- * 
- * @author Michael McKnight (ShadowDog007)
- *
- */
-public class MMCoord
+import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+
+public class BirthSpawnAbility extends AbstractSpawnAbility
 {
-	private int x;
-	private int z;
 
-	public MMCoord(final int x, final int z)
+	protected BirthSpawnAbility(ExtendedEntityType type, int count, String abilitySet)
 	{
-		this.x = x;
-		this.z = z;
-	}
-	
-	public MMCoord(final Chunk chunk)
-	{
-		this(chunk.getX(), chunk.getZ());
-	}
-
-	public int getX()
-	{
-		return x;
-	}
-
-	public int getZ()
-	{
-		return z;
+		super(type, count, abilitySet);
 	}
 
 	@Override
-	public int hashCode()
+	public void addAbility(LivingEntity entity)
 	{
-		return x << 16 + z;
+		if (entity.getTicksLived() > 1)
+			return;
+		
+		super.addAbility(entity);
 	}
 
 	@Override
-	public boolean equals(final Object obj)
+	public AbilityType getAbilityType()
 	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final MMCoord other = (MMCoord) obj;
-		if (x != other.x)
-			return false;
-		if (z != other.z)
-			return false;
-		return true;
+		return AbilityType.BIRTH_SPAWN;
 	}
 
 }

@@ -31,7 +31,7 @@ package com.forgenz.mobmanager.abilities.abilities;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Wolf;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.limiter.config.Config;
 
@@ -85,9 +85,9 @@ public class AngryAbility extends Ability
 	}
 
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.ANGRY;
+		return AbilityType.ANGRY;
 	}
 
 }

@@ -40,7 +40,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -51,7 +51,7 @@ public class PotionAbility extends Ability
 	
 	private static final PotionAbility nullPotion = new PotionAbility(null);
 	
-	public static final AbilityTypes effect = AbilityTypes.POTION;
+	public static final AbilityType effect = AbilityType.POTION;
 	
 	
 	public final HashMap<PotionEffectType, Integer> potionEffects;
@@ -94,9 +94,9 @@ public class PotionAbility extends Ability
 	}
 	
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.POTION;
+		return AbilityType.POTION;
 	}
 	
 	public static String getPotionEffectList()
@@ -162,7 +162,7 @@ public class PotionAbility extends Ability
 			
 			if (!potionMatcher.matcher(optVal).matches())
 			{
-				P.p.getLogger().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityTypes.POTION);
+				P.p.getLogger().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityType.POTION);
 				return null;
 			}
 			

@@ -47,11 +47,13 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 public class AbilityConfig extends AbstractConfig
 {
 	protected final static String WORLDS_FOLDER = "worlds";
-	protected final static String ABILITY_CONFIG_NAME = "abilities.yml";	
+	protected final static String ABILITY_CONFIG_NAME = "abilities.yml";
 	
 	private final HashMap<String, WorldAbilityConfig> worlds = new HashMap<String, WorldAbilityConfig>();
 	
 	public final HashSet<String> enabledWorlds = new HashSet<String>();
+	
+	public final boolean limitBonusSpawns;
 	
 	public final WorldAbilityConfig globalCfg;
 	
@@ -84,6 +86,10 @@ public class AbilityConfig extends AbstractConfig
 			
 		for (Object obj : abilitySets)
 			AbilitySet.createAbilitySet(MiscUtil.getConfigMap(obj));
+		
+		/* ################ LimitBonusSpawns ################ */
+		limitBonusSpawns = cfg.getBoolean("LimitBonusSpawns");
+		set(cfg, "LimitBonusSpawns", limitBonusSpawns);
 		
 		/* ################ Ability Global Config ################ */
 		globalCfg = new WorldAbilityConfig(cfg, "");

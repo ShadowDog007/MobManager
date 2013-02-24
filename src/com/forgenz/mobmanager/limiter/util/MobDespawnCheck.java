@@ -28,6 +28,7 @@
 
 package com.forgenz.mobmanager.limiter.util;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Tameable;
@@ -39,8 +40,6 @@ import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.listeners.MobListener;
-import com.forgenz.mobmanager.limiter.world.MMChunk;
-import com.forgenz.mobmanager.limiter.world.MMCoord;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class MobDespawnCheck
@@ -121,10 +120,14 @@ public class MobDespawnCheck
 			if (P.p.animalProtection.checkUUID(entity.getUniqueId()))
 				return false;
 
-			// TODO Remove this feature completely
 			// If the chunk has more than 'numAnimalsForFarm' then animals are not despawned
-			MMChunk chunk = world.getChunk(entity.getLocation().getChunk());
-			if (chunk.getAnimalCount() >= world.worldConf.numAnimalsForFarm)
+			int animalCount = 0;
+			for (Entity e : entity.getLocation().getChunk().getEntities())
+			{
+				if (MobType.ANIMAL.belongs(e))
+					++animalCount;
+			}
+			if (animalCount >= world.worldConf.numAnimalsForFarm)
 				return false;
 		}
 		// Only despawn villagers if they are over their limits
@@ -152,7 +155,7 @@ public class MobDespawnCheck
 			return true;
 		
 		// Search for a nearby player
-		return !MobListener.i.playerNear(world, new MMCoord(entity.getLocation().getChunk()), entity.getLocation().getBlockY(), MobListener.i.mobFlys(entity));
+		return !MobListener.i.playerNear(world, entity, MobListener.i.mobFlys(entity));
 	}
 	
 	public static boolean shouldDespawn(LivingEntity entity)

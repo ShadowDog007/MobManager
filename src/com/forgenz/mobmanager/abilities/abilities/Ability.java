@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.entity.LivingEntity;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 
 public abstract class Ability
 {
@@ -44,7 +44,7 @@ public abstract class Ability
 	/** Removes the ability from the entity (For reloads) */
 	public abstract void removeAbility(LivingEntity entity);
 	
-	public abstract AbilityTypes getAbilityType();
+	public abstract AbilityType getAbilityType();
 	
 	protected static String[] getChanceSplit(String str)
 	{

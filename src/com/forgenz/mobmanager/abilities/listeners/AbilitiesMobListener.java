@@ -35,10 +35,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
@@ -112,7 +113,7 @@ public class AbilitiesMobListener implements Listener
 		if (ma == null)
 			return;
 		
-		AbilityTypes[] types = AbilityTypes.values();
+		AbilityType[] types = AbilityType.values();
 		for (int i = 0; i < types.length; ++i)
 		{
 			if (!types[i].isValueChanceAbility())
@@ -142,7 +143,7 @@ public class AbilitiesMobListener implements Listener
 		if (ma == null)
 			return;
 		
-		AbilityTypes[] types = AbilityTypes.values();
+		AbilityType[] types = AbilityType.values();
 		for (int i = types.length - 1; i >= 0; --i)
 		{
 			if (!types[i].isValueChanceAbility())
@@ -160,6 +161,35 @@ public class AbilitiesMobListener implements Listener
 			
 			ability.addAbility(entity);
 		}
+	}
+	
+	/**
+	 * Handles the DeathSpawn Abilities
+	 */
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent event)
+	{
+		ExtendedEntityType type = ExtendedEntityType.get(event.getEntity());
+		
+		if (type == null)
+			return;
+		
+		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(event.getEntity().getWorld().getName(), type);
+		
+		if (ma == null)
+			return;
+		
+		ValueChance<Ability> vc = ma.attributes.get(AbilityType.DEATH_SPAWN);
+		
+		if (vc == null)
+			return;
+		
+		Ability ability = vc.getBonus();
+		
+		if (ability == null)
+			return;
+		
+		ability.addAbility(event.getEntity());
 	}
 	
 	/**

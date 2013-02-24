@@ -36,7 +36,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Wolf;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
@@ -48,16 +48,18 @@ public class MobAbilityConfig extends AbstractConfig
 {	
 	public final ExtendedEntityType mob;
 	
+	public final float equipmentDropChance;
+	
 	public final float spawnRate;
 	public final float babyRate;
 	public final float angryRate;
 	public final float chargedRate;
 	
-	public final HashMap<AbilityTypes, ValueChance<Ability>> attributes;
+	public final HashMap<AbilityType, ValueChance<Ability>> attributes;
 	
 	public MobAbilityConfig(ExtendedEntityType mob, ConfigurationSection cfg)
 	{
-		attributes = new HashMap<AbilityTypes, ValueChance<Ability>>();
+		attributes = new HashMap<AbilityType, ValueChance<Ability>>();
 		
 		this.mob = mob;
 		
@@ -67,6 +69,11 @@ public class MobAbilityConfig extends AbstractConfig
 			spawnRate = 1.0F;
 		this.spawnRate = spawnRate;
 		set(cfg, "SpawnRate", spawnRate);
+		
+		/* ######## EquipmentDropChance ######## */
+		float equipmentDropChance = (float) cfg.getDouble("EquipmentDropChance", 0.15F);
+		this.equipmentDropChance = equipmentDropChance < 0 ? 0.0F : equipmentDropChance;
+		set(cfg, "EquipmentDropChance", this.equipmentDropChance);
 		
 		/* ######## BabyRate ######## */
 		if (BabyAbility.isValid(mob))
@@ -111,7 +118,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## ValueChance Abilities ######## */
-		for (AbilityTypes ability : AbilityTypes.values())
+		for (AbilityType ability : AbilityType.values())
 		{
 			// Ignore abilities which don't work as ValueChance + Stand alone
 			if (!ability.isValueChanceAbility())

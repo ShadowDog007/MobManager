@@ -47,8 +47,11 @@ public class WorldConfig extends AbstractConfig
 	public final short[] dynMultis;
 	public final short breedingLimit;
 	public final short numAnimalsForFarm;
-	public final short spawnChunkSearchDistance;
-	public final int undergroundSpawnChunkSearchDistance;
+	
+	public final short despawnSearchDistance;
+	public final short undergroundSearchDistance;
+	public final short despawnSearchHeight;
+	
 	public final int groundHeight;
 	
 	public WorldConfig(World world)
@@ -76,6 +79,9 @@ public class WorldConfig extends AbstractConfig
 			set(cfg, "ChunkCalculatedMaximum." + mob.cPath, dynMultis[mob.index]);
 		}
 		
+		set(cfg, "WorldMaximum", cfg.getConfigurationSection("WorldMaximum"));
+		set(cfg, "ChunkCalculatedMaximum", cfg.getConfigurationSection("ChunkCalculatedMaximum"));
+		
 		/* ################ BreedingMaximumPerChunk ################ */
 		breedingLimit = (short) cfg.getInt("BreedingMaximumPerChunk", 15);
 		set(cfg, "BreedingMaximumPerChunk", breedingLimit);
@@ -84,20 +90,30 @@ public class WorldConfig extends AbstractConfig
 		numAnimalsForFarm = (short) cfg.getInt("NumAnimalsForFarm", 3);
 		set(cfg, "NumAnimalsForFarm", numAnimalsForFarm);
 		
-		/* ################ SpawnChunkSearchDistance ################ */
-		spawnChunkSearchDistance = (short) cfg.getInt("SpawnChunkSearchDistance", -1);
-		set(cfg, "SpawnChunkSearchDistance", spawnChunkSearchDistance);
+		/* ################ DespawnSearchDistance ################ */
+		short despawnSearchDistance = (short) cfg.getInt("DespawnSearchDistance", -1);
+		this.despawnSearchDistance = despawnSearchDistance <= 0 ? -1 : (short) (despawnSearchDistance * despawnSearchDistance);
+		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
-		/* ################ UndergroundSpawnChunkSearchDistance ################ */
-		undergroundSpawnChunkSearchDistance = cfg.getInt("UndergroundSpawnChunkSearchDistance", 2);
-		set(cfg, "UndergroundSpawnChunkSearchDistance", undergroundSpawnChunkSearchDistance);
+		/* ################ UndergroundBlockSearchDistance ################ */
+		short undergroundSearchDistance = (short) cfg.getInt("UndergroundSearchDistance", 32);
+		this.undergroundSearchDistance = (short) (undergroundSearchDistance * undergroundSearchDistance);
+		set(cfg, "UndergroundSearchDistance", undergroundSearchDistance);
 		
+		/* ################ DespawnSearchHeight ################ */
+		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 72));
+		this.despawnSearchHeight = despawnSearchHeight <= 0 ? -1 : (short) (despawnSearchHeight * despawnSearchHeight);
+		set(cfg, "DespawnSearchDistance", despawnSearchHeight);
 		
 		/* ################ GroundHeight ################ */
 		int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : (world.getEnvironment() == Environment.NETHER ? 32 : -1);
 		groundHeight = cfg.getInt("GroundHeight", defaultHeight);
 		set(cfg, "GroundHeight", groundHeight);
 		
+		
+		// Remove old Settings
+		cfg.set("SpawnChunkSearchDistance", null);
+		cfg.set("UndergroundSpawnChunkSearchDistance", null);
 		
 		copyHeader(cfg, "Limiter_WorldConfigHeader.txt", P.p.getDescription().getName() + " Limiter World Config " + P.p.getDescription().getVersion() + "\n");
 		saveConfig(WORLDS_FOLDER + File.separator + world.getName(), LIMITER_CONFIG_NAME, cfg);

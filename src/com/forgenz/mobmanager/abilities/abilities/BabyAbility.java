@@ -33,7 +33,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Zombie;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
@@ -102,9 +102,9 @@ public class BabyAbility extends Ability
 	}
 
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.BABY;
+		return AbilityType.BABY;
 	}
 
 }

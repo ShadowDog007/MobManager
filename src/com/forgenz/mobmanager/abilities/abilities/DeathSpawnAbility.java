@@ -26,81 +26,34 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.limiter.world;
+package com.forgenz.mobmanager.abilities.abilities;
 
-import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.limiter.config.Config;
+import org.bukkit.entity.LivingEntity;
 
-/**
- * Keeps track of players within a given Y coordinate range
- * 
- * @author Michael McKnight (ShadowDog007)
- *
- */
-public class MMLayer
+import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+
+public class DeathSpawnAbility extends AbstractSpawnAbility
 {
-	private int miny;
-	private int maxy;
-	private int numPlayers = 0;
-
-	public MMLayer(final int miny, final int maxy, final int numPlayers)
-	{
-		this.miny = miny;
-		this.maxy = maxy;
-		if (numPlayers > 0)
-			this.numPlayers = numPlayers;
-	}
-
-	public int getMaxY()
-	{
-		return maxy;
-	}
-
-	public int getMinY()
-	{
-		return miny;
-	}
 	
-	public void resetPlayers()
+	protected DeathSpawnAbility(ExtendedEntityType type, int count, String abilitySet)
 	{
-		numPlayers = 0;
+		super(type, count, abilitySet);
 	}
 
-	public boolean isEmpty()
+	@Override
+	public void addAbility(LivingEntity entity)
 	{
-		return numPlayers == 0;
+		if (!entity.isDead())
+			return;
+		
+		super.addAbility(entity);
 	}
 
-	public int getNumPlayers()
+	@Override
+	public AbilityType getAbilityType()
 	{
-		return numPlayers;
+		return AbilityType.DEATH_SPAWN;
 	}
 
-	public int playerEntered()
-	{
-		return ++numPlayers;
-	}
-
-	public int playerLeft()
-	{
-		if (--numPlayers < 0)
-		{
-			numPlayers = 0;
-
-			if (!Config.disableWarnings)
-				P.p.getLogger().warning(String.format("Player left the layer (%d,%d) without any players being in it?", miny, maxy));
-		}
-
-		return numPlayers;
-	}
-
-	public boolean insideRange(final int y)
-	{
-		return miny <= y && maxy >= y;
-	}
-	
-	public int compare(MMLayer layer)
-	{
-		return this.miny + this.maxy - layer.miny - layer.maxy;
-	}
 }

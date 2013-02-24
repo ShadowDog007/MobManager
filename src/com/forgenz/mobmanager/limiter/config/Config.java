@@ -66,8 +66,9 @@ public class Config extends AbstractConfig
 	public static double daysTillFarmAnimalCleanup;
 	public static int protectedFarmAnimalSaveInterval;
 	
-	public static short spawnChunkSearchDistance;
-	public static short flyingMobAditionalLayerDepth;
+	public static short despawnSearchDistance;
+	public static short despawnSearchHeight;
+	public static short flyingMobAditionalBlockDepth;
 	public static int ticksPerRecount;
 	public static int ticksPerDespawnScan;
 	public static int minTicksLivedForDespawn;
@@ -78,8 +79,6 @@ public class Config extends AbstractConfig
 	public static EnumSettingContainer enabledSpawnReasons;
 	
 	public static Set<String> enabledWorlds = new HashSet<String>();
-	public static List<String> layers;
-	public static HashSet<Integer> layerBoundaries;
 	
 	public static HashMap<String, WorldConfig> worldConfigs;
 	
@@ -87,9 +86,6 @@ public class Config extends AbstractConfig
 	{
 		FileConfiguration cfg = getConfig("", LIMITER_CONFIG_NAME);
 		
-		/* ################ ConfigVersion ################ */
-		//String configVersion = cfg.getString("ConfigVersion", null);
-		//set(cfg, "ConfigVersion", P.p.getDescription().getVersion());
 		/* ################ ActiveWorlds ################ */
 		List<String> activeWorlds = cfg.getStringList("EnabledWorlds");
 		
@@ -112,6 +108,7 @@ public class Config extends AbstractConfig
 		/* ################ UseAsyncDespawnScanner ################ */
 		useAsyncDespawnScanner = cfg.getBoolean("UseAsyncDespawnScanner", false);
 		set(cfg, "UseAsyncDespawnScanner", useAsyncDespawnScanner);
+		useAsyncDespawnScanner = false;
 		
 		/* ################ IgnoreCreativePlayers ################ */
 		ignoreCreativePlayers = cfg.getBoolean("IgnoreCreativePlayers", false);
@@ -134,19 +131,24 @@ public class Config extends AbstractConfig
 		protectedFarmAnimalSaveInterval = cfg.getInt("ProtectedFarmAnimalSaveInterval", 6000);
 		set(cfg, "ProtectedFarmAnimalSaveInterval", protectedFarmAnimalSaveInterval);
 		
-		/* ################ SpawnChunkSearchDistance ################ */
-		spawnChunkSearchDistance = (short) Math.abs(cfg.getInt("SpawnChunkSearchDistance", 5));
-		// Validate SpawnChunkSearchDistance
-		if (spawnChunkSearchDistance == 0)
-			spawnChunkSearchDistance = 1;
-		set(cfg, "SpawnChunkSearchDistance", spawnChunkSearchDistance);
+		/* ################ DespawnSearchDistance ################ */
+		short despawnSearchDistance = (short) Math.abs(cfg.getInt("DespawnSearchDistance", 72));
+		Config.despawnSearchDistance = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
+		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
-		/* ################ FlyingMobAditionalLayerDepth ################ */
-		flyingMobAditionalLayerDepth = (short) cfg.getInt("FlyingMobAditionalLayerDepth", 2);
-		set(cfg, "FlyingMobAditionalLayerDepth", flyingMobAditionalLayerDepth);
+		/* ################ DespawnSearchHeight ################ */
+		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 72));
+		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : (short) (despawnSearchHeight * despawnSearchHeight);
+		set(cfg, "DespawnSearchDistance", despawnSearchHeight);
+		
+		/* ################ FlyingMobAditionalBlockDepth ################ */
+		flyingMobAditionalBlockDepth = (short) cfg.getInt("FlyingMobAditionalBlockDepth", 15);
+		if (flyingMobAditionalBlockDepth < 0)
+			flyingMobAditionalBlockDepth = 0;
+		set(cfg, "FlyingMobAditionalBlockDepth", flyingMobAditionalBlockDepth);
 		
 		/* ################ TicksPerRecount ################ */
-		ticksPerRecount = cfg.getInt("TicksPerRecount", 40);
+		ticksPerRecount = cfg.getInt("TicksPerRecount", 100);
 		set(cfg, "TicksPerRecount", ticksPerRecount);
 		
 		/* ################ TicksPerDespawnScan ################ */
@@ -193,50 +195,10 @@ public class Config extends AbstractConfig
 		if (strList.length() != 0)
 			P.p.getLogger().info("EnabledSpawnReasons: " + strList);
 		
-		
-		/* ################ Layers ################ */
-		layers = new ArrayList<String>();
-		layerBoundaries = new HashSet<Integer>();
-		for (String layer : cfg.getStringList("Layers"))
-		{
-			if (!layerPattern.matcher(layer).matches())
-			{
-				P.p.getLogger().info("The layer '" + layer + "' is invalid");
-				continue;
-			}
-			
-			// Splits the range string for the layer
-			final String[] range = Config.layerSplitPattern.split(layer);
-
-			// Converts range into integers
-			int miny = Integer.valueOf(range[0]);
-			int maxy = Integer.valueOf(range[1]);
-
-			// Makes sure miny is actually the lower value
-			if (maxy < miny)
-			{
-				miny = miny ^ maxy;
-				maxy = miny ^ maxy;
-				miny = miny ^ maxy;
-			}
-			
-			layer = miny + "/" + maxy;
-			// Add the boundaries of the layer
-			layerBoundaries.add(miny);
-			layerBoundaries.add(maxy);
-			layers.add(layer);
-		}
-		
-		if (layers.size() == 0)
-		{
-			for (int i = 0; i <= 240; i += 8)
-			{
-				layers.add(i + "/" + (i + 16));
-			}
-		}
-		
-		set(cfg, "Layers", layers);
-		P.p.getLogger().info(layers.size() + " layers found");
+		/* ################ Old Settings ################ */
+		cfg.set("SpawnChunkSearchDistance", null);
+		cfg.set("Layers", null);
+		cfg.set("FlyingMobAditionalLayerDepth", null);
 		
 		// Copy the header to the file
 		copyHeader(cfg, "Limiter_ConfigHeader.txt", P.p.getDescription().getName() + " Limiter Global Config " + P.p.getDescription().getVersion() + "\n");

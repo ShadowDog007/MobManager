@@ -35,7 +35,7 @@ import java.util.Map;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.JoinableAttribute;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
@@ -106,9 +106,9 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 	}
 
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.HEALTH_BONUS;
+		return AbilityType.HEALTH_BONUS;
 	}
 	
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)

@@ -30,7 +30,7 @@ package com.forgenz.mobmanager.abilities.abilities;
 
 import org.bukkit.entity.LivingEntity;
 
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 
 public class NullAbility extends Ability
 {
@@ -53,9 +53,9 @@ public class NullAbility extends Ability
 	}
 
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.NONE;
+		return AbilityType.NONE;
 	}
 
 }

@@ -28,8 +28,6 @@
 
 package com.forgenz.mobmanager.limiter.listeners;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,7 +35,6 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.limiter.util.MobDespawnCheck;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class ChunkListener implements Listener
@@ -51,7 +48,7 @@ public class ChunkListener implements Listener
 		if (world == null)
 			return;
 
-		world.updateMobCounts();
+		world.incrementChunkCount();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -62,18 +59,7 @@ public class ChunkListener implements Listener
 		// If the world is not found it must be inactive
 		if (world == null)
 			return;
-
-		// Remove the chunk from the world
-		world.removeChunk(event.getChunk());
 		
-		// Remove monsters and whatnot from the unloading chunk
-		for (Entity entity : event.getChunk().getEntities())
-		{
-			if (entity instanceof LivingEntity == false)
-				continue;
-			
-			if (MobDespawnCheck.shouldDespawn(world, (LivingEntity) entity, true))
-				entity.remove();
-		}
+		world.decrementChunkCount();
 	}
 }

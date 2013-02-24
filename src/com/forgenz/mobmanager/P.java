@@ -43,17 +43,18 @@ import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.listeners.CommonMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
-import com.forgenz.mobmanager.limiter.config.Config_Old;
 import com.forgenz.mobmanager.limiter.listeners.ChunkListener;
 import com.forgenz.mobmanager.limiter.listeners.MobListener;
-import com.forgenz.mobmanager.limiter.listeners.PlayerListener;
 import com.forgenz.mobmanager.limiter.tasks.MobDespawnTask;
 import com.forgenz.mobmanager.limiter.util.AnimalProtection;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 /**
- * <b>MobManager</b> </br>
- * MobManager aims to reduce the number of unnecessary mob spawns </br>
+ * <b>MobManager</b> Components:
+ * <ul>
+ *     <li>Limiter: Reduces the number of unnecessary mob spawns</li>
+ *     <li>Abilities: Adds configurable abilities for every mob</li>
+ * </ul>
  * 
  * @author Michael McKnight (ShadowDog007)
  *
@@ -131,7 +132,7 @@ public class P extends JavaPlugin
 		// Check if Biome Specific Mobs are enabled
 		biomeSpecificMobs = false;
 		biomeSpecificMobs = getConfig().getBoolean("BiomeSpecificMobs", biomeSpecificMobs);
-		AbstractConfig.set(getConfig(), "BiomeSpecificMobs", biomeSpecificMobs);
+		//AbstractConfig.set(getConfig(), "BiomeSpecificMobs", biomeSpecificMobs);
 		
 		// Copy the Config header into config.yml
 		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"
@@ -176,13 +177,8 @@ public class P extends JavaPlugin
 	
 	private void enableLimiter()
 	{
-		// Load Config's (Convert old config's to new format + location)
-		Config config;
-		
-		if (!getConfig().contains("Version"))
-			config = new Config_Old();
-		else
-			config = new Config();
+		// Load Config
+		Config config = new Config();
 
 		// Setup worlds
 		worlds = new ConcurrentHashMap<String, MMWorld>(2, 0.75F, 2);
@@ -195,8 +191,6 @@ public class P extends JavaPlugin
 
 		// Register Mob event listeners
 		getServer().getPluginManager().registerEvents(new MobListener(), this);
-		// Register Player event listener
-		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 		// Register Chunk event listener
 		getServer().getPluginManager().registerEvents(new ChunkListener(), this);
 

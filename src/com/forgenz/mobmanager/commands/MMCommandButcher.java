@@ -40,7 +40,6 @@ import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.util.MobType;
-import com.forgenz.mobmanager.limiter.world.MMChunk;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class MMCommandButcher extends MMCommand
@@ -76,9 +75,11 @@ public class MMCommandButcher extends MMCommand
 		if (args.length == 1)
 		{
 			toRemove.add(MobType.MONSTER);
-			toRemove.add(MobType.ANIMAL);
 			toRemove.add(MobType.AMBIENT);
 			toRemove.add(MobType.WATER_ANIMAL);
+			
+			if (args[0].equalsIgnoreCase("butcherall"))
+				toRemove.add(MobType.ANIMAL);
 		}
 		else if (args.length > 1)
 		{
@@ -110,14 +111,6 @@ public class MMCommandButcher extends MMCommand
 				{
 					world.decrementMobCount(mob);
 					
-					if (mob == MobType.ANIMAL)
-					{
-						MMChunk chunk = world.getChunk(entity.getLocation().getChunk());
-						if (chunk != null)
-						{
-							chunk.changeNumAnimals(false);
-						}
-					}
 					entity.remove();
 					++numMobs;
 				}

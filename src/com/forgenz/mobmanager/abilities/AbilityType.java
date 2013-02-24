@@ -32,6 +32,7 @@ import java.util.List;
 
 import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
+import com.forgenz.mobmanager.abilities.abilities.AbstractSpawnAbility;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.ArmourAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
@@ -44,9 +45,13 @@ import com.forgenz.mobmanager.abilities.abilities.PotionAbility;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
-public enum AbilityTypes
+public enum AbilityType
 {
 	NONE(null, false),
+	
+	BIRTH_SPAWN("BirthSpawn"),
+	
+	DEATH_SPAWN("DeathSpawn"),
 	
 	POTION("PotionEffects"),
 	
@@ -69,12 +74,12 @@ public enum AbilityTypes
 	private final String abilityConfigPath;
 	private final boolean valueChanceAbility;
 	
-	AbilityTypes(String abilityConfigPath)
+	AbilityType(String abilityConfigPath)
 	{
 		this(abilityConfigPath, true);
 	}
 	
-	AbilityTypes(String abilityConfigPath, boolean valueChanceAbility)
+	AbilityType(String abilityConfigPath, boolean valueChanceAbility)
 	{
 		this .abilityConfigPath = abilityConfigPath;
 		this.valueChanceAbility = valueChanceAbility;
@@ -90,9 +95,9 @@ public enum AbilityTypes
 		return valueChanceAbility;
 	}
 	
-	public static AbilityTypes getAbilityType(String option)
+	public static AbilityType getAbilityType(String option)
 	{
-		for (AbilityTypes ability : values())
+		for (AbilityType ability : values())
 		{
 			if (ability.toString().equalsIgnoreCase(option))
 				return ability;
@@ -122,6 +127,10 @@ public enum AbilityTypes
 			break;
 		case POTION:
 			PotionAbility.setup(mob, abilityChances, optList);
+			break;
+		case BIRTH_SPAWN:
+		case DEATH_SPAWN:
+			AbstractSpawnAbility.setup(this, mob, abilityChances, optList);
 			break;
 		case NONE:
 		case BABY:
@@ -157,6 +166,9 @@ public enum AbilityTypes
 			return NullAbility.ability;
 		case POTION:
 			return PotionAbility.setup(mob, opt);
+		case BIRTH_SPAWN:
+		case DEATH_SPAWN:
+			return AbstractSpawnAbility.setup(this, mob, opt);
 		case ABILITY_SET:
 		default:
 			return null;

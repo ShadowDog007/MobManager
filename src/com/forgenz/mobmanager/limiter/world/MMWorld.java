@@ -28,17 +28,10 @@
 
 package com.forgenz.mobmanager.limiter.world;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.Chunk;
-import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 
 import com.forgenz.mobmanager.P;
@@ -67,10 +60,6 @@ public class MMWorld
 	public final WorldConfig worldConf;
 	
 	/**
-	 * Loaded chunks in the world
-	 */
-	private ConcurrentHashMap<MMCoord, MMChunk> chunks;
-	/**
 	 * Count of loaded chunks in the world
 	 */
 	private int numChunks = 0;
@@ -93,8 +82,6 @@ public class MMWorld
 		this.worldConf = worldConf;
 		
 		mobCounts = new int[worldConf.maximums.length];
-
-		chunks = new ConcurrentHashMap<MMCoord, MMChunk>(0, 0.75F, 2);
 		
 		updateMobCounts();
 
@@ -107,9 +94,19 @@ public class MMWorld
 		P.p.getLogger().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
 	}
 	
+	public short getSearchDistance(short y)
+	{
+		return y <= worldConf.groundHeight ? worldConf.undergroundSearchDistance : getSearchDistance();
+	}
+	
 	public short getSearchDistance()
 	{
-		return worldConf.spawnChunkSearchDistance > 0 ? worldConf.spawnChunkSearchDistance : Config.spawnChunkSearchDistance;
+		return worldConf.despawnSearchDistance > 0 ? worldConf.despawnSearchDistance : Config.despawnSearchDistance;
+	}
+	
+	public short getSearchHeight()
+	{
+		return worldConf.despawnSearchHeight > 0 ? worldConf.despawnSearchHeight : Config.despawnSearchHeight;
 	}
 	
 	private void resetMobCounts()
@@ -137,25 +134,6 @@ public class MMWorld
 			
 			numChunks = world.getLoadedChunks().length;
 			
-			Iterator<MMChunk> it = chunks.values().iterator();
-			while (it.hasNext())
-			{
-				MMChunk chunk = it.next();
-				
-				// Check if the chunk is still required
-				if (!chunk.getChunk().isLoaded())
-				{
-					it.remove();
-					continue;
-				}
-				// Reset chunks counts
-				chunk.resetNumAnimals();
-				chunk.resetPlayers();
-				
-				for (MMLayer layer : chunk.getLayers())
-					layer.resetPlayers();
-			}
-			
 			// Fetches the list of entities if it was not given
 			if (entities == null)
 				entities = world.getLivingEntities();
@@ -163,28 +141,6 @@ public class MMWorld
 			// Loop through each loaded chunk in the world
 			for (final LivingEntity entity : entities)
 			{
-				MMChunk mmchunk = getChunk(entity.getLocation().getChunk());
-				
-				// If the entity is a player update the layers and chunk
-				if (entity instanceof Player)
-				{
-					// Do not add players if they are in creative mode and 'ignoreCreativePlayers' is set
-					if (Config.ignoreCreativePlayers)
-					{
-						Player p = (Player) entity;
-						if (p.getGameMode() == GameMode.CREATIVE)
-							continue;
-					}
-
-
-					mmchunk.playerEntered();
-
-					for (MMLayer layersAt : mmchunk.getLayersAt(entity.getLocation().getBlockY()))
-						layersAt.playerEntered();
-
-					continue;
-				}
-
 				// Check if the mob should be ignored
 				if (Config.ignoredMobs.contains(ExtendedEntityType.get(entity)))
 					continue;
@@ -206,7 +162,6 @@ public class MMWorld
 						if (tameable.isTamed())
 							continue;
 					}
-					mmchunk.changeNumAnimals(true);
 				}
 
 				// Increment counter
@@ -234,68 +189,18 @@ public class MMWorld
 	{
 		return world;
 	}
-
-	public Set<Map.Entry<MMCoord, MMChunk>> getChunks()
-	{
-		return chunks.entrySet();
-	}
 	
 	public int getNumChunks()
 	{
 		return numChunks;
 	}
 
-	public MMChunk getChunk(final Chunk chunk)
-	{
-		if (!chunk.isLoaded())
-			return null;
-
-		MMChunk mmchunk = getChunk(new MMCoord(chunk.getX(), chunk.getZ()));
-		
-		if (mmchunk == null)
-			return addChunk(chunk, false);
-		return mmchunk;
-	}
-
-	public MMChunk getChunk(final MMCoord coord)
-	{
-		if (coord == null)
-			return null;
-		return chunks.get(coord);
-	}
-
-	public MMChunk addChunk(final Chunk chunk, boolean incrementCount)
-	{
-		if (!chunk.isLoaded())
-			return null;
-		
-		MMChunk mmchunk = new MMChunk(chunk, this);
-
-		if (chunks.get(mmchunk.getCoord()) != null)
-		{
-			if (!Config.disableWarnings)
-				P.p.getLogger().warning("Newly loaded chunk already existed in chunk map");
-			return chunks.get(mmchunk.getCoord());
-		}
-		
-		chunks.put(mmchunk.getCoord(), mmchunk);
-		if (incrementCount)
-			++numChunks;
-		return mmchunk;
-	}
-
-	public void removeChunk(final Chunk chunk)
-	{
-		if (chunks.remove(new MMCoord(chunk.getX(), chunk.getZ())) == null)
-			return;
-
-		--numChunks;
-	}
-
 	public int getMobCount(MobType mob)
 	{
 		if (mob == null)
 			return 0;
+		
+		updateMobCounts();
 		
 		return mobCounts[mob.index];
 	}
@@ -319,6 +224,8 @@ public class MMWorld
 		if (mob == null)
 			return true;
 		
+		updateMobCounts();
+		
 		return maxMobs(mob) > mobCounts[mob.index];
 	}
 
@@ -334,5 +241,15 @@ public class MMWorld
 		if (mob == null)
 			return;
 		--mobCounts[mob.index];
+	}
+
+	public void incrementChunkCount()
+	{
+		++numChunks;
+	}
+
+	public void decrementChunkCount()
+	{
+		--numChunks;
 	}
 }

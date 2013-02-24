@@ -39,7 +39,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -72,39 +73,39 @@ public class ArmourAbility extends Ability
 			this.feet = feet;
 		}
 		
-		public void setHead(LivingEntity entity)
+		public void setHead(LivingEntity entity, float dropChance)
 		{
 			if (head != null)
 			{
 				entity.getEquipment().setHelmet(new ItemStack(head));
-				entity.getEquipment().setHelmetDropChance(0.5F);
+				entity.getEquipment().setHelmetDropChance(dropChance);
 			}
 		}
 		
-		public void setChest(LivingEntity entity)
+		public void setChest(LivingEntity entity, float dropChance)
 		{
 			if (head != null)
 			{
 				entity.getEquipment().setChestplate(new ItemStack(chest));
-				entity.getEquipment().setChestplateDropChance(0.5F);
+				entity.getEquipment().setChestplateDropChance(dropChance);
 			}
 		}
 		
-		public void setLegs(LivingEntity entity)
+		public void setLegs(LivingEntity entity, float dropChance)
 		{
 			if (head != null)
 			{
 				entity.getEquipment().setLeggings(new ItemStack(legs));
-				entity.getEquipment().setLeggingsDropChance(0.5F);
+				entity.getEquipment().setLeggingsDropChance(dropChance);
 			}
 		}
 		
-		public void setFeet(LivingEntity entity)
+		public void setFeet(LivingEntity entity, float dropChance)
 		{
 			if (head != null)
 			{
 				entity.getEquipment().setBoots(new ItemStack(feet));
-				entity.getEquipment().setBootsDropChance(0.5F);
+				entity.getEquipment().setBootsDropChance(dropChance);
 			}
 		}
 		
@@ -129,10 +130,14 @@ public class ArmourAbility extends Ability
 		if (entity == null || entity instanceof Player)
 			return;
 		
-		material.setHead(entity);
-		material.setChest(entity);
-		material.setLegs(entity);
-		material.setFeet(entity);
+		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		
+		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
+		
+		material.setHead(entity, dropChance);
+		material.setChest(entity, dropChance);
+		material.setLegs(entity, dropChance);
+		material.setFeet(entity, dropChance);
 	}
 
 	@Override
@@ -144,17 +149,17 @@ public class ArmourAbility extends Ability
 				return;
 		}
 		
-		ArmourMaterials.NONE.setHead(entity);
-		ArmourMaterials.NONE.setChest(entity);
-		ArmourMaterials.NONE.setLegs(entity);
-		ArmourMaterials.NONE.setFeet(entity);
+		ArmourMaterials.NONE.setHead(entity, 0.15F);
+		ArmourMaterials.NONE.setChest(entity, 0.15F);
+		ArmourMaterials.NONE.setLegs(entity, 0.15F);
+		ArmourMaterials.NONE.setFeet(entity, 0.15F);
 		
 	}
 	
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.ARMOUR;
+		return AbilityType.ARMOUR;
 	}
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<?> optList)
@@ -186,7 +191,7 @@ public class ArmourAbility extends Ability
 	{
 		if (!valuePattern.matcher(optVal).matches())
 		{
-			P.p.getLogger().warning("The armour type " + optVal + " is invalid for MobAbilities." + mob + "." + AbilityTypes.ARMOUR);
+			P.p.getLogger().warning("The armour type " + optVal + " is invalid for MobAbilities." + mob + "." + AbilityType.ARMOUR);
 			return null;
 		}
 		
@@ -203,7 +208,7 @@ public class ArmourAbility extends Ability
 		
 		if (material == null)
 		{
-			P.p.getLogger().warning("The armour type " + optVal + " is invalid for MobAtributes." + mob + "." + AbilityTypes.ARMOUR);
+			P.p.getLogger().warning("The armour type " + optVal + " is invalid for MobAtributes." + mob + "." + AbilityType.ARMOUR);
 			return ArmourMaterials.NONE.getAbility();
 		}
 		

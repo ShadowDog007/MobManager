@@ -52,6 +52,8 @@ WARNING: This feature is in beta, it has not been thoroughly tested
     
 WARNING: If this is enabled Plugin Integration with EpicBossRecoded
     will not work.
+    
+NOTE: This feature is disabled in v2.3
 
 #######################################################################
 RemoveTamedAnimals
@@ -98,16 +100,16 @@ This setting is used to determine how often in ticks
 NOTE: This setting is directly related to DaysTillFarmAnimalCleanup
 
 #######################################################################
-SpawnChunkSearchDistance
+DespawnSearchDistance
 #######################################################################
-The distance (in chunks) to scan for
-    nearby players when a mob spawns
+The distance (in blocks) to scan for nearby players when a mob spawns
+    (or is being checked if it should be despawned)
 
 Used as a default for worlds which have
     invalid values set for the same setting
 
 #######################################################################
-FlyingMobAditionalLayerDepth
+FlyingMobAditionalBlockDepth
 #######################################################################
 How many extra layers below normal will be checked
     for players when a flying mob attempts to spawn
@@ -120,12 +122,9 @@ TicksPerRecount
 How often (In ticks, 20 ticks = 1 second) the mobs
     in a world is allowed to be recounted
 
-MobManager can only keep track of mob deaths, not mob despawns
-The lower this number the less often monsters will go above the
-    current maximum mob values
-NOTE: Mobs can be spawned over their limits by other plugins, 
-    spawn eggs as they are not prevented
-    (Perhaps an option to do so in a later version of MobManager?)
+MobManager keeps track of the mob count by listening for deaths of
+    mobs. Sometimes this count can not be accurate, so mobs are
+    recounted. 
 
 NOTE: MobManager also can't count mobs which are removed
     by other plugins (Depending on how its done)
@@ -200,17 +199,6 @@ Note: By default only Natural Spawns are checked
 
 Valid spawn reasons can be found here:
     http://jd.bukkit.org/apidocs/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
-
-#######################################################################
-Layers
-#######################################################################
-Layers to use
-Each layer stores the players within them
-Layers at the same heights are checked around mob spawns
-The mob spawn is only allowed if one of the layers
-    checked contains a player
-
-Layers should overlap to give an even distribution of mobs
 
 #######################################################################
 

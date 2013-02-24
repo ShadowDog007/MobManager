@@ -38,7 +38,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.abilities.AbilityTypes;
+import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -92,9 +92,9 @@ public class AbilitySet extends Ability
 	}
 
 	@Override
-	public AbilityTypes getAbilityType()
+	public AbilityType getAbilityType()
 	{
-		return AbilityTypes.ABILITY_SET;
+		return AbilityType.ABILITY_SET;
 	}
 	
 	public ExtendedEntityType getAbilitySetsEntityType()
@@ -154,7 +154,7 @@ public class AbilitySet extends Ability
 			if (str instanceof String == false)
 				continue;
 			
-			AbilityTypes abilityType = AbilityTypes.getAbilityType((String) str);
+			AbilityType abilityType = AbilityType.getAbilityType((String) str);
 			
 			if (abilityType == null)
 			{

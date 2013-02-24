@@ -28,11 +28,13 @@
 
 package com.forgenz.mobmanager.limiter.listeners;
 
-import java.util.List;
-
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,10 +47,6 @@ import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.util.MobType;
-import com.forgenz.mobmanager.limiter.util.Spiral;
-import com.forgenz.mobmanager.limiter.world.MMChunk;
-import com.forgenz.mobmanager.limiter.world.MMCoord;
-import com.forgenz.mobmanager.limiter.world.MMLayer;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 /**
@@ -85,49 +83,36 @@ public class MobListener implements Listener
 	 * @return True if there is a player within range of the center chunk and in
 	 *         a layer which overlaps the height 'y'
 	 */
-	public boolean playerNear(final MMWorld world, final MMCoord center, final int y, boolean flying)
+	public boolean playerNear(MMWorld world, LivingEntity entity, boolean flying)
 	{
 		int searchDist = world.getSearchDistance();
+		int maxY = Config.flyingMobAditionalBlockDepth;
 		
-		if (y <= world.worldConf.groundHeight)
-			searchDist = world.worldConf.undergroundSpawnChunkSearchDistance;
+		Location eLoc = entity.getLocation();
+		Location pLoc = new Location(null, 0, 0, 0);
 		
-		// Creates a spiral generator
-		final Spiral spiral = new Spiral(center, searchDist);
+		if (eLoc.getBlockY() <= world.worldConf.groundHeight)
+			searchDist = world.worldConf.undergroundSearchDistance;
 		
-		MMCoord coord;
-		// Loop through until the entire circle has been generated
-		while ((coord = spiral.run()) != null)
+		for (Player player : P.p.getServer().getOnlinePlayers())
 		{
-			// Fetch the given chunk
-			final MMChunk chunk = world.getChunk(coord);
-			
-			// If the chunk is not loaded continue
-			if (chunk == null)
+			if (Config.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
 				continue;
 			
-			// If the chunk has no players in it continue
-			if (!chunk.hasPlayers())
+			if (player.getWorld() != eLoc.getWorld())
 				continue;
 			
-			// Fetch layers to check for players
-			List<MMLayer> layers = flying ? chunk.getLayersAtAndBelow(y) : chunk.getLayersAt(y);
-			
-			// Loop through each layer which overlaps the height 'y'
-			for (final MMLayer layer : layers)
-			{
-				// If the layer has a player in it then there is a player close
-				// to the center near Y = 'y'
-				if (!layer.isEmpty())
-				{
-					return true;
-				}
-			}
+			if (player.getLocation(pLoc).distanceSquared(eLoc) <= searchDist
+					&& Math.abs(eLoc.getBlockY() - pLoc.getBlockY()) - (flying ? Config.flyingMobAditionalBlockDepth : 0) <= maxY)
+				return true;
 		}
+		
 		return false;
 	}
 	
 	// Event listener methods
+	private final Location loc = new Location(null, 0, 0, 0);
+	
 	/**
 	 * Checks mob limits to determine if the mob can spawn </br>
 	 * Only prevents natural spawns (Including for disabled mobs)
@@ -168,27 +153,20 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		MMChunk chunk = null;
-		
 		
 		// Animals need to be counted per chunk as well
 		if (mob == MobType.ANIMAL)
 		{
 			if (event.getSpawnReason() == SpawnReason.BREEDING || event.getSpawnReason() == SpawnReason.EGG)
 			{
-				// Try update mob counts
-				world.updateMobCounts();
-				
-				chunk = world.getChunk(event.getLocation().getChunk());
-				if (chunk == null)
+				int animalCount = 0;
+				for (Entity entity : event.getEntity().getLocation(loc).getChunk().getEntities())
 				{
-					if (!Config.disableWarnings)
-						P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
-					return;
+					if (MobType.ANIMAL.belongs(entity))
+						++animalCount;
 				}
-				
 				// Cancels the event if the chunk is not within breeding limits
-				if (!chunk.withinBreedingLimits())
+				if (animalCount >= 15)
 				{
 					event.setCancelled(true);
 				}
@@ -199,7 +177,7 @@ public class MobListener implements Listener
 		}
 
 		// Try to update the number of mobs in this world
-		world.updateMobCounts();
+		
 		// Check if we are within spawn limits
 		if (!world.withinMobLimit(mob))
 		{
@@ -207,19 +185,8 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		// Fetches the chunk if it has not been fetched already
-		if (chunk == null)
-			chunk = world.getChunk(event.getLocation().getChunk());
-		
-		if (chunk == null)
-		{
-			if (!Config.disableWarnings)
-				P.p.getLogger().warning(mob + " spawn was allowed because chunk was missing");
-			return;
-		}
-		
 		// Checks that there is a player within range of the creature spawn
-		if (!playerNear(world, chunk.getCoord(), event.getLocation().getBlockY(), mobFlys(event.getEntity())))
+		if (!playerNear(world, event.getEntity(), mobFlys(event.getEntity())))
 		{
 			event.setCancelled(true);
 			return;
@@ -247,17 +214,6 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		// Counts the mob
-		// Must count animals inside of chunks too
-		if (mob == MobType.ANIMAL)
-		{
-			MMChunk chunk = world.getChunk(event.getLocation().getChunk());
-			if (chunk != null)
-			{
-				chunk.changeNumAnimals(true);
-			}
-		}
-		
 		world.incrementMobCount(mob);
 	}
 	
@@ -282,17 +238,6 @@ public class MobListener implements Listener
 		if (world == null)
 		{
 			return;
-		}
-		
-		// Animals must be counted in chunks as well
-		if (mob == MobType.ANIMAL)
-		{
-			// Fetch chunk the animal died in
-			MMChunk chunk = world.getChunk(event.getEntity().getLocation().getChunk());
-			if (chunk != null)
-			{
-				chunk.changeNumAnimals(false);
-			}
 		}
 		
 		world.decrementMobCount(mob);

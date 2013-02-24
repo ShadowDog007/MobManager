@@ -30,7 +30,6 @@ package com.forgenz.mobmanager.commands;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
@@ -39,8 +38,6 @@ import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.limiter.util.MobType;
-import com.forgenz.mobmanager.limiter.world.MMChunk;
-import com.forgenz.mobmanager.limiter.world.MMCoord;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 class MMCommandCount extends MMCommand
@@ -115,13 +112,9 @@ class MMCommandCount extends MMCommand
 		for (final MMWorld world : worldList)
 		{					
 			world.updateMobCounts();
-			
-			int numPlayers = 0;
-			for (final Entry<MMCoord, MMChunk> chunk : world.getChunks())
-				numPlayers += chunk.getValue().getNumPlayers();
 								
 			sender.sendMessage(String.format("%1$sWorld:%2$s%3$s, %1$sChunks:%2$s%4$d, %1$sPlayers:%2$s%5$d",
-					ChatColor.DARK_GREEN, ChatColor.AQUA, world.getWorld().getName(), world.getNumChunks(), numPlayers));
+					ChatColor.DARK_GREEN, ChatColor.AQUA, world.getWorld().getName(), world.getNumChunks(), world.getWorld().getPlayers().size()));
 			
 			sender.sendMessage(String.format("%1$sM:%2$s%4$d%3$s/%2$s%5$d, %1$sA:%2$s%6$d%3$s/%2$s%7$d, %1$sW:%2$s%8$d%3$s/%2$s%9$d, %1$sAm:%2$s%10$d%3$s/%2$s%11$d, %1$sV:%2$s%12$d%3$s/%2$s%13$d",
 					ChatColor.GREEN, ChatColor.AQUA, ChatColor.YELLOW,
