@@ -60,27 +60,39 @@ public abstract class AbstractSpawnAbility extends Ability
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
-		if (spawning || type == null)
+		if (spawning)
 			return;
+		
 		// Make sure the bonus mobs don't recursively spawn more bonus mobs
 		spawning = true;
 		
+		// Get the ability set being assigned to the mob
 		AbilitySet abilities = abilitySet != null ? AbilitySet.getAbilitySet(abilitySet) : null;
+		// Get the entity type the mob will be
+		ExtendedEntityType type = this.type != null ? this.type : (abilitySet != null ? abilities.type : null);
+		
+		// If there is no entity type return
+		if (type == null)
+			return;
 		
 		// Spawn each mob
 		for (int i = 0; i < count; ++i)
 		{
 			// If the mob has an ability set we do not add any abilities
 			if (abilities != null)
-				P.p.abilitiesIgnoreNextSpawn(true);
+				P.p().abilitiesIgnoreNextSpawn(true);
 			
-			if (!P.p.abilityCfg.limitBonusSpawns)
-				P.p.limiterIgnoreNextSpawn(true);
+			if (!P.p().abilityCfg.limitBonusSpawns)
+				P.p().limiterIgnoreNextSpawn(true);
+				P.p().abilitiesIgnoreNextSpawn(true);
+			
+			if (!P.p().abilityCfg.limitBonusSpawns)
+				P.p().limiterIgnoreNextSpawn(true);
 			
 			// Spawn the entity
 			LivingEntity spawnedEntity = type.spawnMob(entity.getLocation(loc));
 			
-			if (abilities != null)
+			if (abilities != null && spawnedEntity != null)
 				abilities.addAbility(spawnedEntity);
 		}
 		
@@ -98,21 +110,28 @@ public abstract class AbstractSpawnAbility extends Ability
 	public static void setup(AbilityType type, ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)
 	{
 		Iterator<Object> it = optList.iterator();
-		
+			
+		// Iterate through each option map in the list
 		while (it.hasNext())
 		{
+			// Fetch the option map from the iterator
 			Map<String, Object> optMap = MiscUtil.getConfigMap(it.next());
 			
+			// If no map was found continue
 			if (optMap == null)
 				continue;
 			
+			// Get the chance from the map
 			int chance = MiscUtil.getInteger(optMap.get("CHANCE"));
 			
+			// Validate the chance
 			if (chance <= 0)
 				continue;
 			
+			// Fetch an object of the spawn ability
 			AbstractSpawnAbility ability = setup(type, mob, optMap);
 			
+			// Add the ability to the abilityChances if valid
 			if (ability != null)
 				abilityChances.addChance(chance, ability);
 		}
@@ -120,25 +139,39 @@ public abstract class AbstractSpawnAbility extends Ability
 
 	public static AbstractSpawnAbility setup(AbilityType type, ExtendedEntityType mob, Map<String, Object> optMap)
 	{
-		String mobTypeString = MiscUtil.getMapValue(optMap, "MOBTYPE", (type == AbilityType.BIRTH_SPAWN ? "Birth" : "Death") + " Spawn", String.class);
+		// Check for a MobType
+		String mobTypeString = MiscUtil.getMapValue(optMap, "MOBTYPE", null, String.class);
 		
-		if (mobTypeString == null)
-			return null;
+		ExtendedEntityType mobType = null;
 		
-		ExtendedEntityType mobType = mobTypeString.equalsIgnoreCase("NONE") ? null : ExtendedEntityType.get(mobTypeString);
-		
-		if (!mobTypeString.equalsIgnoreCase("NONE") && mobType == null)
+		// Try fetch a mobtype for the spawn
+		if (mobTypeString != null)
 		{
-			P.p.getLogger().warning("No EntityType called " + mobTypeString + " for " + (type == AbilityType.BIRTH_SPAWN ? "Birth" : "Death") + " Spawn");
-			return null;
+			mobType = mobTypeString.equalsIgnoreCase("NONE") ? null : ExtendedEntityType.get(mobTypeString);
+			
+			if (!mobTypeString.equalsIgnoreCase("NONE") && mobType == null)
+			{
+				P.p().getLogger().warning("No EntityType called " + mobTypeString + " for " + (type == AbilityType.BIRTH_SPAWN ? "Birth" : "Death") + " Spawn");
+				return null;
+			}
 		}
 		
+		// Get the number of mobs spawned
 		int count = MiscUtil.getInteger(optMap.get("COUNT"));
 		
+		// Validate the mob count
 		if (count <= 0)
 			count = 1;
 		
-		String abilitySet = MiscUtil.getString(optMap.get("ABILITYSET"));
+		// Get the ability set the mobs will spawn as
+		String abilitySet = MiscUtil.getMapValue(optMap, "ABILITYSET", null, String.class);
+		
+		// If neither a mob type or an ability set was found the options are invalid 
+		if (mobType == null && abilitySet == null && !mobTypeString.equalsIgnoreCase("NONE"))
+		{
+			P.p().getLogger().warning("You must provide a MobType or AbilitySet in Birth/Death Spawns");
+			return null;
+		}
 		
 		switch (type)
 		{

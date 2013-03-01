@@ -64,7 +64,7 @@ public class TSettingContainer<T>
 			}
 			
 			if (!valid)
-				P.p.getLogger().warning("Invalid " + error + " " + obj);
+				P.p().getLogger().warning("Invalid " + error + " " + obj);
 		}
 	}
 	

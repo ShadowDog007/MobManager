@@ -71,7 +71,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 	@SuppressWarnings("unchecked")
 	public AnimalProtection()
 	{
-		protectedAnimalsFile = new File(P.p.getDataFolder(), "protectedAnimals.dat");
+		protectedAnimalsFile = new File(P.p().getDataFolder(), "protectedAnimals.dat");
 		cleanupPeriod = (long) Config.daysTillFarmAnimalCleanup * 24 * 3600 * 1000;
 
 		if (protectedAnimalsFile.exists())
@@ -84,7 +84,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			}
 			catch (Exception e)
 			{
-				P.p.getLogger().severe("Failed to load current protected animals");
+				P.p().getLogger().severe("Failed to load current protected animals");
 				protectedAnimals = new ConcurrentHashMap<UUID,Long>(0, 0.75F, 2);
 				
 				return;
@@ -130,7 +130,8 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 	
 	public void addUUID(UUID uuid)
 	{
-		protectedAnimals.put(uuid, System.currentTimeMillis());
+		if (cleanupPeriod <= 0)
+			protectedAnimals.put(uuid, System.currentTimeMillis());
 	}
 
 	/**
@@ -155,11 +156,11 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			numAttempts = 0;
 		} catch (IOException e)
 		{
-			P.p.getLogger().severe("Error writing protected animals list to file");
+			P.p().getLogger().severe("Error writing protected animals list to file");
 			
 			if (++numAttempts >= 5)
 			{
-				P.p.getLogger().severe("Max attempts to write file exceeded, no more attempts will be made");
+				P.p().getLogger().severe("Max attempts to write file exceeded, no more attempts will be made");
 				cancel();
 			}
 			e.printStackTrace();
@@ -212,7 +213,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			return;
 		}
 		
-		P.p.animalProtection.addUUID(event.getRightClicked().getUniqueId());
+		P.p().animalProtection.addUUID(event.getRightClicked().getUniqueId());
 	}
 	
 	/**

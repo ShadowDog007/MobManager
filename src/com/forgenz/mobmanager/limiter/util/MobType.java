@@ -46,31 +46,31 @@ public enum MobType
 	 * Represents a monster
 	 */
 	@SuppressWarnings("unchecked")
-	MONSTER("M", "Monsters", 0, 512, 10, getClasses(Monster.class, Ghast.class, Slime.class)),
+	MONSTER("M", "Monsters", 0, 512, 20, getClasses(Monster.class, Ghast.class, Slime.class)),
 	
 	/**
 	 * Represents animals (Includes IronGolems and Snowmen)
 	 */
 	@SuppressWarnings("unchecked")
-	ANIMAL("A", "Animals", 1, 320, 10, getEnvironments(Environment.NORMAL), getClasses(Animals.class, Golem.class)),
+	ANIMAL("A", "Animals", 1, 320, 15, getEnvironments(Environment.NORMAL), getClasses(Animals.class, Golem.class)),
 	
 	/**
 	 * Represents a water animal (Just squid at the moment)
 	 */
 	@SuppressWarnings("unchecked")
-	WATER_ANIMAL("W", "Water_Animals", 2, 128, 4, getEnvironments(Environment.NORMAL), getClasses(WaterMob.class)),
+	WATER_ANIMAL("W", "Water_Animals", 2, 128, 6, getEnvironments(Environment.NORMAL), getClasses(WaterMob.class)),
 	
 	/**
 	 * Represents an ambient creature (Just bats at the moment)
 	 */
 	@SuppressWarnings("unchecked")
-	AMBIENT("Am", "Ambient", 3, 64, 4, getClasses(Ambient.class)),
+	AMBIENT("Am", "Ambient", 3, 64, 6, getClasses(Ambient.class)),
 	
 	/**
 	 * Represents a villager
 	 */
 	@SuppressWarnings("unchecked")
-	VILLAGER("V", "Villager", 4, 64, 5, getEnvironments(Environment.NORMAL), getClasses(Villager.class));
+	VILLAGER("V", "Villager", 4, 128, 10, getEnvironments(Environment.NORMAL), getClasses(Villager.class));
 	
 	public final String shortName;
 	public final String cPath;

@@ -54,7 +54,7 @@ public class MMCommandReload extends MMCommand
 			return;
 		}
 		
-		P p = P.p;
+		P p = P.p();
 		p.getServer().getPluginManager().disablePlugin(p);
 		p.reloadConfig();
 		p.getServer().getPluginManager().enablePlugin(p);

@@ -43,7 +43,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.util.MobType;
@@ -94,7 +93,7 @@ public class MobListener implements Listener
 		if (eLoc.getBlockY() <= world.worldConf.groundHeight)
 			searchDist = world.worldConf.undergroundSearchDistance;
 		
-		for (Player player : P.p.getServer().getOnlinePlayers())
+		for (Player player : P.p().getServer().getOnlinePlayers())
 		{
 			if (Config.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
 				continue;
@@ -121,10 +120,10 @@ public class MobListener implements Listener
 	public void onCreatureSpawn(final CreatureSpawnEvent event)
 	{
 		// Check if we should ignore the following spawn
-		if (P.p.shouldIgnoreNextSpawn() || P.p.shouldLimiterIgnoreNextSpawn())
+		if (P.p().shouldIgnoreNextSpawn() || P.p().shouldLimiterIgnoreNextSpawn())
 			return;
 		
-		if (!PluginIntegration.getInstance().canDespawn(event.getEntity()))
+		if (!P.p().getPluginIntegration().canDespawn(event.getEntity()))
 			return;
 		
 		// Checks for spawn reasons we want to limit

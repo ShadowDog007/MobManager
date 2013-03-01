@@ -86,7 +86,7 @@ public class MMCommandSpawn extends MMCommand
 	{
 		if (args.length == 7)
 		{
-			World world = P.p.getServer().getWorld(args[3]);
+			World world = P.p().getServer().getWorld(args[3]);
 			
 			if (world == null)
 			{
@@ -125,7 +125,7 @@ public class MMCommandSpawn extends MMCommand
 		
 		for (int i = 0; i < count; ++i)
 		{
-			P.p.limiterIgnoreNextSpawn(true);
+			P.p().limiterIgnoreNextSpawn(true);
 			
 			Entity entity = entityType.spawnMob(loc);
 			
@@ -141,7 +141,7 @@ public class MMCommandSpawn extends MMCommand
 	
 	protected static void spawnset(CommandSender sender, String mob, Location loc, int count)
 	{
-		if (!P.p.isAbiltiesEnabled())
+		if (!P.p().isAbiltiesEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "~Abilities must be enabled to spawn AbilitySet Mobs");
 			return;
@@ -167,9 +167,9 @@ public class MMCommandSpawn extends MMCommand
 		for (int i = 0; i < count; ++i)
 		{
 			// Make sure the mob spawns without any abilities
-			P.p.ignoreNextSpawn(true);
-			P.p.abilitiesIgnoreNextSpawn(true);
-			P.p.limiterIgnoreNextSpawn(true);
+			P.p().ignoreNextSpawn(true);
+			P.p().abilitiesIgnoreNextSpawn(true);
+			P.p().limiterIgnoreNextSpawn(true);
 			
 			Entity entity = entityType.spawnMob(loc);
 			

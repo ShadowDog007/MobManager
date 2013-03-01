@@ -103,14 +103,16 @@ public class MiscUtil
 		
 		if (obj == null)
 		{
-			P.p.getLogger().warning(String.format("Missing key %s for %s", key, error));
+			if (error != null)
+				P.p().getLogger().warning(String.format("Missing key %s for %s", key, error));
 			return null;
 		}
 		
 		if (classOfT.isAssignableFrom(obj.getClass()))
 			return (T) obj;
 		
-		P.p.getLogger().warning(String.format("Invalid Value for key %s for %s", key, error));
+		if (error != null)
+			P.p().getLogger().warning(String.format("Invalid Value for key %s for %s", key, error));
 		return null;
 	}
 	

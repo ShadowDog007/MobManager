@@ -130,7 +130,7 @@ public class ArmourAbility extends Ability
 		if (entity == null || entity instanceof Player)
 			return;
 		
-		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
 		
 		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
 		
@@ -191,7 +191,7 @@ public class ArmourAbility extends Ability
 	{
 		if (!valuePattern.matcher(optVal).matches())
 		{
-			P.p.getLogger().warning("The armour type " + optVal + " is invalid for MobAbilities." + mob + "." + AbilityType.ARMOUR);
+			P.p().getLogger().warning("The armour type " + optVal + " is invalid for MobAbilities." + mob + "." + AbilityType.ARMOUR);
 			return null;
 		}
 		
@@ -208,7 +208,7 @@ public class ArmourAbility extends Ability
 		
 		if (material == null)
 		{
-			P.p.getLogger().warning("The armour type " + optVal + " is invalid for MobAtributes." + mob + "." + AbilityType.ARMOUR);
+			P.p().getLogger().warning("The armour type " + optVal + " is invalid for MobAtributes." + mob + "." + AbilityType.ARMOUR);
 			return ArmourMaterials.NONE.getAbility();
 		}
 		

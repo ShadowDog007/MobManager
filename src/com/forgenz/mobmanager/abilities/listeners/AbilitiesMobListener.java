@@ -35,8 +35,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
@@ -47,7 +47,6 @@ import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
-import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 
@@ -59,13 +58,13 @@ public class AbilitiesMobListener implements Listener
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void rates(CreatureSpawnEvent event)
 	{
-		if (P.p.shouldIgnoreNextSpawn() || P.p.shouldAbilitiesIgnoreNextSpawn())
+		if (P.p().shouldIgnoreNextSpawn() || P.p().shouldAbilitiesIgnoreNextSpawn())
 			return;
 		
-		if (!PluginIntegration.getInstance().canApplyAbilities(event.getEntity()))
+		if (!P.p().getPluginIntegration().canApplyAbilities(event.getEntity()))
 			return;
 		
-		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.get(event.getEntity()));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.get(event.getEntity()));
 		
 		if (ma == null)
 			return;
@@ -97,7 +96,7 @@ public class AbilitiesMobListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void onCreatureSpawn(CreatureSpawnEvent event)
 	{
-		if (P.p.shouldIgnoreNextSpawn() || P.p.shouldAbilitiesIgnoreNextSpawn())
+		if (P.p().shouldIgnoreNextSpawn() || P.p().shouldAbilitiesIgnoreNextSpawn())
 			return;
 		
 		addAbilities(event.getEntity());
@@ -105,10 +104,10 @@ public class AbilitiesMobListener implements Listener
 	
 	public static void addAbilities(LivingEntity entity)
 	{
-		if (!PluginIntegration.getInstance().canApplyAbilities(entity))
+		if (!P.p().getPluginIntegration().canApplyAbilities(entity))
 			return;
 		
-		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
 		
 		if (ma == null)
 			return;
@@ -135,10 +134,10 @@ public class AbilitiesMobListener implements Listener
 	
 	public static void removeAbilities(LivingEntity entity)
 	{
-		if (!PluginIntegration.getInstance().canApplyAbilities(entity))
+		if (!P.p().getPluginIntegration().canApplyAbilities(entity))
 			return;
 		
-		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
 		
 		if (ma == null)
 			return;
@@ -174,7 +173,7 @@ public class AbilitiesMobListener implements Listener
 		if (type == null)
 			return;
 		
-		MobAbilityConfig ma = P.p.abilityCfg.getMobConfig(event.getEntity().getWorld().getName(), type);
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(event.getEntity().getWorld().getName(), type);
 		
 		if (ma == null)
 			return;
@@ -219,7 +218,7 @@ public class AbilitiesMobListener implements Listener
 		if (damager == null)
 			return;
 		
-		if (!PluginIntegration.getInstance().canApplyAbilities(damager))
+		if (!P.p().getPluginIntegration().canApplyAbilities(damager))
 			return;
 		
 		// Fetch the multiplier for damage caused by the mob

@@ -65,7 +65,7 @@ public class EnumSettingContainer
 			}
 			
 			if (!found)
-				P.p.getLogger().info(String.format(missingEnumError, string));
+				P.p().getLogger().info(String.format(missingEnumError, string));
 		}
 	}
 	

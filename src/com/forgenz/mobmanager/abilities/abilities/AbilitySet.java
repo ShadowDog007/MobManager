@@ -55,7 +55,7 @@ public class AbilitySet extends Ability
 	}
 	
 	private final HashSet<Ability> abilities;
-	private final ExtendedEntityType type;
+	protected final ExtendedEntityType type;
 	
 	public static AbilitySet getAbilitySet(String name)
 	{
@@ -76,6 +76,9 @@ public class AbilitySet extends Ability
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
+		if (abilities == null)
+			return;
+		
 		for (Ability ability : abilities)
 		{
 			ability.addAbility(entity);
@@ -85,6 +88,9 @@ public class AbilitySet extends Ability
 	@Override
 	public void removeAbility(LivingEntity entity)
 	{
+		if (abilities == null)
+			return;
+			
 		for (Ability ability : abilities)
 		{
 			ability.removeAbility(entity);
@@ -114,7 +120,7 @@ public class AbilitySet extends Ability
 		
 		if (abilitySets.containsKey(name.toLowerCase()))
 		{
-			P.p.getLogger().warning("AbilitySet with name " + name + " already exists");
+			P.p().getLogger().warning("AbilitySet with name " + name + " already exists");
 			return;
 		}
 		
@@ -128,7 +134,7 @@ public class AbilitySet extends Ability
 			
 			if (entityType == null)
 			{
-				P.p.getLogger().warning("Invalid EntityType " + key + " in AbilitySets");
+				P.p().getLogger().warning("Invalid EntityType " + key + " in AbilitySets");
 			}
 		}
 		
@@ -158,7 +164,7 @@ public class AbilitySet extends Ability
 			
 			if (abilityType == null)
 			{
-				P.p.getLogger().warning("The ability " + str + " does not exist");
+				P.p().getLogger().warning("The ability " + str + " does not exist");
 				continue;
 			}
 			
@@ -197,7 +203,7 @@ public class AbilitySet extends Ability
 			
 			if (set == null)
 			{
-				P.p.getLogger().warning("Missing SetName " + setName + " for " + mob);
+				P.p().getLogger().warning("Missing SetName " + setName + " for " + mob);
 				continue;
 			}
 			

@@ -59,7 +59,7 @@ class MMCommandCount extends MMCommand
 			return;
 		}
 		
-		if (!P.p.isLimiterEnabled())
+		if (!P.p().isLimiterEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "This command requires EnableLimiter in main config to be true");
 			return;
@@ -152,7 +152,7 @@ class MMCommandCount extends MMCommand
 					ChatColor.GREEN, ChatColor.AQUA,
 					totalWorlds,
 					totalChunks,
-					P.p.getServer().getOnlinePlayers().length));
+					P.p().getServer().getOnlinePlayers().length));
 			
 			sender.sendMessage(String.format("%1$sM:%2$s%4$d%3$s/%2$s%5$d, %1$sA:%2$s%6$d%3$s/%2$s%7$d, %1$sW:%2$s%8$d%3$s/%2$s%9$d, %1$sAm:%2$s%10$d%3$s/%2$s%11$d, %1$sV:%2$s%12$d%3$s/%2$s%13$d %1$sT:%2$s%14$d%3$s/%2$s%15$d",
 					ChatColor.GREEN, ChatColor.AQUA, ChatColor.YELLOW,

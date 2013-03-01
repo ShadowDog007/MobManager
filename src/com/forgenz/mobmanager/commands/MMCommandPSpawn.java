@@ -57,7 +57,7 @@ public class MMCommandPSpawn extends MMCommand
 		if (!super.validArgs(sender, maincmd, args))
 			return;
 		
-		Player player = P.p.getServer().getPlayer(args[3]);
+		Player player = P.p().getServer().getPlayer(args[3]);
 		
 		if (player == null || !player.isOnline())
 		{

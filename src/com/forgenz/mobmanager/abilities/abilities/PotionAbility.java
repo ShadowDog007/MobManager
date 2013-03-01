@@ -162,7 +162,7 @@ public class PotionAbility extends Ability
 			
 			if (!potionMatcher.matcher(optVal).matches())
 			{
-				P.p.getLogger().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityType.POTION);
+				P.p().getLogger().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityType.POTION);
 				return null;
 			}
 			
@@ -190,7 +190,7 @@ public class PotionAbility extends Ability
 			
 			if (potionEffect == null)
 			{
-				P.p.getLogger().warning("No potion effect found named " + optVal);
+				P.p().getLogger().warning("No potion effect found named " + optVal);
 				continue;
 			}
 			

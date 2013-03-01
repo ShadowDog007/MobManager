@@ -36,7 +36,6 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EntityEquipment;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.listeners.MobListener;
@@ -71,7 +70,7 @@ public class MobDespawnCheck
 		{
 			if (!Config.disableWarnings)
 			{
-				P.p.getLogger().warning("Error when checking whether to despawn a mob");
+				P.p().getLogger().warning("Error when checking whether to despawn a mob");
 				NullPointerException e = new NullPointerException();
 				
 				e.printStackTrace();
@@ -88,7 +87,7 @@ public class MobDespawnCheck
 			return false;
 		
 		// Check if other plugins will allow the mob to be despawned
-		if (!PluginIntegration.getInstance().canDespawn(entity))
+		if (!P.p().getPluginIntegration().canDespawn(entity))
 			return false;
 
 		// Check if the mob is being ignored
@@ -104,7 +103,7 @@ public class MobDespawnCheck
 		if (mob == MobType.ANIMAL)
 		{
 			// If animal protection is off then despawning of animals is disabled
-			if (P.p.animalProtection == null)
+			if (P.p().animalProtection == null)
 				return false;
 			
 			// Check if the animal is tamed
@@ -117,7 +116,7 @@ public class MobDespawnCheck
 			}
 			
 			// Check if the animal is being protected
-			if (P.p.animalProtection.checkUUID(entity.getUniqueId()))
+			if (P.p().animalProtection.checkUUID(entity.getUniqueId()))
 				return false;
 
 			// If the chunk has more than 'numAnimalsForFarm' then animals are not despawned

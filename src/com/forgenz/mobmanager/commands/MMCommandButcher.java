@@ -60,7 +60,7 @@ public class MMCommandButcher extends MMCommand
 			return;
 		}
 		
-		if (!P.p.isLimiterEnabled())
+		if (!P.p().isLimiterEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "This command requires EnableLimiter in main config to be true");
 			return;

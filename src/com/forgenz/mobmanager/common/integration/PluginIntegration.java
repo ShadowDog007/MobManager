@@ -48,6 +48,7 @@ import com.forgenz.mobmanager.common.config.AbstractConfig;
 public class PluginIntegration implements Protector
 {
 	private static PluginIntegration integration = null;
+	@Deprecated
 	public static PluginIntegration getInstance()
 	{
 		return integration;
@@ -61,9 +62,9 @@ public class PluginIntegration implements Protector
 			integration = this;
 		
 		/* Plugins Integrated by me :) */
-		if (P.p.getConfig().getBoolean("Integration.EpicBossRecoded", true))
+		if (P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true))
 			new EpicBossRecoded();
-		AbstractConfig.set(P.p.getConfig(), "Integration.EpicBossRecoded", P.p.getConfig().getBoolean("Integration.EpicBossRecoded", true));
+		AbstractConfig.set(P.p().getConfig(), "Integration.EpicBossRecoded", P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true));
 	}
 	
 	/**
@@ -107,7 +108,7 @@ public class PluginIntegration implements Protector
 		if (entity == null)
 			return true;
 		
-		final boolean async = !P.p.getServer().isPrimaryThread();
+		final boolean async = !P.p().getServer().isPrimaryThread();
 		
 		for (Entry<Plugin, Protector> entry : protectors.entrySet())
 		{
@@ -126,7 +127,7 @@ public class PluginIntegration implements Protector
 			}
 			catch (Exception e)
 			{
-				P.p.getLogger().severe("Caught Exception while checking if a mob could despawn");
+				P.p().getLogger().severe("Caught Exception while checking if a mob could despawn");
 				e.printStackTrace();
 			}
 		}
@@ -140,7 +141,7 @@ public class PluginIntegration implements Protector
 		if (entity == null)
 			return true;
 		
-		final boolean async = !P.p.getServer().isPrimaryThread();
+		final boolean async = !P.p().getServer().isPrimaryThread();
 		
 		for (Entry<Plugin, Protector> entry : protectors.entrySet())
 		{
@@ -159,7 +160,7 @@ public class PluginIntegration implements Protector
 			}
 			catch (Exception e)
 			{
-				P.p.getLogger().severe("Caught Exception while checking if a mob could have abilities");
+				P.p().getLogger().severe("Caught Exception while checking if a mob could have abilities");
 				e.printStackTrace();
 			}
 		}
@@ -176,12 +177,12 @@ public class PluginIntegration implements Protector
 	/* #### Component Flags #### */
 	public boolean limiterEnabled()
 	{
-		return P.p.isLimiterEnabled();
+		return P.p().isLimiterEnabled();
 	}
 	
 	public boolean abilitiesEnabled()
 	{
-		return P.p.isAbiltiesEnabled();
+		return P.p().isAbiltiesEnabled();
 	}
 	
 	/* #### IgnoreSpawn Flags #### */
@@ -190,7 +191,7 @@ public class PluginIntegration implements Protector
 	 */
 	public void ignoreNextSpawn(boolean value)
 	{
-		P.p.ignoreNextSpawn(value);
+		P.p().ignoreNextSpawn(value);
 	}
 	
 	/**
@@ -198,7 +199,7 @@ public class PluginIntegration implements Protector
 	 */
 	public void limiterIgnoreNextSpawn(boolean value)
 	{
-		P.p.limiterIgnoreNextSpawn(value);
+		P.p().limiterIgnoreNextSpawn(value);
 	}
 	
 	/**
@@ -206,6 +207,6 @@ public class PluginIntegration implements Protector
 	 */
 	public void abilitiesIgnoreNextSpawn(boolean value)
 	{
-		P.p.abilitiesIgnoreNextSpawn(value);
+		P.p().abilitiesIgnoreNextSpawn(value);
 	}
 }

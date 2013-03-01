@@ -92,7 +92,7 @@ public class Config extends AbstractConfig
 		if (activeWorlds == null || activeWorlds.size() == 0)
 		{
 			activeWorlds = new ArrayList<String>();
-			for (World world : P.p.getServer().getWorlds())
+			for (World world : P.p().getServer().getWorlds())
 			{
 				activeWorlds.add(world.getName());
 			}
@@ -125,27 +125,11 @@ public class Config extends AbstractConfig
 		enableAnimalDespawning = cfg.getBoolean("EnableAnimalDespawning", true);
 		set(cfg, "EnableAnimalDespawning", enableAnimalDespawning);
 		
-		daysTillFarmAnimalCleanup = cfg.getDouble("DaysTillFarmAnimalCleanup", 15.0D);
+		daysTillFarmAnimalCleanup = cfg.getDouble("DaysTillFarmAnimalCleanup", 30.0D);
 		set(cfg, "DaysTillFarmAnimalCleanup", daysTillFarmAnimalCleanup);
 		
 		protectedFarmAnimalSaveInterval = cfg.getInt("ProtectedFarmAnimalSaveInterval", 6000);
 		set(cfg, "ProtectedFarmAnimalSaveInterval", protectedFarmAnimalSaveInterval);
-		
-		/* ################ DespawnSearchDistance ################ */
-		short despawnSearchDistance = (short) Math.abs(cfg.getInt("DespawnSearchDistance", 72));
-		Config.despawnSearchDistance = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
-		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
-		
-		/* ################ DespawnSearchHeight ################ */
-		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 72));
-		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : (short) (despawnSearchHeight * despawnSearchHeight);
-		set(cfg, "DespawnSearchDistance", despawnSearchHeight);
-		
-		/* ################ FlyingMobAditionalBlockDepth ################ */
-		flyingMobAditionalBlockDepth = (short) cfg.getInt("FlyingMobAditionalBlockDepth", 15);
-		if (flyingMobAditionalBlockDepth < 0)
-			flyingMobAditionalBlockDepth = 0;
-		set(cfg, "FlyingMobAditionalBlockDepth", flyingMobAditionalBlockDepth);
 		
 		/* ################ TicksPerRecount ################ */
 		ticksPerRecount = cfg.getInt("TicksPerRecount", 100);
@@ -166,7 +150,7 @@ public class Config extends AbstractConfig
 		set(cfg, "IgnoredMobs", ignoredList);
 		String strList = ignoredMobs.toString();
 		if (strList.length() != 0)
-			P.p.getLogger().info("IgnoredMobs: " + strList);
+			P.p().getLogger().info("IgnoredMobs: " + strList);
 		
 		
 		/* ################ DisabledMobs ################ */
@@ -175,7 +159,7 @@ public class Config extends AbstractConfig
 		set(cfg, "DisabledMobs", disabledList);
 		strList = disabledMobs.toString();
 		if (strList.length() != 0)
-			P.p.getLogger().info("DisabledMobs: " + strList);
+			P.p().getLogger().info("DisabledMobs: " + strList);
 		
 		/* ################ EnabledSpawnReasons ################ */
 		enabledSpawnReasons = new EnumSettingContainer(SpawnReason.class, cfg.getList("EnabledSpawnReasons", null), "The Spawn Reason '%s' is invalid");
@@ -193,7 +177,23 @@ public class Config extends AbstractConfig
 		set(cfg, "EnabledSpawnReasons", srList);
 		strList = enabledSpawnReasons.toString();
 		if (strList.length() != 0)
-			P.p.getLogger().info("EnabledSpawnReasons: " + strList);
+			P.p().getLogger().info("EnabledSpawnReasons: " + strList);
+		
+		/* ################ DespawnSearchDistance ################ */
+		short despawnSearchDistance = (short) Math.abs(cfg.getInt("DespawnSearchDistance", 72));
+		Config.despawnSearchDistance = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
+		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
+		
+		/* ################ DespawnSearchHeight ################ */
+		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 72));
+		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : (short) (despawnSearchHeight * despawnSearchHeight);
+		set(cfg, "DespawnSearchDistance", despawnSearchHeight);
+		
+		/* ################ FlyingMobAditionalBlockDepth ################ */
+		flyingMobAditionalBlockDepth = (short) cfg.getInt("FlyingMobAditionalBlockDepth", 15);
+		if (flyingMobAditionalBlockDepth < 0)
+			flyingMobAditionalBlockDepth = 0;
+		set(cfg, "FlyingMobAditionalBlockDepth", flyingMobAditionalBlockDepth);
 		
 		/* ################ Old Settings ################ */
 		cfg.set("SpawnChunkSearchDistance", null);
@@ -201,7 +201,7 @@ public class Config extends AbstractConfig
 		cfg.set("FlyingMobAditionalLayerDepth", null);
 		
 		// Copy the header to the file
-		copyHeader(cfg, "Limiter_ConfigHeader.txt", P.p.getDescription().getName() + " Limiter Global Config " + P.p.getDescription().getVersion() + "\n");
+		copyHeader(cfg, "Limiter_ConfigHeader.txt", P.p().getDescription().getName() + " Limiter Global Config " + P.p().getDescription().getVersion() + "\n");
 		saveConfig("", LIMITER_CONFIG_NAME, cfg);
 	}
 	
@@ -212,7 +212,7 @@ public class Config extends AbstractConfig
 		
 		for (String worldName : enabledWorlds)
 		{
-			World world = P.p.getServer().getWorld(worldName);
+			World world = P.p().getServer().getWorld(worldName);
 			
 			if (world == null)
 				continue;

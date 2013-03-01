@@ -56,26 +56,43 @@ NOTE: If this value is too low many animals may not be despawned
       Around 3-5 'should' work fine.
 
 #######################################################################
-SpawnSearchChunkDistance
+DespawnSearchDistance
 #######################################################################
 When a mob spawns MobManager searches for players
     around the mob. If it finds a player within range
     the mob is allowed to spawn.
-SpawnSearchChunkDistance is the distance in chunks around
+DespawnSearchDistance is the distance in blocks around
     the spawned mob which MobManager will check for players
 
-NOTE: If set to -1 the value from config.yml will be used
+Used as a default for worlds which have
+    invalid values set for the same setting
+
+NOTE: If set to -1 the value from limiter.yml will be used
 
 #######################################################################
-UndergroundSpawnChunkSearchDistance
+UndergroundSearchDistance
 #######################################################################
 UndergroundSpawnChunkSearchDistance is a alternative search distance to
-    SpawnSearchChunkDistance.
+    DespawnSearchDistance.
+    
 When a mob spawns underground the underground search radius is used.
     (Ground height determined by the setting GroundHeight)
+
 This setting is provided as players are less likely to meet mobs that
     can spawn given the normal search radius while underground
-    (Assuming the player is running around in caves)
+    (Assuming the player is running around in caves and not in
+    an open underground environment like the nether)
+    
+#######################################################################
+DespawnSearchHeight
+#######################################################################
+When a mob spawns MobManager searches for players
+    around the mob. If it finds a player within range
+    the mob is allowed to spawn.
+DespawnSearchDistance is the distance in blocks above and below
+    the spawned mob which MobManager will check for players
+    
+NOTE: If set to -1 the value from limiter.yml will be used
 
 #######################################################################
 GroundHeight

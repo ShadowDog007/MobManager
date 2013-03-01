@@ -100,6 +100,7 @@ This setting is used to determine how often in ticks
 NOTE: This setting is directly related to DaysTillFarmAnimalCleanup
 
 #######################################################################
+<<<<<<< HEAD
 DespawnSearchDistance
 #######################################################################
 The distance (in blocks) to scan for nearby players when a mob spawns
@@ -117,6 +118,8 @@ How many extra layers below normal will be checked
 This allows a higher chance for flying mobs to spawn
 
 #######################################################################
+=======
+>>>>>>> Release v2.3
 TicksPerRecount
 #######################################################################
 How often (In ticks, 20 ticks = 1 second) the mobs
@@ -199,6 +202,41 @@ Note: By default only Natural Spawns are checked
 
 Valid spawn reasons can be found here:
     http://jd.bukkit.org/apidocs/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
+    
+#######################################################################
+DespawnSearchDistance
+#######################################################################
+When a mob spawns MobManager searches for players
+    around the mob. If it finds a player within range
+    the mob is allowed to spawn.
+DespawnSearchDistance is the distance in blocks around
+    the spawned mob which MobManager will check for players
+
+Used as a default for worlds which have
+    invalid values set for the same setting
+    
+#######################################################################
+DespawnSearchHeight
+#######################################################################
+When a mob spawns MobManager searches for players
+    around the mob. If it finds a player within range
+    the mob is allowed to spawn.
+DespawnSearchDistance is the distance in blocks above and below
+    the spawned mob which MobManager will check for players
+
+Used as a default for worlds which have
+    invalid values set for the same setting
 
 #######################################################################
+<<<<<<< HEAD
+=======
+FlyingMobAditionalBlockDepth
+#######################################################################
+How many extra layers below normal will be checked
+    for players when a flying mob attempts to spawn
+
+This allows a higher chance for flying mobs to spawn
+
+#######################################################################
+>>>>>>> Release v2.3
 

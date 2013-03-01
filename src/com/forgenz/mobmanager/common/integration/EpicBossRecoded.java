@@ -41,7 +41,7 @@ public class EpicBossRecoded implements Protector
 	
 	protected EpicBossRecoded()
 	{
-		Plugin plugin = P.p.getServer().getPluginManager().getPlugin("EpicBossRecoded");
+		Plugin plugin = P.p().getServer().getPluginManager().getPlugin("EpicBossRecoded");
 		
 		if (plugin instanceof EpicBoss)
 			epicboss = (EpicBoss) plugin;
@@ -51,9 +51,9 @@ public class EpicBossRecoded implements Protector
 		if (epicboss == null)
 			return;
 		
-		PluginIntegration.getInstance().registerProtector(plugin, this);
+		P.p().getPluginIntegration().registerProtector(plugin, this);
 		
-		P.p.getLogger().info("Hooked into EpicBossRecoded - " + epicboss.getDescription().getVersion());
+		P.p().getLogger().info("Hooked into EpicBossRecoded - " + epicboss.getDescription().getVersion());
 	}
 
 	@Override

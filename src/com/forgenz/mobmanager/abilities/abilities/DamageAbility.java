@@ -62,18 +62,18 @@ public class DamageAbility extends Ability
 		
 		if (multi == 1.0F)
 		{
-			entity.removeMetadata("MOBMANAGER_DAMAGE_MULTI", P.p);
+			entity.removeMetadata("MOBMANAGER_DAMAGE_MULTI", P.p());
 		}
 		else
 		{	
-			entity.setMetadata("MOBMANAGER_DAMAGE_MULTI", new FixedMetadataValue(P.p, multi));
+			entity.setMetadata("MOBMANAGER_DAMAGE_MULTI", new FixedMetadataValue(P.p(), multi));
 		}
 	}
 
 	@Override
 	public void removeAbility(LivingEntity entity)
 	{
-		entity.removeMetadata("MOBMANAGER_DAMAGE_MULTI", P.p);
+		entity.removeMetadata("MOBMANAGER_DAMAGE_MULTI", P.p());
 	}
 	
 	public static float getMetaValue(LivingEntity entity)
@@ -85,7 +85,7 @@ public class DamageAbility extends Ability
 		
 		for (MetadataValue val : meta)
 		{
-			if (val.getOwningPlugin() != P.p)
+			if (val.getOwningPlugin() != P.p())
 				continue;
 			
 			return val.asFloat();
@@ -125,7 +125,7 @@ public class DamageAbility extends Ability
 			
 			if (multi < 0)
 			{
-				P.p.getLogger().warning("Damage multipliers must be positive!");
+				P.p().getLogger().warning("Damage multipliers must be positive!");
 				multi = 1.0F;
 			}
 			
@@ -137,7 +137,7 @@ public class DamageAbility extends Ability
 	{
 		if (multi < 0)
 		{
-			P.p.getLogger().warning("Damage multipliers must be positive!");
+			P.p().getLogger().warning("Damage multipliers must be positive!");
 			multi = 1.0F;
 		}
 		

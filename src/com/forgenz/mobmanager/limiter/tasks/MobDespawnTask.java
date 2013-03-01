@@ -196,23 +196,23 @@ public class MobDespawnTask extends BukkitRunnable
 				}
 				
 				// Check if there is more to go
-				if (it.hasNext() && P.p != null)
+				if (it.hasNext() && P.p() != null)
 				{
 					// Schedule the task to run later
 					if (Config.useAsyncDespawnScanner)
-						P.p.getServer().getScheduler().runTaskLaterAsynchronously(P.p, this, 1L);
+						P.p().getServer().getScheduler().runTaskLaterAsynchronously(P.p(), this, 1L);
 					else
-						P.p.getServer().getScheduler().runTaskLater(P.p, this, 1L);
+						P.p().getServer().getScheduler().runTaskLater(P.p(), this, 1L);
 				}
 				// If we are in async we need to schedule a new task to remove the entities
-				else if (P.p != null)
+				else if (P.p() != null)
 				{
 					if (Config.useAsyncDespawnScanner)
 					{
 						final LivingEntity[] entities = mobsToDespawn.toArray(new LivingEntity[0]);
 						mobsToDespawn.clear();
 						
-						P.p.getServer().getScheduler().runTaskLater(P.p, new Runnable()
+						P.p().getServer().getScheduler().runTaskLater(P.p(), new Runnable()
 						{
 
 							@Override
@@ -238,21 +238,21 @@ public class MobDespawnTask extends BukkitRunnable
 		
 		/* ######## SETUP TASK START ######## */
 		// Setups up each world, one per tick then starts the despawn scanner
-		P.p.getServer().getScheduler().runTaskLater(P.p, new Runnable()
+		P.p().getServer().getScheduler().runTaskLater(P.p(), new Runnable()
 		{
 			@Override
 			public void run()
 			{
 				if (it.setupNextWorld())
-					P.p.getServer().getScheduler().runTaskLater(P.p, this, 1L);
+					P.p().getServer().getScheduler().runTaskLater(P.p(), this, 1L);
 				else
 				{
 					/* ######## SCAN START ######## */
 					// Run the despawner task
 					if (Config.useAsyncDespawnScanner)
-						P.p.getServer().getScheduler().runTaskLaterAsynchronously(P.p, removeQueueFillTask, 1L);
+						P.p().getServer().getScheduler().runTaskLaterAsynchronously(P.p(), removeQueueFillTask, 1L);
 					else
-						P.p.getServer().getScheduler().runTaskLater(P.p, removeQueueFillTask, 1L);
+						P.p().getServer().getScheduler().runTaskLater(P.p(), removeQueueFillTask, 1L);
 				}	
 			}
 		}, 1L);

@@ -68,7 +68,7 @@ public class AbilityConfig extends AbstractConfig
 		{
 			list = new ArrayList<String>();
 			
-			for (World world : P.p.getServer().getWorlds())
+			for (World world : P.p().getServer().getWorlds())
 			{
 				list.add(world.getName());
 			}
@@ -94,7 +94,7 @@ public class AbilityConfig extends AbstractConfig
 		/* ################ Ability Global Config ################ */
 		globalCfg = new WorldAbilityConfig(cfg, "");
 		
-		String headerVersion = P.p.getDescription().getName() + " Ability %s " + P.p.getDescription().getVersion() + "\n";
+		String headerVersion = P.p().getDescription().getName() + " Ability %s " + P.p().getDescription().getVersion() + "\n";
 		String worldHeader = getResourceAsString("Abilities_WorldConfigHeader.txt");
 		
 		copyHeader(String.format(headerVersion, "Global Config") + getResourceAsString("Abilities_ConfigHeader.txt") + worldHeader, cfg);
@@ -105,7 +105,7 @@ public class AbilityConfig extends AbstractConfig
 		for (String worldName : list)
 		{
 			boolean found = false;
-			for (World world : P.p.getServer().getWorlds())
+			for (World world : P.p().getServer().getWorlds())
 			{
 				if (world.getName().equalsIgnoreCase(worldName))
 				{
@@ -124,7 +124,7 @@ public class AbilityConfig extends AbstractConfig
 			if (worldCfg.worldSettingsEnabled())
 				worlds.put(worldName, worldCfg);
 			
-			copyHeader(cfg, "Abilities_WorldConfigHeader.txt", P.p.getDescription().getName() + " Config " + P.p.getDescription().getVersion() + "\n");
+			copyHeader(cfg, "Abilities_WorldConfigHeader.txt", P.p().getDescription().getName() + " Config " + P.p().getDescription().getVersion() + "\n");
 			saveConfig(WORLDS_FOLDER + File.separator + worldName, ABILITY_CONFIG_NAME, cfg);
 		}
 	}

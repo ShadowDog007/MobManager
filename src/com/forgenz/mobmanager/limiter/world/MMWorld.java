@@ -91,7 +91,7 @@ public class MMWorld
 		final int maxAmbient = worldConf.maximums[MobType.AMBIENT.index];
 		final int maxVillagers = worldConf.maximums[MobType.VILLAGER.index];
 
-		P.p.getLogger().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
+		P.p().getLogger().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
 	}
 	
 	public short getSearchDistance(short y)
@@ -169,7 +169,7 @@ public class MMWorld
 			}
 			
 			// Reset 'updatedThisTick' so updates can be run again later
-			P.p.getServer().getScheduler().runTaskLater(P.p,
+			P.p().getServer().getScheduler().runTaskLater(P.p(),
 				new Runnable()
 				{
 					public void run()

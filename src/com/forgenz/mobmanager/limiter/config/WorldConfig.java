@@ -75,6 +75,10 @@ public class WorldConfig extends AbstractConfig
 			maximums[mob.index] = (short) Math.abs(cfg.getInt("WorldMaximum." + mob.cPath, mob.getDefaultMax(world.getEnvironment())));
 			dynMultis[mob.index] = (short) Math.abs(cfg.getInt("ChunkCalculatedMaximum." + mob.cPath, mob.getDefaultDynMulti(world.getEnvironment())));
 			
+			// Limit dynamic multi so to prevent ending up with -ve limits
+			if (dynMultis[mob.index] > 1000)
+				dynMultis[mob.index] = 1000;
+			
 			set(cfg, "WorldMaximum." + mob.cPath, maximums[mob.index]);
 			set(cfg, "ChunkCalculatedMaximum." + mob.cPath, dynMultis[mob.index]);
 		}
@@ -95,7 +99,8 @@ public class WorldConfig extends AbstractConfig
 		this.despawnSearchDistance = despawnSearchDistance <= 0 ? -1 : (short) (despawnSearchDistance * despawnSearchDistance);
 		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
-		/* ################ UndergroundBlockSearchDistance ################ */
+
+		/* ################ UndergroundSearchDistance ################ */
 		short undergroundSearchDistance = (short) cfg.getInt("UndergroundSearchDistance", 32);
 		this.undergroundSearchDistance = (short) (undergroundSearchDistance * undergroundSearchDistance);
 		set(cfg, "UndergroundSearchDistance", undergroundSearchDistance);
@@ -115,7 +120,7 @@ public class WorldConfig extends AbstractConfig
 		cfg.set("SpawnChunkSearchDistance", null);
 		cfg.set("UndergroundSpawnChunkSearchDistance", null);
 		
-		copyHeader(cfg, "Limiter_WorldConfigHeader.txt", P.p.getDescription().getName() + " Limiter World Config " + P.p.getDescription().getVersion() + "\n");
+		copyHeader(cfg, "Limiter_WorldConfigHeader.txt", P.p().getDescription().getName() + " Limiter World Config " + P.p().getDescription().getVersion() + "\n");
 		saveConfig(WORLDS_FOLDER + File.separator + world.getName(), LIMITER_CONFIG_NAME, cfg);
 	}
 }

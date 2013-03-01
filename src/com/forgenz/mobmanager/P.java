@@ -61,9 +61,20 @@ import com.forgenz.mobmanager.limiter.world.MMWorld;
  */
 public class P extends JavaPlugin
 {
-	public static P p = null;
+	private static P p = null;
+	public static P p()
+	{
+		return p;
+	}
 	
 	public static ConcurrentHashMap<String, MMWorld> worlds = null;
+	
+	private PluginIntegration integration;
+	
+	public PluginIntegration getPluginIntegration()
+	{
+		return integration;
+	}
 	
 	private MobDespawnTask despawner = null;
 	
@@ -153,7 +164,7 @@ public class P extends JavaPlugin
 		getCommand("mm").setExecutor(new MMCommandListener());
 		
 		// Create PluginIntegration
-		new PluginIntegration();
+		integration = new PluginIntegration();
 		
 		AbstractConfig.set(getConfig(), "Integration", getConfig().getConfigurationSection("Integration"));
 		

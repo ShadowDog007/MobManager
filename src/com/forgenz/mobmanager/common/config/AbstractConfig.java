@@ -55,24 +55,24 @@ public abstract class AbstractConfig
 	
 	public static FileConfiguration getConfig(String folder, String config)
 	{
-		return YamlConfiguration.loadConfiguration(new File(P.p.getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + config));
+		return YamlConfiguration.loadConfiguration(new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + config));
 	}
 	
 	public static void saveConfig(String folder, String config, FileConfiguration cfg)
 	{
 		try
 		{
-			cfg.save(new File(P.p.getDataFolder(), folder + File.separator + config));
+			cfg.save(new File(P.p().getDataFolder(), folder + File.separator + config));
 		}
 		catch (IOException exception)
 		{
-			P.p.getLogger().severe("Unable to write to config file at \"" + folder + File.separator + config + "\"");
+			P.p().getLogger().severe("Unable to write to config file at \"" + folder + File.separator + config + "\"");
 		}
 	}
 	
 	public static String getResourceAsString(String resource)
 	{
-		InputStream headerStream = P.p.getResource(resource);
+		InputStream headerStream = P.p().getResource(resource);
 		if (headerStream == null)
 			return "";
 		

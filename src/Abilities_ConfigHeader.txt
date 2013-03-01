@@ -35,7 +35,8 @@ AbilitySets:
   - HEALTH_BONUS: 5
    
 Valid Abilities:
-POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, BABY, ANGRY, CHARGED
+POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, BABY, ANGRY,
+CHARGED, BIRTH_SPAWN, DEATH_SPAWN
 
 NOTE: The MobType Key is only used in /mm spawnset to determine
     which mob should be spawned along with a given AbilitySet
@@ -43,4 +44,14 @@ NOTE: The MobType Key is only used in /mm spawnset to determine
     
 NOTE: A default AbilitySet exists with no abilities. To use this call
     The AbilitySet 'NONE' under 'ApplySets' for your mob
+
+#######################################################################
+LimitBonusSpawns
+#######################################################################
+If this is true Bonus spawns (From Birth/Death Spawns) will be
+    restricted by the Limiter component of MobManager.
+    (So you do not go over your mob limits)
+
+If this is false Bonus spawns (From Birth/Death Spawns) will always
+    spawn every mob
 

@@ -75,7 +75,7 @@ public class WorldAbilityConfig extends AbstractConfig
 			
 			if (mobType == null)
 			{
-				P.p.getLogger().warning(String.format("No such mob named '%s' in %s:AbilitySets", key, AbilityConfig.ABILITY_CONFIG_NAME));
+				P.p().getLogger().warning(String.format("No such mob named '%s' in %s:AbilitySets", key, AbilityConfig.ABILITY_CONFIG_NAME));
 				continue;
 			}
 			

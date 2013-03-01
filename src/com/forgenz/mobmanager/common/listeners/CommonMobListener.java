@@ -43,8 +43,8 @@ public class CommonMobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
 	public void onCreatureSpawn(CreatureSpawnEvent event)
 	{
-		P.p.ignoreNextSpawn(false);
-		P.p.abilitiesIgnoreNextSpawn(false);
-		P.p.limiterIgnoreNextSpawn(false);
+		P.p().ignoreNextSpawn(false);
+		P.p().abilitiesIgnoreNextSpawn(false);
+		P.p().limiterIgnoreNextSpawn(false);
 	}
 }

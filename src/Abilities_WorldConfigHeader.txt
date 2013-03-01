@@ -86,7 +86,7 @@ A number between 0.0 and 1.0
     
 E.G. if AngryRate was 0.5 there would be a 50% chance that a wolf
     which spawns will be set as angry
-This setting only works for Wolfs
+This setting only works for Wolves
 
 ################
 ChargedRate (Rate)
@@ -97,6 +97,25 @@ A number between 0.0 and 1.0
 E.G. if ChargedRate was 0.5 there would be a 50% chance that a creeper
     which spawns will become charged
 This setting only works for Creepers
+
+################
+BirthSpawn / DeathSpawn (ChanceList)
+################
+A list of mobs which will spawn on a given mob
+    upon Birth or Death of the given mob.
+
+Keys:
+- MobType: The mobtype which the mob will spawn as.
+    Set MobType as NONE if you want to provide a chance for
+    no mob to spawn
+- AbilitySet: The ability set which will be applied to the mob
+    Ignore this setting if you want Mobs to spawn with random
+    abilities.
+- Count: The number of mobs which will be spawned upon
+    birth/death of the mob
+    
+NOTE: You must always provide a MobType UNLESS you provide
+    an AbilitySet which has a default MobType set.
 
 ################
 PotionEffects (ChanceList)
