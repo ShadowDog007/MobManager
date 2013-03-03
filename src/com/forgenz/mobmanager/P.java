@@ -69,7 +69,7 @@ public class P extends JavaPlugin
 	
 	public static ConcurrentHashMap<String, MMWorld> worlds = null;
 	
-	private PluginIntegration integration;
+	private PluginIntegration integration = new PluginIntegration();;
 	
 	public PluginIntegration getPluginIntegration()
 	{
@@ -155,6 +155,8 @@ public class P extends JavaPlugin
 			return;
 		}
 		
+		integration.integrate();
+		
 		// Enable each component
 		if (limiterEnabled)
 			enableLimiter();
@@ -162,9 +164,6 @@ public class P extends JavaPlugin
 			enableAbilities();
 		
 		getCommand("mm").setExecutor(new MMCommandListener());
-		
-		// Create PluginIntegration
-		integration = new PluginIntegration();
 		
 		AbstractConfig.set(getConfig(), "Integration", getConfig().getConfigurationSection("Integration"));
 		

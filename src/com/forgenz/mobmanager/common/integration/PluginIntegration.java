@@ -60,7 +60,10 @@ public class PluginIntegration implements Protector
 	{
 		if (integration == null)
 			integration = this;
-		
+	}
+	
+	public void integrate()
+	{
 		/* Plugins Integrated by me :) */
 		if (P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true))
 			new EpicBossRecoded();

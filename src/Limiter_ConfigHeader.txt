@@ -100,26 +100,6 @@ This setting is used to determine how often in ticks
 NOTE: This setting is directly related to DaysTillFarmAnimalCleanup
 
 #######################################################################
-<<<<<<< HEAD
-DespawnSearchDistance
-#######################################################################
-The distance (in blocks) to scan for nearby players when a mob spawns
-    (or is being checked if it should be despawned)
-
-Used as a default for worlds which have
-    invalid values set for the same setting
-
-#######################################################################
-FlyingMobAditionalBlockDepth
-#######################################################################
-How many extra layers below normal will be checked
-    for players when a flying mob attempts to spawn
-
-This allows a higher chance for flying mobs to spawn
-
-#######################################################################
-=======
->>>>>>> Release v2.3
 TicksPerRecount
 #######################################################################
 How often (In ticks, 20 ticks = 1 second) the mobs
@@ -228,8 +208,6 @@ Used as a default for worlds which have
     invalid values set for the same setting
 
 #######################################################################
-<<<<<<< HEAD
-=======
 FlyingMobAditionalBlockDepth
 #######################################################################
 How many extra layers below normal will be checked
@@ -238,5 +216,4 @@ How many extra layers below normal will be checked
 This allows a higher chance for flying mobs to spawn
 
 #######################################################################
->>>>>>> Release v2.3
 
