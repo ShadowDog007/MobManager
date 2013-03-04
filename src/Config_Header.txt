@@ -5,10 +5,33 @@ EnableLimiter
 #######################################################################
 Enables the limiter component of MobManager
 
+MobManager's Limiter aims to reduce the number of mobs which spawn
+     in places where players will never come across them.
+     e.g. far below players in caves.
+     
+The Limiter is capable of massively reducing the number of mobs on
+    your server without reducing the number of mobs which a player
+    gets the chance to interact with.
+    (Do your setup right and you can have less mobs in total, and
+    have your players think there are actually more) 
+
 #######################################################################
 EnableAbilities
 #######################################################################
 Enables the abilities component of MobManager
+
+MobManager's Abilities aims to allow you to fully customize the
+    strength of each mob to provide a more or less challenging
+    environment for players.
+    
+Abilities all have chances, so you can have variety between mobs
+    i.e. (You can have 1 in 100 zombies be very strong)
+
+#######################################################################
+EnableVersionCheck
+#######################################################################
+If false /mm version will only provide the current version and not
+    check for a new version
 
 #######################################################################
 Integration.EpicBossRecoded

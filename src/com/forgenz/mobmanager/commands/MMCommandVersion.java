@@ -66,6 +66,14 @@ public class MMCommandVersion extends MMCommand
 		
 		final String versionString = P.p().getDescription().getVersion();
 		
+		sender.sendMessage(ChatColor.DARK_GREEN + P.p().getDescription().getName() + " version " + versionString);
+		
+		if (!P.p().isVersionCheckEnabled())
+		{
+			sender.sendMessage(ChatColor.DARK_GREEN + "Turn on EnableVersionCheck to allow checking for a new version");
+			return;
+		}
+		
 		P.p().getServer().getScheduler().runTaskAsynchronously(P.p(), new Runnable()
 		{
 
@@ -105,7 +113,6 @@ public class MMCommandVersion extends MMCommand
 				    }
 				}
 				
-				sender.sendMessage(ChatColor.DARK_GREEN + P.p().getDescription().getName() + " version " + versionString);
 				if (update.length() != 0)
 				{
 					String[] split = versionStringSplit.split(update);

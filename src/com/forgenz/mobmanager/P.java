@@ -102,6 +102,13 @@ public class P extends JavaPlugin
 	{
 		return biomeSpecificMobs;
 	}
+	
+	private boolean versionCheckEnabled;
+	
+	public boolean isVersionCheckEnabled()
+	{
+		return versionCheckEnabled;
+	}
 
 	@Override
 	public void onLoad()
@@ -144,6 +151,9 @@ public class P extends JavaPlugin
 		biomeSpecificMobs = false;
 		biomeSpecificMobs = getConfig().getBoolean("BiomeSpecificMobs", biomeSpecificMobs);
 		//AbstractConfig.set(getConfig(), "BiomeSpecificMobs", biomeSpecificMobs);
+		
+		versionCheckEnabled = getConfig().getBoolean("EnableVersionCheck", true);
+		AbstractConfig.set(getConfig(), "EnableVersionCheck", versionCheckEnabled);
 		
 		// Copy the Config header into config.yml
 		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"
