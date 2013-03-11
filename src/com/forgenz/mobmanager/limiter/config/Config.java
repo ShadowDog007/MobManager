@@ -108,7 +108,6 @@ public class Config extends AbstractConfig
 		/* ################ UseAsyncDespawnScanner ################ */
 		useAsyncDespawnScanner = cfg.getBoolean("UseAsyncDespawnScanner", false);
 		set(cfg, "UseAsyncDespawnScanner", useAsyncDespawnScanner);
-		useAsyncDespawnScanner = false;
 		
 		/* ################ IgnoreCreativePlayers ################ */
 		ignoreCreativePlayers = cfg.getBoolean("IgnoreCreativePlayers", false);
@@ -185,9 +184,9 @@ public class Config extends AbstractConfig
 		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
 		/* ################ DespawnSearchHeight ################ */
-		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 72));
+		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 24));
 		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : (short) (despawnSearchHeight * despawnSearchHeight);
-		set(cfg, "DespawnSearchDistance", despawnSearchHeight);
+		set(cfg, "DespawnSearchHeight", despawnSearchHeight);
 		
 		/* ################ FlyingMobAditionalBlockDepth ################ */
 		flyingMobAditionalBlockDepth = (short) cfg.getInt("FlyingMobAditionalBlockDepth", 15);

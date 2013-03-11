@@ -130,7 +130,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 	
 	public void addUUID(UUID uuid)
 	{
-		if (cleanupPeriod <= 0)
+		if (cleanupPeriod > 0)
 			protectedAnimals.put(uuid, System.currentTimeMillis());
 	}
 
@@ -224,6 +224,9 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 	public void onCreatureSpawn(CreatureSpawnEvent event)
 	{
 		if (event.getSpawnReason() != SpawnReason.BREEDING && event.getSpawnReason() != SpawnReason.EGG)
+			return;
+		
+		if (!(event.getEntity() instanceof Animals))
 			return;
 		
 		Animals animal = (Animals) event.getEntity();

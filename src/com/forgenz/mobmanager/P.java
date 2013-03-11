@@ -222,11 +222,9 @@ public class P extends JavaPlugin
 		if (Config.enableAnimalDespawning)
 		{
 			animalProtection = new AnimalProtection();
-			if (animalProtection != null)
-			{
-				getServer().getPluginManager().registerEvents(animalProtection, this);
-				animalProtection.runTaskTimerAsynchronously(this, Config.protectedFarmAnimalSaveInterval, Config.protectedFarmAnimalSaveInterval);
-			}
+			
+			getServer().getPluginManager().registerEvents(animalProtection, this);
+			animalProtection.runTaskTimerAsynchronously(this, Config.protectedFarmAnimalSaveInterval, Config.protectedFarmAnimalSaveInterval);
 		}
 		
 		getLogger().info("v" + getDescription().getVersion() + " ennabled with " + worlds.size() + " worlds");
