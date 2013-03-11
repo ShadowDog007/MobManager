@@ -47,7 +47,7 @@ public class MMCommandSpawn extends MMCommand
 	
 	MMCommandSpawn()
 	{
-		super(Pattern.compile("spawn|spawnset", Pattern.CASE_INSENSITIVE), Pattern.compile("^([a-zA-Z_]+ \\d{1,2}|[a-zA-Z_]+ \\d{1,2} [a-zA-Z_]+ (-?\\d+ ){2}-?\\d)$"),
+		super(Pattern.compile("spawn|spawnset", Pattern.CASE_INSENSITIVE), Pattern.compile("^([a-zA-Z_]+ \\d{1,2}|[a-zA-Z_]+ \\d{1,2} [a-zA-Z_]+ (-?\\d+ ){2}-?\\d+)$"),
 				2, 6);
 	}
 
