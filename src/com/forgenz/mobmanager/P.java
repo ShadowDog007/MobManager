@@ -31,6 +31,7 @@ package com.forgenz.mobmanager;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -273,16 +274,21 @@ public class P extends JavaPlugin
 		if (addAbilities)
 		{
 			// Iterate through each enabled world
-			for (String world : abilityCfg.enabledWorlds)
+			for (String worldName : abilityCfg.enabledWorlds)
 			{
-				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
+				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(worldName);
 				
 				// If there are no global configs and the world has no configs, check next world
 				if (!hasGlobal && worldCfg != null && worldCfg.mobs.size() == 0)
 					continue;
 				
+				World world = getServer().getWorld(worldName);
+				
+				if (world == null)
+					continue;
+				
 				// Iterate through each entity in the world and set their max HP accordingly
-				for (LivingEntity entity : getServer().getWorld(world).getLivingEntities())
+				for (LivingEntity entity : world.getLivingEntities())
 				{
 					AbilitiesMobListener.addAbilities(entity, null);
 				}
@@ -314,16 +320,21 @@ public class P extends JavaPlugin
 		if (addAbilities)
 		{
 			// Iterate through each enabled world
-			for (String world : abilityCfg.enabledWorlds)
+			for (String worldName : abilityCfg.enabledWorlds)
 			{
-				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
+				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(worldName);
 				
 				// If there are no global configs and the world has no configs, check next world
 				if (!hasGlobal && worldCfg != null && worldCfg.mobs.size() == 0)
 					continue;
 				
+				World world = getServer().getWorld(worldName);
+				
+				if (world == null)
+					continue;
+				
 				// Iterate through each entity in the world and set their max HP accordingly
-				for (LivingEntity entity : getServer().getWorld(world).getLivingEntities())
+				for (LivingEntity entity : world.getLivingEntities())
 				{
 					AbilitiesMobListener.removeAbilities(entity);
 				}
