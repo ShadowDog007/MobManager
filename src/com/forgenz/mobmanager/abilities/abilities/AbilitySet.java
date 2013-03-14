@@ -81,7 +81,6 @@ public class AbilitySet extends Ability
 		
 		for (Ability ability : abilities)
 		{
-			P.p().getLogger().severe("AbilityType: " + ability.getAbilityType());
 			ability.addAbility(entity);
 		}
 	}
