@@ -74,6 +74,11 @@ public class AbilityConfig extends AbstractConfig
 			}
 		}
 		
+		for (String world : list)
+		{
+			enabledWorlds.add(world.toUpperCase());
+		}
+		
 		set(cfg, "EnabledWorlds", list);
 		
 		/* ################ AbilitySets ################ */
@@ -131,38 +136,26 @@ public class AbilityConfig extends AbstractConfig
 	
 	public WorldAbilityConfig getWorldConfig(String world)
 	{
-		if (!enabledWorlds.contains(world))
+		if (!enabledWorlds.contains(world.toUpperCase()))
 			return null;
 		
 		WorldAbilityConfig worldCfg = worlds.get(world);
 		
-		return worldCfg != null ? worldCfg : globalCfg;
+		return worldCfg != null && worldCfg.worldSettingsEnabled() ? worldCfg : globalCfg;
 	}
 	
-	public MobAbilityConfig getMobConfig(String world, ExtendedEntityType mobType)
+	public MobAbilityConfig getMobConfig(String world, ExtendedEntityType mobType, SpawnReason spawnReason)
 	{
 		WorldAbilityConfig worldCfg = getWorldConfig(world);
 		
-		MobAbilityConfig mobCfg = null;
+		if (worldCfg == null)
+			return null;
 		
-		if (worldCfg != null)
-		{
-			mobCfg = worldCfg.mobs.get(mobType);
-		}
+		if (spawnReason != null && !worldCfg.enabledSpawnReasons.containsValue(spawnReason.toString()))
+			return null;
+		
+		MobAbilityConfig mobCfg = worldCfg.mobs.get(mobType);
 		
 		return mobCfg != null ? mobCfg : globalCfg.mobs.get(mobType);
-	}
-	
-	public boolean enabledSpawnReason(String world, SpawnReason reason)
-	{
-		if (!enabledWorlds.contains(world))
-			return false;
-		
-		WorldAbilityConfig worldCfg = worlds.get(world);
-		
-		if (worldCfg == null)
-			worldCfg = globalCfg;
-		
-		return worldCfg.enabledSpawnReasons.containsValue(reason.toString());
 	}
 }

@@ -130,7 +130,7 @@ public class ArmourAbility extends Ability
 		if (entity == null || entity instanceof Player)
 			return;
 		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
 		
 		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
 		

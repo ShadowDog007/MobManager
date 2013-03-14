@@ -67,6 +67,15 @@ E.G. if SpawnRate was 0.5 there would be a 50% chance that any mob
     which attempts to spawn will be allowed to spawn
 This setting can be used to reduce the number of certain mobs on your
     server. (Possibly Freeing up space for other mobs)
+    
+
+################
+EquipmentDropChance (Rate)
+################
+A number between 0.0 and 1.0
+Represents the chance a mob will drop armour/held items upon death
+
+NOTE: This only works when using Armour or Item_Hand abilities
 
 ################
 BabyRate (Rate)
@@ -250,7 +259,8 @@ ApplySets (ChanceList)
 ################
 Here you set chances and the given AbilitySets to apply to a mob
 
-NOTE: AbilitySets stack with the above abilities as well
+NOTE: If an ability set is applied to a mob
+    no other abilities will be applied to it.
 
 AbilitySets are formatted like so (Using Zombie as an example)
 

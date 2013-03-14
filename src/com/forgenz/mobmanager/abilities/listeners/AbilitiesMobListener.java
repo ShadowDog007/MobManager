@@ -34,6 +34,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -41,10 +42,12 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
+import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
+import com.forgenz.mobmanager.abilities.abilities.DeathSpawnAbility;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -64,7 +67,7 @@ public class AbilitiesMobListener implements Listener
 		if (!P.p().getPluginIntegration().canApplyAbilities(event.getEntity()))
 			return;
 		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.get(event.getEntity()));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.get(event.getEntity()), event.getSpawnReason());
 		
 		if (ma == null)
 			return;
@@ -99,26 +102,52 @@ public class AbilitiesMobListener implements Listener
 		if (P.p().shouldIgnoreNextSpawn() || P.p().shouldAbilitiesIgnoreNextSpawn())
 			return;
 		
-		addAbilities(event.getEntity());
+		addAbilities(event.getEntity(), event.getSpawnReason());
 	}
 	
-	public static void addAbilities(LivingEntity entity)
+	/**
+	 * Adds a set of random abilities to the entity (If the given spawnReason permits)
+	 * @param entity The entity to have abilities added to
+	 * @param spawnReason The reason why the entity spawned (null to ignore)
+	 */
+	public static void addAbilities(LivingEntity entity, SpawnReason spawnReason)
 	{
+		// Check if any plugins are protecting this entity
 		if (!P.p().getPluginIntegration().canApplyAbilities(entity))
 			return;
 		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		// Fetch the mob config for this entity
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), spawnReason);
 		
+		// If there is not config for the entity there is nothing more to do
 		if (ma == null)
 			return;
 		
+		// Fetch Ability Sets
+		ValueChance<Ability> abilityChance = ma.attributes.get(AbilityType.ABILITY_SET);
+		if (abilityChance != null)
+		{
+			// Fetch an ability
+			AbilitySet ability = (AbilitySet) abilityChance.getBonus();
+			// If there is no ability or the 'none' ability set is given
+			// we allow other abilities to be applied
+			if (ability != null && ability.getNumAbilities() > 0)
+			{
+				// Add the ability and return to prevent other abilities being applied
+				ability.addAbility(entity);
+				return;
+			}
+		}
+		
+		// Cycle through each type of ability and apply them 
+		// Note: Make sure we do not apply abilitySets (hence i < types.length - 1)
 		AbilityType[] types = AbilityType.values();
-		for (int i = 0; i < types.length; ++i)
+		for (int i = 0; i < types.length - 1; ++i)
 		{
 			if (!types[i].isValueChanceAbility())
 				continue;
 			
-			ValueChance<Ability> abilityChance = ma.attributes.get(types[i]);
+			abilityChance = ma.attributes.get(types[i]);
 			
 			if (abilityChance == null)
 				continue;
@@ -137,7 +166,7 @@ public class AbilitiesMobListener implements Listener
 		if (!P.p().getPluginIntegration().canApplyAbilities(entity))
 			return;
 		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity));
+		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
 		
 		if (ma == null)
 			return;
@@ -168,22 +197,7 @@ public class AbilitiesMobListener implements Listener
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event)
 	{
-		ExtendedEntityType type = ExtendedEntityType.get(event.getEntity());
-		
-		if (type == null)
-			return;
-		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(event.getEntity().getWorld().getName(), type);
-		
-		if (ma == null)
-			return;
-		
-		ValueChance<Ability> vc = ma.attributes.get(AbilityType.DEATH_SPAWN);
-		
-		if (vc == null)
-			return;
-		
-		Ability ability = vc.getBonus();
+		DeathSpawnAbility ability = DeathSpawnAbility.getDeathSpawnAbility(event.getEntity());
 		
 		if (ability == null)
 			return;

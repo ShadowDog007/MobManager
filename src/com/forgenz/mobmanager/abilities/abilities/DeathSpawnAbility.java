@@ -28,14 +28,19 @@
 
 package com.forgenz.mobmanager.abilities.abilities;
 
-import org.bukkit.entity.LivingEntity;
+import java.util.List;
 
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
+
+import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
 public class DeathSpawnAbility extends AbstractSpawnAbility
 {
-	
+	private final static String metadataKey = "MOBMANAGER_SPAWN_DEATH";
 	protected DeathSpawnAbility(ExtendedEntityType type, int count, String abilitySet)
 	{
 		super(type, count, abilitySet);
@@ -44,16 +49,41 @@ public class DeathSpawnAbility extends AbstractSpawnAbility
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
-		if (!entity.isDead())
-			return;
-		
-		super.addAbility(entity);
+		// If the entity is dead we spawn entities on it
+		if (entity.isDead())
+		{
+			super.addAbility(entity);
+		}
+		// Else we store the ability as metadata for use when the enitity dies
+		else
+		{
+			entity.setMetadata(metadataKey, new FixedMetadataValue(P.p(), this));
+		}
 	}
 
 	@Override
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.DEATH_SPAWN;
+	}
+	
+	public static DeathSpawnAbility getDeathSpawnAbility(LivingEntity entity)
+	{
+		List<MetadataValue> metadata = entity.getMetadata(metadataKey);
+		
+		if (metadata == null)
+			return null;
+		
+		for (MetadataValue metaValue : metadata)
+		{
+			if (metaValue.getOwningPlugin() != P.p())
+				continue;
+			
+			if (metaValue.value() instanceof DeathSpawnAbility)
+				return (DeathSpawnAbility) metaValue.value();
+		}
+		
+		return null;
 	}
 
 }

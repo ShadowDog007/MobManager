@@ -193,6 +193,8 @@ public class P extends JavaPlugin
 			disableLimiter();
 		if (abilitiesEnabled)
 			disableAbilities();
+		
+		p = null;
 	}
 	
 	private void enableLimiter()
@@ -240,8 +242,6 @@ public class P extends JavaPlugin
 			animalProtection.cancel();
 			animalProtection.run();
 		}
-		
-		p = null;
 	}
 	
 	private void enableAbilities()
@@ -284,7 +284,7 @@ public class P extends JavaPlugin
 				// Iterate through each entity in the world and set their max HP accordingly
 				for (LivingEntity entity : getServer().getWorld(world).getLivingEntities())
 				{
-					AbilitiesMobListener.addAbilities(entity);
+					AbilitiesMobListener.addAbilities(entity, null);
 				}
 			}
 		}

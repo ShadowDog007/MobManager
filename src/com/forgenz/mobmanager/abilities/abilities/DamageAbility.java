@@ -44,6 +44,7 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
 public class DamageAbility extends Ability
 {
+	private static final String metadataKey = "MOBMANAGER_DAMAGE_MULTI";
 	public final float multi;
 
 	private DamageAbility(float multi)
@@ -62,23 +63,23 @@ public class DamageAbility extends Ability
 		
 		if (multi == 1.0F)
 		{
-			entity.removeMetadata("MOBMANAGER_DAMAGE_MULTI", P.p());
+			entity.removeMetadata(metadataKey, P.p());
 		}
 		else
 		{	
-			entity.setMetadata("MOBMANAGER_DAMAGE_MULTI", new FixedMetadataValue(P.p(), multi));
+			entity.setMetadata(metadataKey, new FixedMetadataValue(P.p(), multi));
 		}
 	}
 
 	@Override
 	public void removeAbility(LivingEntity entity)
 	{
-		entity.removeMetadata("MOBMANAGER_DAMAGE_MULTI", P.p());
+		entity.removeMetadata(metadataKey, P.p());
 	}
 	
 	public static float getMetaValue(LivingEntity entity)
 	{
-		List<MetadataValue> meta = entity.getMetadata("MOBMANAGER_DAMAGE_MULTI");
+		List<MetadataValue> meta = entity.getMetadata(metadataKey);
 		
 		if (meta == null)
 			return 1.0F;

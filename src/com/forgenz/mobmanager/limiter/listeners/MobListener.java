@@ -110,6 +110,8 @@ public class MobListener implements Listener
 	}
 	
 	// Event listener methods
+	
+	// Pre-made location object for speedz
 	private final Location loc = new Location(null, 0, 0, 0);
 	
 	/**
@@ -158,16 +160,24 @@ public class MobListener implements Listener
 		{
 			if (event.getSpawnReason() == SpawnReason.BREEDING || event.getSpawnReason() == SpawnReason.EGG)
 			{
-				int animalCount = 0;
-				for (Entity entity : event.getEntity().getLocation(loc).getChunk().getEntities())
+				// If breeding limit is invalid (-ve) it is disabled
+				if (world.worldConf.breedingLimit >= 0)
 				{
-					if (MobType.ANIMAL.belongs(entity))
-						++animalCount;
-				}
-				// Cancels the event if the chunk is not within breeding limits
-				if (animalCount >= 15)
-				{
-					event.setCancelled(true);
+					int animalCount = 0;
+					// If the limit is 0 there is no point counting the mobs
+					if (world.worldConf.breedingLimit != 0)
+					{
+						for (Entity entity : event.getEntity().getLocation(loc).getChunk().getEntities())
+						{
+							if (MobType.ANIMAL.belongs(entity))
+								++animalCount;
+						}
+					}
+					// Cancels the event if the chunk is not within breeding limits
+					if (animalCount >= world.worldConf.breedingLimit)
+					{
+						event.setCancelled(true);
+					}
 				}
 				
 				// There is probably going to be a player there? So don't bother checking for one?

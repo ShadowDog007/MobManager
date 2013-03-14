@@ -51,7 +51,7 @@ public class AbilitySet extends Ability
 	{
 		abilitySets.clear();
 		// Add default none ability
-		abilitySets.put("none", new AbilitySet(new HashSet<Ability>(), null));
+		abilitySets.put("none", new AbilitySet(null, null));
 	}
 	
 	private final HashSet<Ability> abilities;
@@ -81,6 +81,7 @@ public class AbilitySet extends Ability
 		
 		for (Ability ability : abilities)
 		{
+			P.p().getLogger().severe("AbilityType: " + ability.getAbilityType());
 			ability.addAbility(entity);
 		}
 	}
@@ -101,6 +102,13 @@ public class AbilitySet extends Ability
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.ABILITY_SET;
+	}
+	
+	public int getNumAbilities()
+	{
+		if (abilities == null)
+			return 0;
+		return abilities.size();
 	}
 	
 	public ExtendedEntityType getAbilitySetsEntityType()
