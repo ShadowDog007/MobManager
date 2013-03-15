@@ -25,3 +25,10 @@
 *.jar
 *.war
 *.ear
+
+# Maven Stuff #
+/target
+
+# Libraries #
+!/lib/integration/*.jar
+
