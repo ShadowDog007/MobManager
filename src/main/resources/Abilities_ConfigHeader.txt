@@ -16,6 +16,8 @@ EXAMPLE:
 AbilitySets:
 - Name: SteveTheZombie
   MobType: ZOMBIE
+  ShowName: true
+  ShowOverheadName: true
   Options:
   - POTION:
     - SPEED
@@ -38,9 +40,22 @@ Valid Abilities:
 POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, BABY, ANGRY,
 CHARGED, BIRTH_SPAWN, DEATH_SPAWN
 
+
+Keys:
+- Name: Defines the name of the Ability Set
+- MobType: Defines the default type of this Ability Set
+- ShowName: (true/false) Sets the mobs name as the name of the
+    ability set (Shown when a mob kills a player)
+- ShowOverheadName: (true/false) Shows the ability sets name
+    above the mobs head (Forces ShowName to true)
+
 NOTE: The MobType Key is only used in /mm spawnset to determine
     which mob should be spawned along with a given AbilitySet
     (If a MobType is not provided)
+    
+NOTE: If ShowName is true and ShowOverheadName is false
+    The mobs name is still shown above its head but
+    only when the player looks directly at the mob 
     
 NOTE: A default AbilitySet exists with no abilities. To use this call
     The AbilitySet 'NONE' under 'ApplySets' for your mob

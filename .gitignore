@@ -28,6 +28,7 @@
 
 # Maven Stuff #
 /target
+mvn_*.bat
 
 # Libraries #
 !/lib/integration/*.jar

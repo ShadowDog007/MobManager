@@ -51,11 +51,13 @@ public class AbilitySet extends Ability
 	{
 		abilitySets.clear();
 		// Add default none ability
-		abilitySets.put("none", new AbilitySet(null, null));
+		abilitySets.put("none", new AbilitySet(null, null, null, false));
 	}
 	
 	private final HashSet<Ability> abilities;
 	protected final ExtendedEntityType type;
+	private final String name;
+	private final boolean showOverheadName;
 	
 	public static AbilitySet getAbilitySet(String name)
 	{
@@ -67,10 +69,12 @@ public class AbilitySet extends Ability
 		return abilitySets.keySet().toArray(new String[abilitySets.size()]);
 	}
 	
-	private AbilitySet(HashSet<Ability> abilities, ExtendedEntityType type)
+	private AbilitySet(HashSet<Ability> abilities, ExtendedEntityType type, String name, boolean showOverheadName)
 	{
 		this.abilities = abilities;
 		this.type = type;
+		this.name = name;
+		this.showOverheadName = showOverheadName;
 	}
 
 	@Override
@@ -79,9 +83,18 @@ public class AbilitySet extends Ability
 		if (abilities == null)
 			return;
 		
+		// Add each ability to the entity
 		for (Ability ability : abilities)
 		{
 			ability.addAbility(entity);
+		}
+		
+		// If the entity has a name show it
+		if (name != null)
+		{
+			entity.setCustomName(name);
+			if (showOverheadName)
+				entity.setCustomNameVisible(true);
 		}
 	}
 
@@ -90,10 +103,13 @@ public class AbilitySet extends Ability
 	{
 		if (abilities == null)
 			return;
-			
-		for (Ability ability : abilities)
+		
+		if (name != null && entity.getCustomName().equals(name) || name == null && entity.getCustomName() == null)
 		{
-			ability.removeAbility(entity);
+			for (Ability ability : abilities)
+			{
+				ability.removeAbility(entity);
+			}
 		}
 	}
 
@@ -117,22 +133,26 @@ public class AbilitySet extends Ability
 	
 	public static void createAbilitySet(Map<String, Object> optMap)
 	{
+		// If there are no options return
 		if (optMap == null)
 			return;
 		
+		// Fetch the Sets name from the map
 		String name = MiscUtil.getMapValue(optMap, "NAME", "AbilitySets", String.class);
 		
+		// If no name is given return
 		if (name == null)
 			return;
 		
+		// If the name already exists return
 		if (abilitySets.containsKey(name.toLowerCase()))
 		{
 			P.p().getLogger().warning("AbilitySet with name " + name + " already exists");
 			return;
 		}
 		
+		// Fetch the default mob type if it exists
 		ExtendedEntityType entityType = null;
-		
 		if (optMap.containsKey("MOBTYPE"))
 		{
 			String key = MiscUtil.getString(optMap.get("MOBTYPE"));
@@ -145,44 +165,65 @@ public class AbilitySet extends Ability
 			}
 		}
 		
+		// Get the list of abilities for the set
 		List<?> optList = MiscUtil.getMapValue(optMap, "OPTIONS", "AbilitySets", List.class);
 		
+		// If the list is missing return
 		if (optList == null)
 			return;
 		
+		// Create the HashSet which will store the abilities
 		HashSet<Ability> abilities = new HashSet<Ability>();
-		
+		// Iterate through each object in the list
 		for (Object obj : optList)
 		{
+			// If the object is not a map its invalid
 			if (obj instanceof Map == false)
 				continue;
 			
+			// Cast the object to a map
 			Map<?, ?> map = (Map<?, ?>) obj;
 			
+			// If there are no elements in the map it is invalid
 			if (map.size() == 0)
 				continue;
 			
+			// Fetch what should be the only key
 			Object str = map.keySet().toArray(new Object[1])[0];
 			
+			// If the key is not a string the map is invalid
 			if (str instanceof String == false)
 				continue;
 			
+			// Determine which ability type the key is for
 			AbilityType abilityType = AbilityType.getAbilityType((String) str);
 			
+			// If no ability type was found produce an error and continue
 			if (abilityType == null)
 			{
 				P.p().getLogger().warning("The ability " + str + " does not exist");
 				continue;
 			}
 			
+			// Setup the ability
 			Ability ability = abilityType.setup(ExtendedEntityType.get(EntityType.UNKNOWN), map.get(str));
 			
+			// If the ability was successfully created add it to the ability set
 			if (ability != null)
 				abilities.add(ability);
 		}
 		
+		Boolean showName = MiscUtil.getMapValue(optMap, "SHOWNAME", null, Boolean.class);
+		if (showName == null)
+			showName = false;
+		
+		Boolean showOverheadName = MiscUtil.getMapValue(optMap, "SHOWOVERHEADNAME", null, Boolean.class);
+		if (showOverheadName == null)
+			showOverheadName = false;
+		
+		// If at least one ability was created we save the ability set
 		if (abilities.size() > 0)
-			abilitySets.put(name.toLowerCase(), new AbilitySet(abilities, entityType));
+			abilitySets.put(name.toLowerCase(), new AbilitySet(abilities, entityType, showName || showOverheadName ? name : null, showOverheadName));
 	} 
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)
