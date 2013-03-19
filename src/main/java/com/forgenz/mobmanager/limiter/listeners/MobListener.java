@@ -208,13 +208,6 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void countCreatureSpawns(CreatureSpawnEvent event)
 	{
-		// Check if we don't need to count the mob
-		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null || Config.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
-		{
-			return;
-		}
-		
 		// Fetch the world the creature spawned in
 		MMWorld world = P.worlds.get(event.getLocation().getWorld().getName());
 		// Do nothing if the world is inactive
@@ -223,6 +216,7 @@ public class MobListener implements Listener
 			return;
 		}
 		
+		MobType mob = MobType.valueOf(event.getEntity());
 		world.incrementMobCount(mob);
 	}
 	
@@ -234,13 +228,6 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDeath(final EntityDeathEvent event)
 	{
-		// Check if we can ignore the mob spawn
-		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null)
-		{
-			return;
-		}
-
 		// Fetch the world the spawn occurred in
 		final MMWorld world = P.worlds.get(event.getEntity().getLocation().getWorld().getName());
 		// Do nothing if the world is inactive
@@ -249,6 +236,7 @@ public class MobListener implements Listener
 			return;
 		}
 		
+		MobType mob = MobType.valueOf(event.getEntity());
 		world.decrementMobCount(mob);
 	}
 }
