@@ -49,6 +49,11 @@ Keys:
 - ShowOverheadName: (true/false) Shows the ability sets name
     above the mobs head (Forces ShowName to true)
 
+WARNING: The use of MobType and ShowName is only supported in 
+    Minecraft Versions 1.5 and newer. Using these settings
+    will generate errors if used on an unsupported minecraft
+    version
+    
 NOTE: The MobType Key is only used in /mm spawnset to determine
     which mob should be spawned along with a given AbilitySet
     (If a MobType is not provided)
