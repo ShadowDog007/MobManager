@@ -41,9 +41,6 @@ public abstract class Ability
 	/** Adds the ability to the entity */
 	public abstract void addAbility(LivingEntity entity);
 	
-	/** Removes the ability from the entity (For reloads) */
-	public abstract void removeAbility(LivingEntity entity);
-	
 	public abstract AbilityType getAbilityType();
 	
 	protected static String[] getChanceSplit(String str)

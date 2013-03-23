@@ -100,13 +100,6 @@ public abstract class AbstractSpawnAbility extends Ability
 		spawning = false;
 	}
 
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		// Nothing to see here folks, move along
-		return;
-	}
-
 	public static void setup(AbilityType type, ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)
 	{
 		Iterator<Object> it = optList.iterator();

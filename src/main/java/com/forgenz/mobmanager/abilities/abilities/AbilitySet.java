@@ -99,21 +99,6 @@ public class AbilitySet extends Ability
 	}
 
 	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		if (abilities == null)
-			return;
-		
-		if (name != null && entity.getCustomName().equals(name) || name == null && entity.getCustomName() == null)
-		{
-			for (Ability ability : abilities)
-			{
-				ability.removeAbility(entity);
-			}
-		}
-	}
-
-	@Override
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.ABILITY_SET;

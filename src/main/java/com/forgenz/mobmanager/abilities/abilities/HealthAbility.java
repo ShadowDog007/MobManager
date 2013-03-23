@@ -100,12 +100,6 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 	}
 
 	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		entity.resetMaxHealth();
-	}
-
-	@Override
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.HEALTH_BONUS;

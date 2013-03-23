@@ -78,22 +78,6 @@ public class PotionAbility extends Ability
 	}
 	
 	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		if (potionEffects == null)
-			return;
-		
-		for (PotionEffect effect : entity.getActivePotionEffects())
-		{
-			if (!potionEffects.containsKey(effect.getType()) || potionEffects.get(effect.getType()) != effect.getAmplifier())
-				continue;
-			
-			if (effect.getDuration() > Integer.MAX_VALUE >> 1)
-				entity.removePotionEffect(effect.getType());
-		}
-	}
-	
-	@Override
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.POTION;

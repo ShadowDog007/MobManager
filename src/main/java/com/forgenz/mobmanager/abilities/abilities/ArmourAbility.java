@@ -139,22 +139,6 @@ public class ArmourAbility extends Ability
 		material.setLegs(entity, dropChance);
 		material.setFeet(entity, dropChance);
 	}
-
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		for (ItemStack mat : entity.getEquipment().getArmorContents())
-		{
-			if (mat.getType() != material.head && mat.getType() != material.chest && mat.getType() != material.legs && mat.getType() != material.feet)
-				return;
-		}
-		
-		ArmourMaterials.NONE.setHead(entity, 0.15F);
-		ArmourMaterials.NONE.setChest(entity, 0.15F);
-		ArmourMaterials.NONE.setLegs(entity, 0.15F);
-		ArmourMaterials.NONE.setFeet(entity, 0.15F);
-		
-	}
 	
 	@Override
 	public AbilityType getAbilityType()

@@ -55,17 +55,6 @@ public class ChargedCreeperAbility extends Ability
 		
 		creeper.setPowered(true);
 	}
-
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		if (entity instanceof Creeper == false)
-			return;
-		
-		Creeper creeper = (Creeper) entity;
-		
-		creeper.setPowered(false);
-	}
 	
 	public static void addByChance(LivingEntity entity, MobAbilityConfig ma)
 	{

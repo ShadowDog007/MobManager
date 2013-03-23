@@ -48,11 +48,6 @@ public class NullAbility extends Ability
 	}
 
 	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-	}
-
-	@Override
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.NONE;

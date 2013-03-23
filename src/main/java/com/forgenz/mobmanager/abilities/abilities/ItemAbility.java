@@ -69,19 +69,6 @@ public class ItemAbility extends Ability
 		entity.getEquipment().setItemInHand(new ItemStack(item));
 		entity.getEquipment().setItemInHandDropChance(dropChance);
 	}
-
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		if (item == null)
-			return;
-		
-		if (entity.getEquipment().getItemInHand().getType() == item)
-		{
-			entity.getEquipment().setItemInHand(new ItemStack(Material.AIR));
-			entity.getEquipment().setItemInHandDropChance(0.15F);
-		}
-	}
 	
 	@Override
 	public AbilityType getAbilityType()

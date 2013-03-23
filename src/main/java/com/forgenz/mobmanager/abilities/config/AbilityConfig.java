@@ -93,8 +93,8 @@ public class AbilityConfig extends AbstractConfig
 			AbilitySet.createAbilitySet(MiscUtil.getConfigMap(obj));
 		
 		/* ################ LimitBonusSpawns ################ */
-		limitBonusSpawns = cfg.getBoolean("LimitBonusSpawns");
-		set(cfg, "LimitBonusSpawns", limitBonusSpawns);
+		limitBonusSpawns = cfg.getBoolean("LimitBonusSpawns", true);
+		set(cfg, "LimitBonusSpawns", limitBonusSpawns);		
 		
 		/* ################ Ability Global Config ################ */
 		globalCfg = new WorldAbilityConfig(cfg, "");

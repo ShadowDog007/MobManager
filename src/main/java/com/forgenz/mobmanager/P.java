@@ -31,12 +31,9 @@ package com.forgenz.mobmanager;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
-import com.forgenz.mobmanager.abilities.config.WorldAbilityConfig;
 import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
 import com.forgenz.mobmanager.commands.MMCommandListener;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
@@ -251,97 +248,10 @@ public class P extends JavaPlugin
 		
 		// Register Mob event listeners
 		getServer().getPluginManager().registerEvents(new AbilitiesMobListener(), this);
-		
-		// Sets already living mob HP to config settings
-		boolean hasGlobal = abilityCfg.globalCfg.mobs.size() != 0;
-		boolean addAbilities = hasGlobal;
-		
-		// If there are no global configs we check if there are any world configs
-		if (!hasGlobal)
-		{
-			for (String world : abilityCfg.enabledWorlds)
-			{
-				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
-				if (worldCfg != null && worldCfg.mobs.size() != 0)
-				{
-					addAbilities = true;
-					break;
-				}
-			}
-		}
-		
-		// Check if we should bother iterating through entities
-		if (addAbilities)
-		{
-			// Iterate through each enabled world
-			for (String worldName : abilityCfg.enabledWorlds)
-			{
-				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(worldName);
-				
-				// If there are no global configs and the world has no configs, check next world
-				if (!hasGlobal && worldCfg != null && worldCfg.mobs.size() == 0)
-					continue;
-				
-				World world = getServer().getWorld(worldName);
-				
-				if (world == null)
-					continue;
-				
-				// Iterate through each entity in the world and set their max HP accordingly
-				for (LivingEntity entity : world.getLivingEntities())
-				{
-					AbilitiesMobListener.addAbilities(entity, null);
-				}
-			}
-		}
 	}
 	
 	private void disableAbilities()
-	{		
-		// Resets mob abilities
-		boolean hasGlobal = abilityCfg.globalCfg.mobs.size() != 0;
-		boolean addAbilities = hasGlobal;
-		
-		// If there are no global configs we check if there are any world configs
-		if (!hasGlobal)
-		{
-			for (String world : abilityCfg.enabledWorlds)
-			{
-				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(world);
-				if (worldCfg != null && worldCfg.mobs.size() != 0)
-				{
-					addAbilities = true;
-					break;
-				}
-			}
-		}
-		
-		// Check if we should bother iterating through entities
-		if (addAbilities)
-		{
-			// Iterate through each enabled world
-			for (String worldName : abilityCfg.enabledWorlds)
-			{
-				WorldAbilityConfig worldCfg = abilityCfg.getWorldConfig(worldName);
-				
-				// If there are no global configs and the world has no configs, check next world
-				if (!hasGlobal && worldCfg != null && worldCfg.mobs.size() == 0)
-					continue;
-				
-				World world = getServer().getWorld(worldName);
-				
-				if (world == null)
-					continue;
-				
-				// Iterate through each entity in the world and set their max HP accordingly
-				for (LivingEntity entity : world.getLivingEntities())
-				{
-					AbilitiesMobListener.removeAbilities(entity);
-				}
-			}
-		}
-		
-
+	{
 		abilityCfg = null;
 	}
 	

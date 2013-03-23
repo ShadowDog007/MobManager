@@ -56,18 +56,6 @@ public class AngryAbility extends Ability
 		if (!wolf.isTamed())
 			wolf.setAngry(true);
 	}
-
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		if (entity instanceof Wolf == false)
-			return;
-		
-		Wolf wolf = (Wolf) entity;
-		
-		if (!wolf.isTamed())
-			wolf.setAngry(false);
-	}
 	
 	public static void addByChance(LivingEntity entity, MobAbilityConfig ma)
 	{

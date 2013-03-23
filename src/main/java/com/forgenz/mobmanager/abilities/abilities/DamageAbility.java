@@ -70,12 +70,6 @@ public class DamageAbility extends Ability
 			entity.setMetadata(metadataKey, new FixedMetadataValue(P.p(), multi));
 		}
 	}
-
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		entity.removeMetadata(metadataKey, P.p());
-	}
 	
 	public static float getMetaValue(LivingEntity entity)
 	{

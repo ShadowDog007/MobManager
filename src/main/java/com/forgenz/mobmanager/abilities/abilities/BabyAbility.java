@@ -62,21 +62,6 @@ public class BabyAbility extends Ability
 			((Zombie) entity).setBaby(true);
 		}
 	}
-
-	@Override
-	public void removeAbility(LivingEntity entity)
-	{
-		if (entity instanceof Ageable)
-		{
-			Ageable adult = (Ageable) entity;
-		
-			adult.setAdult();
-		}
-		else if (entity instanceof Zombie)
-		{
-			((Zombie) entity).setBaby(false);
-		}
-	}
 	
 	public static void addByChance(LivingEntity entity, MobAbilityConfig ma)
 	{
