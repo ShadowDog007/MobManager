@@ -253,6 +253,71 @@ MobAbilities:
     - Chance: 7
       ID: -1
   
+################
+Drops (ChanceList)
+################
+This is a list of chances/items that
+    will be dropped upon the mobs death
+
+Check here for item id's:
+    http://www.minecraftwiki.net/wiki/Data_values
+For a list of enchantment names go here:
+    http://jd.bukkit.org/rb/apidocs/org/bukkit/enchantments/Enchantment.html
+
+Keys:
+- Drops: List of maps which define what items are dropped
+    for the given chance.
+    Drops has additional keys:
+    - ID: The id of the item to be dropped
+    - Data: The data to be added to the item
+    - MinCount: The minimum number of the item to be dropped
+    - MaxCount: The maximum number of the item to be dropped
+    - Durability: The durability on the item
+    - Enchantments: A list of enchantments to add to the item
+
+- Replace: If true, vanilla drops are replaced with new drops
+    If false, new drops are dropped with vanilla drops
+    Default is false 
+    
+    
+EXAMPLE:
+MobAbilities:
+  ZOMBIE:
+    Drops:
+    - Chance: 1
+      Replace: true
+      Drops:
+      - ID: 367
+        MinCount: 1
+        MaxCount: 3
+      - ID: 267
+        MinCount: -1
+        MaxCount: 1
+        Durability: 20
+        Enchantments:
+        - DAMAGE_ALL:2
+        
+  <MobType>
+    Drops:
+    - Chance: 1
+      Replace: <True/False>
+      Drops:
+      - ID: <Item_Id>
+        Data: <Item_Data>
+        MinCount: <Min count>
+        MaxCount: <Max Count>
+        Enchantments:
+        - <Enchantment_1>
+        - <Enchantment_2>:<Enchantment_2_Level>    
+      
+NOTE: If neither MinCount or MaxCount are provided min/maxcount is
+    set to 1
+NOTE: If MinCount is negative this gives the item a lesser chance
+    to spawn
+NOTE: If MinCount is given by MaxCount is not, MaxCount is
+    set the same as MinCount
+NOTE: Enchantments can only be added to items which support them
+
 
 ################
 ApplySets (ChanceList)

@@ -28,6 +28,8 @@
 
 package com.forgenz.mobmanager.abilities.listeners;
 
+import java.util.List;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -38,6 +40,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
@@ -48,6 +51,7 @@ import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.abilities.DeathSpawnAbility;
+import com.forgenz.mobmanager.abilities.abilities.DropsAbility;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -161,48 +165,37 @@ public class AbilitiesMobListener implements Listener
 		}
 	}
 	
-	public static void removeAbilities(LivingEntity entity)
-	{
-		if (!P.p().getPluginIntegration().canApplyAbilities(entity))
-			return;
-		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
-		
-		if (ma == null)
-			return;
-		
-		AbilityType[] types = AbilityType.values();
-		for (int i = types.length - 1; i >= 0; --i)
-		{
-			if (!types[i].isValueChanceAbility())
-				continue;
-			
-			ValueChance<Ability> abilityChance = ma.attributes.get(types[i]);
-			
-			if (abilityChance == null)
-				continue;
-			
-			Ability ability = abilityChance.getBonus();
-			
-			if (ability == null)
-				continue;
-			
-			ability.addAbility(entity);
-		}
-	}
-	
 	/**
-	 * Handles the DeathSpawn Abilities
+	 * Handles the DeathSpawn/Drops Abilities
 	 */
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event)
 	{
-		DeathSpawnAbility ability = DeathSpawnAbility.getDeathSpawnAbility(event.getEntity());
+		// Handle DeathSpawn abilities
+		DeathSpawnAbility deathSpawnAbility = DeathSpawnAbility.getDeathSpawnAbility(event.getEntity());
 		
-		if (ability == null)
-			return;
+		if (deathSpawnAbility != null)
+		{
+			deathSpawnAbility.addAbility(event.getEntity());
+		}
 		
-		ability.addAbility(event.getEntity());
+		// Handle DropsAbility
+		DropsAbility dropsAbility = DropsAbility.getAbility(event.getEntity());
+		
+		if (dropsAbility != null)
+		{
+			if (dropsAbility.replaceDrops())
+			{
+				event.getDrops().clear();
+			}
+			
+			List<ItemStack> items = dropsAbility.getItemList();
+			
+			for (ItemStack item : items)
+			{
+				event.getDrops().add(item);
+			}
+		}
 	}
 	
 	/**

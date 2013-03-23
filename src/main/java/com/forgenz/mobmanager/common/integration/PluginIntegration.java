@@ -185,7 +185,7 @@ public class PluginIntegration implements Protector
 	
 	public boolean abilitiesEnabled()
 	{
-		return P.p().isAbiltiesEnabled();
+		return P.p().isAbilitiesEnabled();
 	}
 	
 	/* #### IgnoreSpawn Flags #### */

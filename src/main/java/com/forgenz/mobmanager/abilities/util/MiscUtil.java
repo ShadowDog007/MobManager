@@ -129,8 +129,13 @@ public class MiscUtil
 	
 	public static int getInteger(Object obj)
 	{
+		return getInteger(obj, 0);
+	}
+	
+	public static int getInteger(Object obj, int def)
+	{
 		if (obj == null)
-			return 0;
+			return def;
 		
 		if (obj instanceof Integer)
 			return (Integer) obj;
@@ -142,10 +147,10 @@ public class MiscUtil
 		}
 		catch (Exception e)
 		{
-			return 0;
+			return def;
 		}
 		
-		return 0;
+		return def;
 	}
 	
 	public static float getFloat(Object obj)

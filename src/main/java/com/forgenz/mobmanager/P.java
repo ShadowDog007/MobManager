@@ -89,7 +89,7 @@ public class P extends JavaPlugin
 		return limiterEnabled;
 	}
 	
-	public boolean isAbiltiesEnabled()
+	public boolean isAbilitiesEnabled()
 	{
 		return abilitiesEnabled;
 	}
@@ -117,17 +117,6 @@ public class P extends JavaPlugin
 	public void onEnable()
 	{
 		p = this;
-		
-		// Start Metrics gathering
-		try
-		{
-			Metrics metrics = new Metrics(this);
-			metrics.start();
-		}
-		catch (IOException e)
-		{
-			getLogger().info("Failed to start metrics gathering..  :(");
-		}
 		
 		// Register common listeners
 		getServer().getPluginManager().registerEvents(new CommonMobListener(), this);
@@ -178,6 +167,9 @@ public class P extends JavaPlugin
 		// Save the config with the current version
 		AbstractConfig.set(getConfig(), "Version", getDescription().getVersion());
 		saveConfig();
+		
+		// Start Metrics gathering
+		startMetrics();
 	}
 
 	@Override
@@ -253,6 +245,59 @@ public class P extends JavaPlugin
 	private void disableAbilities()
 	{
 		abilityCfg = null;
+	}
+	
+	private void startMetrics()
+	{
+		try
+		{
+			Metrics metrics = new Metrics(this);
+			
+			// Shows percentage of servers which use the limiter component
+			Metrics.Graph limiterGraph = metrics.createGraph("Limiter Stats");
+			limiterGraph.addPlotter(new Metrics.Plotter("Enabled")
+			{
+				@Override
+				public int getValue()
+				{
+					return isLimiterEnabled() ? 1 : 0;
+				}
+			});
+			limiterGraph.addPlotter(new Metrics.Plotter("Disabled")
+			{
+				@Override
+				public int getValue()
+				{
+					return isLimiterEnabled() ? 0 : 1;
+				}
+			});
+			
+			// Shows percentage of servers which use the abilities component
+			Metrics.Graph abilitiesGraph = metrics.createGraph("Abilities Stats");
+			abilitiesGraph.addPlotter(new Metrics.Plotter("Enabled")
+			{
+				@Override
+				public int getValue()
+				{
+					return isAbilitiesEnabled() ? 1 : 0;
+				}
+			});
+			abilitiesGraph.addPlotter(new Metrics.Plotter("Disabled")
+			{
+				@Override
+				public int getValue()
+				{
+					return isAbilitiesEnabled() ? 0 : 1;
+				}
+			});
+			
+			// Done :)
+			metrics.start();
+		}
+		catch (IOException e)
+		{
+			getLogger().info("Failed to start metrics gathering..  :(");
+		}
 	}
 	
 	/* #### IgnoreSpawn Flags #### */

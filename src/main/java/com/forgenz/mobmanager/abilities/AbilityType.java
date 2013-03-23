@@ -38,6 +38,7 @@ import com.forgenz.mobmanager.abilities.abilities.ArmourAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
+import com.forgenz.mobmanager.abilities.abilities.DropsAbility;
 import com.forgenz.mobmanager.abilities.abilities.HealthAbility;
 import com.forgenz.mobmanager.abilities.abilities.ItemAbility;
 import com.forgenz.mobmanager.abilities.abilities.NullAbility;
@@ -62,6 +63,8 @@ public enum AbilityType
 	ARMOUR("Armour"),
 	
 	ITEM_HAND("Item_Hand"),
+	
+	DROPS("Drops"),
 	
 	BABY("BabyRate", false),
 	
@@ -125,6 +128,9 @@ public enum AbilityType
 		case ITEM_HAND:
 			ItemAbility.setup(mob, abilityChances, optList);
 			break;
+		case DROPS:
+			DropsAbility.setup(mob, abilityChances, optList);
+			break;
 		case POTION:
 			PotionAbility.setup(mob, abilityChances, optList);
 			break;
@@ -162,6 +168,8 @@ public enum AbilityType
 			return HealthAbility.setup(mob, opt);
 		case ITEM_HAND:
 			return ItemAbility.setup(mob, opt);
+		case DROPS:
+			return DropsAbility.setup(mob, opt);
 		case NONE:
 			return NullAbility.ability;
 		case POTION:

@@ -141,7 +141,7 @@ public class MMCommandSpawn extends MMCommand
 	
 	protected static void spawnset(CommandSender sender, String mob, Location loc, int count)
 	{
-		if (!P.p().isAbiltiesEnabled())
+		if (!P.p().isAbilitiesEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "~Abilities must be enabled to spawn AbilitySet Mobs");
 			return;
