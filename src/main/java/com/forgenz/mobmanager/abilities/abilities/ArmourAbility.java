@@ -28,27 +28,41 @@
 
 package com.forgenz.mobmanager.abilities.abilities;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.Patterns;
 
 public class ArmourAbility extends Ability
 {
 	public static final Pattern valuePattern = Pattern.compile("^(DIAMOND|IRON|CHAIN|GOLD|LEATHER|NONE|DEFAULT)$", Pattern.CASE_INSENSITIVE);
 	
+	public enum ArmourPosition
+	{
+		HELMET(0), CHESTPLATE(1), LEGGINGS(2), BOOTS(3);
+		
+		public final byte p;
+		
+		ArmourPosition(int p)
+		{
+			this.p = (byte) p;
+		}
+		
+	}
 	public enum ArmourMaterials
 	{
 		DIAMOND(Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS),
@@ -59,91 +73,138 @@ public class ArmourAbility extends Ability
 		NONE(Material.AIR, Material.AIR, Material.AIR, Material.AIR),
 		DEFAULT(null, null, null, null);
 		
-		private ArmourAbility ability = null;
-		private final Material head;
-		private final Material chest;
-		private final Material legs;
-		private final Material feet;
+		private final Material[] materials = new Material[4]; 
 		
 		ArmourMaterials(Material head, Material chest, Material legs, Material feet)
 		{
-			this.head = head;
-			this.chest = chest;
-			this.legs = legs;
-			this.feet = feet;
+			materials[ArmourPosition.HELMET.p] = head;
+			materials[ArmourPosition.CHESTPLATE.p] = chest;
+			materials[ArmourPosition.LEGGINGS.p] = legs;
+			materials[ArmourPosition.BOOTS.p] = feet;
 		}
 		
-		public void setHead(LivingEntity entity, float dropChance)
+		public Material getMaterial(ArmourPosition position)
 		{
-			if (head != null)
-			{
-				entity.getEquipment().setHelmet(new ItemStack(head));
-				entity.getEquipment().setHelmetDropChance(dropChance);
-			}
-		}
-		
-		public void setChest(LivingEntity entity, float dropChance)
-		{
-			if (head != null)
-			{
-				entity.getEquipment().setChestplate(new ItemStack(chest));
-				entity.getEquipment().setChestplateDropChance(dropChance);
-			}
-		}
-		
-		public void setLegs(LivingEntity entity, float dropChance)
-		{
-			if (head != null)
-			{
-				entity.getEquipment().setLeggings(new ItemStack(legs));
-				entity.getEquipment().setLeggingsDropChance(dropChance);
-			}
-		}
-		
-		public void setFeet(LivingEntity entity, float dropChance)
-		{
-			if (head != null)
-			{
-				entity.getEquipment().setBoots(new ItemStack(feet));
-				entity.getEquipment().setBootsDropChance(dropChance);
-			}
-		}
-		
-		public ArmourAbility getAbility()
-		{
-			if (ability == null)
-				ability = new ArmourAbility(this);
-			return ability;
+			return materials[position.p];
 		}
 	}
 	
-	private final ArmourMaterials material;
-	
-	private ArmourAbility(ArmourMaterials material)
+	public static class Armour
 	{
-		this.material = material;
+		public final ArmourPosition position;
+		public final float dropChance;
+		private final ItemStack itemTemplate;
+		
+		public Armour(ArmourPosition position, float dropChance, ArmourMaterials material, ArrayList<Enchantment> enchantments, ArrayList<Integer> enchantLevels)
+		{
+			this.position = position;
+			this.dropChance = dropChance < 0.0F ? 0.15F : dropChance;
+			
+			// The following generates the template itemstack
+			
+			// Fetches and validates the material
+			Material itemMat = material.getMaterial(position);
+			
+			if (itemMat == null)
+			{
+				itemTemplate = null;
+				return;
+			}
+			
+			// Create an Item Stack with the new material
+			itemTemplate = new ItemStack(itemMat);
+			
+			// Add enchantments to the item stack
+			if (enchantments != null && enchantLevels != null && enchantments.size() == enchantLevels.size())
+			{
+				// Iterate through each enchantment
+				for (int i = 0; i < enchantments.size(); ++i)
+				{
+					Enchantment e = enchantments.get(i);
+					// Check if you can enchant the item
+					if (e.canEnchantItem(itemTemplate))
+					{
+						// Fetch the level
+						Integer level = enchantLevels.get(i);
+						
+						// Validate the level
+						if (level != null)
+						{
+							if (level > e.getMaxLevel())
+							{
+								level = e.getMaxLevel();
+							}
+							else if (level < e.getStartLevel())
+							{
+								level = e.getStartLevel();
+							}
+						}
+						else
+						{
+							level = e.getStartLevel();
+						}
+						
+						// Add the enchantment to the item stack
+						itemTemplate.addEnchantment(e, level);
+					}
+				}
+			}
+		}
+		
+		public void addArmour(LivingEntity entity)
+		{
+			// If no template exists we do nothing
+			if (itemTemplate == null)
+				return;
+			
+			// Create a copy of the item template
+			ItemStack item = new ItemStack(itemTemplate);
+			
+			switch (position)
+			{
+			case BOOTS:
+				entity.getEquipment().setBoots(item);
+				entity.getEquipment().setBootsDropChance(dropChance);
+				break;
+			case CHESTPLATE:
+				entity.getEquipment().setChestplate(item);
+				entity.getEquipment().setChestplateDropChance(dropChance);
+				break;
+			case HELMET:
+				entity.getEquipment().setHelmet(item);
+				entity.getEquipment().setHelmetDropChance(dropChance);
+				break;
+			case LEGGINGS:
+				entity.getEquipment().setLeggings(item);
+				entity.getEquipment().setLeggingsDropChance(dropChance);
+				break;			
+			}
+		}
+	}
+	
+	private final ArrayList<Armour> armour;
+	
+	private ArmourAbility(ArrayList<Armour> armour)
+	{
+		this.armour = armour;
 	}
 
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
-		if (entity == null || entity instanceof Player)
+		if (entity == null || entity instanceof Player || armour == null)
 			return;
 		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
-		
-		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
-		
-		material.setHead(entity, dropChance);
-		material.setChest(entity, dropChance);
-		material.setLegs(entity, dropChance);
-		material.setFeet(entity, dropChance);
+		for (Armour a : armour)
+		{
+			a.addArmour(entity);
+		}
 	}
 	
 	@Override
 	public AbilityType getAbilityType()
 	{
-		return AbilityType.ARMOUR;
+		return AbilityType.ARMOURSET;
 	}
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<?> optList)
@@ -161,48 +222,144 @@ public class ArmourAbility extends Ability
 			
 			if (chance <= 0)
 				continue;
-			
-			String armourType = MiscUtil.getMapValue(optMap, "MATERIAL", "ARMOUR-" + mob.toString(), String.class);
 				
-			ArmourAbility ability = setup(mob, armourType);
+			ArmourAbility ability = setup(mob, MiscUtil.getList(optMap.get("PIECES")));
 			
 			if (ability != null)
 				abilityChances.addChance(chance, ability);
 		}
 	}
 	
-	public static ArmourAbility setup(ExtendedEntityType mob, String optVal)
+	public static ArmourAbility setup(ExtendedEntityType mob, List<Object> optList)
 	{
-		if (!valuePattern.matcher(optVal).matches())
+		ArrayList<Armour> armourList = null;
+		
+		if (optList != null)
 		{
-			P.p().getLogger().warning("The armour type " + optVal + " is invalid for MobAbilities." + mob + "." + AbilityType.ARMOUR);
+			for (Object obj : optList)
+			{
+				Armour armour = getArmour(MiscUtil.getConfigMap(obj));
+				
+				if (armour != null)
+				{
+					if (armourList == null)
+						armourList = new ArrayList<Armour>(1);
+					
+					armourList.add(armour);
+				}
+			}
+		}
+		
+		return new ArmourAbility(armourList);
+	}
+	
+	public static Armour getArmour(Map<String, Object> optMap)
+	{
+		// Check for valid option map
+		if (optMap == null)
+			return null;
+		
+		String tmpStr = MiscUtil.getString(optMap.get("POSITION"));
+		
+		if (tmpStr == null)
+		{
+			P.p().getLogger().warning("Missing armour position in abilities.yml");
 			return null;
 		}
 		
-		ArmourMaterials material = null;
-		
-		for (ArmourMaterials mat : ArmourMaterials.values())
+		ArmourPosition position = null;
+		// Find the armour position
+		for (ArmourPosition pos : ArmourPosition.values())
 		{
-			if (mat.toString().equalsIgnoreCase(optVal))
+			if (tmpStr.equalsIgnoreCase(pos.toString()))
 			{
-				material = mat;
+				position = pos;
 				break;
 			}
 		}
 		
-		if (material == null)
+		if (position == null)
 		{
-			P.p().getLogger().warning("The armour type " + optVal + " is invalid for MobAtributes." + mob + "." + AbilityType.ARMOUR);
-			return ArmourMaterials.NONE.getAbility();
+			P.p().getLogger().info("Invalid armour position given: " + tmpStr);
+			return null;
 		}
 		
-		return material.getAbility();
+		// Fetch the material
+		tmpStr = MiscUtil.getString(optMap.get("MATERIAL"));
+		
+		if (tmpStr == null || !valuePattern.matcher(tmpStr).matches())
+		{
+			if (tmpStr != null)
+			{
+				P.p().getLogger().warning("Invalid armour material given: " + tmpStr);
+			}
+			return null;
+		}
+		
+		ArmourMaterials armourMaterial = ArmourMaterials.valueOf(tmpStr.toUpperCase());
+		
+		float dropChance = MiscUtil.getFloat(optMap.get("DROPCHANCE"), 0.15F);
+		
+		List<Object> enchantmentList = MiscUtil.getList(optMap.get("ENCHANTMENTS"));
+		
+		ArrayList<Enchantment> enchantments = null;
+		ArrayList<Integer> enchantLevels = null;
+		
+		if (enchantmentList != null)
+		{
+			enchantments = new ArrayList<Enchantment>();
+			enchantLevels = new ArrayList<Integer>();
+			
+			for (Object obj : enchantmentList)
+			{
+				String enchantString = MiscUtil.getString(obj);
+				
+				if (enchantString == null)
+					continue;
+				
+				// Split the string <Enchantment>:<Level>
+				String[] split = Patterns.colonSplit.split(enchantString);
+				
+				if (split.length == 0)
+					continue;
+				
+				// Fetch the enchantment
+				Enchantment enchantment = Enchantment.getByName(split[0].toUpperCase());
+				
+				if (enchantment == null)
+				{
+					P.p().getLogger().warning("Invalid Enchantment given to ArmourSet: " + split[0]);
+					continue;
+				}
+				
+				// Fetch the level for the enchantment
+				int level = split.length == 2 ? MiscUtil.getInteger(split[1], enchantment.getStartLevel()) : enchantment.getStartLevel();
+				// Validate the level
+				if (level > enchantment.getMaxLevel())
+					level = enchantment.getMaxLevel();
+				else if (level < enchantment.getStartLevel())
+					level = enchantment.getStartLevel();
+				
+				// Add the enchantment and its level to the lists
+				enchantments.add(enchantment);
+				enchantLevels.add(level);
+			}
+			
+			if (enchantments.size() == 0)
+			{
+				enchantments = null;
+				enchantLevels = null;
+			}
+		}
+		
+		return new Armour(position, dropChance, armourMaterial, enchantments, enchantLevels);
 	}
 	
 	public static ArmourAbility setup(ExtendedEntityType mob, Object opt)
 	{
-		if (opt instanceof String)
-			return setup(mob, (String) opt);
+		List<Object> optList = MiscUtil.getList(opt);
+		if (optList != null)
+			return setup(mob, optList);
 		return null;
 	}
 }

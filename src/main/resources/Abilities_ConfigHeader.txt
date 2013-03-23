@@ -14,30 +14,59 @@ Names must not contain spaces
 
 EXAMPLE:
 AbilitySets:
-- Name: SteveTheZombie
+- Name: ExampleSet
   MobType: ZOMBIE
   ShowName: true
   ShowOverheadName: true
   Options:
   - POTION:
-    - SPEED
-    - REGENERATION
+    - SPEED:2
     - JUMP
-  - DAMAGE_MULTI: 10.0
-  - HEALTH_BONUS: 10
-- Name: StevesSon
-  MobType: ZOMBIE
-  Options:
+  - HEALTH_BONUS: -5
+  - DAMAGE_MULTI: 2.0
+  - ARMOURSET:
+    - Position: Helmet
+      Material: DIAMOND
+      Enchantments:
+      - PROTECTION_FIRE
+    - Position: Chestplate
+      Material: LEATHER
+      DropChance: 1.0
+    - Position: Leggings
+      Material: NONE
+    - Position: Boots
+      Material: CHAIN
+      DropChance: 0.0
+      Enchantments:
+      - PROTECTION_FALL:2
+  - ITEM_HAND: 267
+  - DROPS:
+    - ID: 267
+      MinCount: -2
+      MaxCount: 1
+      Enchantments:
+      - DAMAGE_ARTHROPODS:2
   - BABY: null
-  - POTION:
-    - SPEED
-    - REGENERATION
-    - JUMP
-  - DAMAGE_MULTI: 5.0
-  - HEALTH_BONUS: 5
+  - BIRTH_SPAWN:
+      MobType: VILLAGER
+      Count: 2
+  - DEATH_SPAWN
+      MobType: ZOMBIE
+      Count: 2
+  
+- Name: WolfExample
+  MobType: WOLF
+  Options:
+  - ANGRY: null
+  
+- Name: CreeperExample
+  MobType: CREEPER
+  Options:
+  - CHARGED: null
+  
    
 Valid Abilities:
-POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOUR, ITEM_HAND, DROPS,
+POTION, HEALTH_BONUS, DAMAGE_MULTI, ARMOURSET, ITEM_HAND, DROPS,
 BABY, ANGRY, CHARGED, BIRTH_SPAWN, DEATH_SPAWN
 
 

@@ -112,7 +112,7 @@ public class DropsAbility extends Ability
 			// Create the item stack/stacks
 			while (count > 0)
 			{
-				itemz.add(new ItemStack(material, count > material.getMaxStackSize() ? material.getMaxStackSize() : count, durability));
+				itemz.add(new ItemStack(material, count > material.getMaxStackSize() ? material.getMaxStackSize() : count, (short) (material.getMaxDurability() - durability)));
 				count -= material.getMaxStackSize();
 			}
 			
@@ -285,14 +285,14 @@ public class DropsAbility extends Ability
 				int minCount = MiscUtil.getInteger(dropMap.get("MINCOUNT"), 1);
 				int maxCount = MiscUtil.getInteger(dropMap.get("MAXCOUNT"), minCount);
 				
-				int durability = MiscUtil.getInteger(dropMap.get("DURABILITY"), Integer.MAX_VALUE);
+				int durability = MiscUtil.getInteger(dropMap.get("DURABILITY"), material.getMaxDurability());
 				
 				// Create a new DropSet and store it in the list
 				DropSet drop = new DropSet(material, data, durability, minCount, maxCount);
 				dropSets.add(drop);
 				
 				// Fetch enchantments and add them to the DropSet
-				List<Object> enchantments = MiscUtil.getList(dropMap.get("Enchantments"));
+				List<Object> enchantments = MiscUtil.getList(dropMap.get("ENCHANTMENTS"));
 				
 				// Ignore enchantments if key does not match
 				if (enchantments == null)
@@ -332,7 +332,7 @@ public class DropsAbility extends Ability
 					}
 					
 					// Get the level of the enchantment
-					int level = split.length == 2 && Patterns.numberCheck.matcher(split[1]).matches() ? Integer.valueOf(split[0]) : enchantment.getStartLevel();
+					int level = split.length == 2 && Patterns.numberCheck.matcher(split[1]).matches() ? Integer.valueOf(split[1]) : enchantment.getStartLevel();
 					
 					// Validate the enchantment level
 					if (level > enchantment.getMaxLevel())

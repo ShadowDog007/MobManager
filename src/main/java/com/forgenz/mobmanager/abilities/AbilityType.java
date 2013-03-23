@@ -60,7 +60,7 @@ public enum AbilityType
 	
 	DAMAGE_MULTI("DamageMulti"),
 	
-	ARMOUR("Armour"),
+	ARMOURSET("ArmourSet"),
 	
 	ITEM_HAND("Item_Hand"),
 	
@@ -116,7 +116,7 @@ public enum AbilityType
 		case ABILITY_SET:
 			AbilitySet.setup(mob, abilityChances, optList);
 			break;
-		case ARMOUR:
+		case ARMOURSET:
 			ArmourAbility.setup(mob, abilityChances, optList);
 			break;
 		case DAMAGE_MULTI:
@@ -154,7 +154,7 @@ public enum AbilityType
 	{
 		switch (this)
 		{
-		case ARMOUR:
+		case ARMOURSET:
 			return ArmourAbility.setup(mob, opt);
 		case BABY:
 			return BabyAbility.ability;

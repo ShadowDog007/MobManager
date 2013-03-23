@@ -155,8 +155,13 @@ public class MiscUtil
 	
 	public static float getFloat(Object obj)
 	{
+		return getFloat(obj, 1.0F);
+	}
+	
+	public static float getFloat(Object obj, float def)
+	{
 		if (obj == null)
-			return 1.0F;
+			return def;
 		
 		if (obj instanceof Float)
 			return (Float) obj;
@@ -171,9 +176,9 @@ public class MiscUtil
 		}
 		catch (Exception e)
 		{
-			return 1.0F;
+			return def;
 		}
 		
-		return 1.0F;
+		return def;
 	}
 }

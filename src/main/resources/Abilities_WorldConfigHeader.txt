@@ -73,7 +73,7 @@ This setting can be used to reduce the number of certain mobs on your
 EquipmentDropChance (Rate)
 ################
 A number between 0.0 and 1.0
-Represents the chance a mob will drop armour/held items upon death
+Represents the chance a mob will drop held items upon death
 
 NOTE: This only works when using Armour or Item_Hand abilities
 
@@ -195,9 +195,11 @@ MobAbilities:
       Multi: 1.0
 
 ################
-Armour (ChanceList)
+ArmourSet (ChanceList)
 ################
-Armour is a list of armour materials to be put on a mob
+ArmourSet is a list of armour materials to be put on a mob
+Armour is picked per position (Helmet/Chestplate/Leggings/Boots)
+Armour can also have enchantments added
 
 Valid armour materials are:
 - DIAMOND
@@ -208,24 +210,47 @@ Valid armour materials are:
 - NONE
 - DEFAULT
 
-The chosen armour is put on the mob when it spawns. It always uses
-    a full set of armour.
+Valid Armour Positions are:
+- Helmet
+- Chestplate
+- Leggings
+- Boots
+
+The chosen armour is put on the mob when it spawns.
 NOTE: NONE means that the mob will have NO armour.
     DEFAULT will leave the mob with whatever armour it had beforehand
     
 Keys:
-- Material: The material the armour applied will be made of
+- Pieces: List of each piece of armour to give to the mob
+    Contains the following sub-keys:
+    - Position: The position to put the armour (e.g. Helmet/Chestplate etc)
+    - Material: The material for the armour
+    - DropChance: The chance (Between 0.0 and 1.0) for the piece of armour
+        to drop when the mob dies
+    - Enchantments: A list of enchantments to be added to the armour
+        (In the format '<enchantment>:<level>')
     
 EXAMPLE:
 MobAbilities:
   ZOMBIE:
     Armour:
     - Chance: 1
-      Material: DIAMOND
-    - Chance: 4
-      Material: IRON
-    - Chance: 15
-      Material: DEFAULT
+      Head:
+        Material: DIAMOND
+        Enchantments:
+        - PROTECTION_FIRE
+      Chestplate:
+        Material: LEATHER
+        DropChance: 1.0
+      Leggings:
+        Material: NONE
+      Boots:
+        Material: CHAIN
+        DropChance: 0.0
+        Enchantments:
+        - PROTECTION_FALL:2
+        
+    - Chance: 4 # This would produce no change to the mobs armour
 
 ################
 Item_Hand (ChanceList)
