@@ -183,7 +183,8 @@ When a mob does damage it multiplies the normal damage
 NOTE: Multipliers can stack with damage multipliers from AbilitySets
 
 Keys:
-- Multi: The damage multiplier (Must have a decimal component e.g. 1.0 NOT 1)
+- Multi: The damage multiplier
+    (Must have a decimal component e.g. 1.0 NOT 1)
 
 EXAMPLE:
 MobAbilities:
@@ -223,10 +224,11 @@ NOTE: NONE means that the mob will have NO armour.
 Keys:
 - Pieces: List of each piece of armour to give to the mob
     Contains the following sub-keys:
-    - Position: The position to put the armour (e.g. Helmet/Chestplate etc)
+    - Position: The position to put the armour
+        (e.g. Helmet/Chestplate etc)
     - Material: The material for the armour
-    - DropChance: The chance (Between 0.0 and 1.0) for the piece of armour
-        to drop when the mob dies
+    - DropChance: The chance (Between 0.0 and 1.0) for the
+        piece of armour to drop when the mob dies
     - Enchantments: A list of enchantments to be added to the armour
         (In the format '<enchantment>:<level>')
     
