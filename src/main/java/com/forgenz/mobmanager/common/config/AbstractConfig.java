@@ -31,7 +31,6 @@ package com.forgenz.mobmanager.common.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -49,9 +48,6 @@ public abstract class AbstractConfig
 	public final static String WORLDS_FOLDER = "worlds";
 	public final static String LIMITER_CONFIG_NAME = "limiter.yml";
 	public final static String ABILITY_CONFIG_NAME = "abilities.yml";
-	
-	public final static Pattern layerPattern = Pattern.compile("^\\d+:{1}\\d+$");
-	public final static Pattern layerSplitPattern = Pattern.compile(":{1}");
 	
 	public static FileConfiguration getConfig(String folder, String config)
 	{
