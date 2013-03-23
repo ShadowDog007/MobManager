@@ -113,7 +113,7 @@ public class DropsAbility extends Ability
 			while (count > 0)
 			{
 				itemz.add(new ItemStack(material, count > material.getMaxStackSize() ? material.getMaxStackSize() : count, durability));
-				
+				count -= material.getMaxStackSize();
 			}
 			
 			// If data is not 0 add the data
