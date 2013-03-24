@@ -209,6 +209,10 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void countCreatureSpawns(CreatureSpawnEvent event)
 	{
+		// If the mob is being ignored it is not counted towards the limits
+		if (Config.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
+			return;
+		
 		// Fetch the world the creature spawned in
 		MMWorld world = P.worlds.get(event.getLocation().getWorld().getName());
 		// Do nothing if the world is inactive
@@ -229,6 +233,10 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDeath(final EntityDeathEvent event)
 	{
+		// If the mob is being ignored it was not counted towards the limits
+		if (Config.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
+			return;
+		
 		// Fetch the world the spawn occurred in
 		final MMWorld world = P.worlds.get(event.getEntity().getLocation().getWorld().getName());
 		// Do nothing if the world is inactive
