@@ -132,8 +132,9 @@ public class MobListener implements Listener
 		if (!Config.enabledSpawnReasons.containsValue(event.getSpawnReason().toString()))
 			return;
 		
+		ExtendedEntityType eMobType = ExtendedEntityType.get(event.getEntity());
 		// Check if the entity is disabled
-		if (Config.disabledMobs.contains(ExtendedEntityType.get(event.getEntity())))
+		if (Config.disabledMobs.contains(eMobType))
 		{
 			// Prevent the entity from spawning
 			event.setCancelled(true);
@@ -142,7 +143,7 @@ public class MobListener implements Listener
 		
 		// Checks if we can ignore the creature spawn
 		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null || Config.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
+		if (mob == null || Config.ignoredMobs.contains(eMobType))
 		{
 			return;
 		}

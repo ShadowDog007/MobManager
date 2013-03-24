@@ -46,31 +46,31 @@ public enum MobType
 	 * Represents a monster
 	 */
 	@SuppressWarnings("unchecked")
-	MONSTER("M", "Monsters", 0, 512, 20, getClasses(Monster.class, Ghast.class, Slime.class)),
+	MONSTER("M", "Monsters", 0, 512, 20, Monster.class, Ghast.class, Slime.class),
 	
 	/**
 	 * Represents animals (Includes IronGolems and Snowmen)
 	 */
 	@SuppressWarnings("unchecked")
-	ANIMAL("A", "Animals", 1, 320, 15, getEnvironments(Environment.NORMAL), getClasses(Animals.class, Golem.class)),
+	ANIMAL("A", "Animals", 1, 320, 15,new Environment[] {Environment.NORMAL}, Animals.class, Golem.class),
 	
 	/**
 	 * Represents a water animal (Just squid at the moment)
 	 */
 	@SuppressWarnings("unchecked")
-	WATER_ANIMAL("W", "Water_Animals", 2, 128, 6, getEnvironments(Environment.NORMAL), getClasses(WaterMob.class)),
+	WATER_ANIMAL("W", "Water_Animals", 2, 128, 6, new Environment[] {Environment.NORMAL}, WaterMob.class),
 	
 	/**
 	 * Represents an ambient creature (Just bats at the moment)
 	 */
 	@SuppressWarnings("unchecked")
-	AMBIENT("Am", "Ambient", 3, 64, 6, getClasses(Ambient.class)),
+	AMBIENT("Am", "Ambient", 3, 64, 6, Ambient.class),
 	
 	/**
 	 * Represents a villager
 	 */
 	@SuppressWarnings("unchecked")
-	VILLAGER("V", "Villager", 4, 128, 10, getEnvironments(Environment.NORMAL), getClasses(Villager.class));
+	VILLAGER("V", "Villager", 4, 128, 10, new Environment[] {Environment.NORMAL}, Villager.class);
 	
 	public final String shortName;
 	public final String cPath;
@@ -88,7 +88,7 @@ public enum MobType
 	 * @param dynMulti The default dynamic multiplier for this group
 	 * @param mobTypes The classes or entities which belong to this group
 	 */
-	private MobType(String shortName, String cPath, int index, int maximum, int dynMulti, Class<? extends LivingEntity>[] mobTypes)
+	private MobType(String shortName, String cPath, int index, int maximum, int dynMulti, Class<? extends LivingEntity> ...mobTypes)
 	{
 		this(shortName, cPath, index, maximum, dynMulti, null, mobTypes);
 	}
@@ -96,7 +96,7 @@ public enum MobType
 	/**
 	 * @param environments The environments the mob can spawn in (null for all)
 	 */
-	private MobType(String shortName, String cPath, int index, int maximum, int dynMulti, Environment[] environments, Class<? extends LivingEntity>[] mobTypes)
+	private MobType(String shortName, String cPath, int index, int maximum, int dynMulti, Environment[] environments, Class<? extends LivingEntity> ...mobTypes)
 	{
 		this.shortName = shortName;
 		this.cPath = cPath;
@@ -106,16 +106,6 @@ public enum MobType
 		this.activeEnvironments = environments;
 		this.default_maximum = (short) maximum;
 		this.default_dynMulti = (short) dynMulti;
-	}
-	
-	private static Environment[] getEnvironments(Environment ...environments)
-	{
-		return environments.length != 0 ? environments : null;
-	}
-	
-	private static Class<? extends LivingEntity>[] getClasses(Class<? extends LivingEntity> ...mobTypes)
-	{
-		return mobTypes;
 	}
 	
 	public short getDefaultMax(Environment environment)
