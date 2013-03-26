@@ -41,9 +41,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.PotionAbility;
+import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -114,7 +114,7 @@ public class MMCommandDebug extends MMCommand
 			
 			Player player = (Player) sender;
 			
-			MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(player.getWorld().getName(), ExtendedEntityType.get(EntityType.ZOMBIE), null);
+			MobAbilityConfig ma = AbilityConfig.i().getMobConfig(player.getWorld().getName(), ExtendedEntityType.get(EntityType.ZOMBIE), null);
 			
 			if (ma == null)
 			{

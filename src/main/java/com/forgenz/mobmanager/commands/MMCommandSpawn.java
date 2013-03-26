@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
+import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.util.RandomLocationGen;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
@@ -133,14 +134,14 @@ public class MMCommandSpawn extends MMCommand
 			Location spawnLoc;			
 			// Check if we should use the random spawn location generator
 			if (P.p().isAbilitiesEnabled()
-					&& (!playerSpawn && P.p().abilityCfg.commandSpawnUseRadius
-							|| playerSpawn && P.p().abilityCfg.commandPSpawnUseRadius))
+					&& (!playerSpawn && AbilityConfig.i().commandSpawnUseRadius
+							|| playerSpawn && AbilityConfig.i().commandPSpawnUseRadius))
 			{
-				int minRange = playerSpawn ? P.p().abilityCfg.commandPSpawnMinRange : 1;
-				spawnLoc = RandomLocationGen.getLocation(loc, P.p().abilityCfg.bonusSpawnRange, minRange,
-						P.p().abilityCfg.bonusSpawnHeightRange);
+				int minRange = playerSpawn ? AbilityConfig.i().commandPSpawnMinRange : 1;
+				spawnLoc = RandomLocationGen.getLocation(loc, AbilityConfig.i().bonusSpawnRange, minRange,
+						AbilityConfig.i().bonusSpawnHeightRange);
 				// If flag is set, don't allow mobs to spawn ON the player
-				if (playerSpawn && !P.p().abilityCfg.commandPSpawnRadiusAllowCenter && spawnLoc == loc)
+				if (playerSpawn && !AbilityConfig.i().commandPSpawnRadiusAllowCenter && spawnLoc == loc)
 					continue;
 			}
 			else
@@ -193,14 +194,14 @@ public class MMCommandSpawn extends MMCommand
 			Location spawnLoc;
 			// Check if we should use the random spawn location generator
 			if (P.p().isAbilitiesEnabled()
-					&& (!playerSpawn && P.p().abilityCfg.commandSpawnUseRadius
-							|| playerSpawn && P.p().abilityCfg.commandPSpawnUseRadius))
+					&& (!playerSpawn && AbilityConfig.i().commandSpawnUseRadius
+							|| playerSpawn && AbilityConfig.i().commandPSpawnUseRadius))
 			{
-				int minRange = playerSpawn ? P.p().abilityCfg.commandPSpawnMinRange : 1;
-				spawnLoc = RandomLocationGen.getLocation(loc, P.p().abilityCfg.bonusSpawnRange, minRange,
-						P.p().abilityCfg.bonusSpawnHeightRange);
+				int minRange = playerSpawn ? AbilityConfig.i().commandPSpawnMinRange : 1;
+				spawnLoc = RandomLocationGen.getLocation(loc, AbilityConfig.i().bonusSpawnRange, minRange,
+						AbilityConfig.i().bonusSpawnHeightRange);
 				// If flag is set, don't allow mobs to spawn ON the player
-				if (playerSpawn && !P.p().abilityCfg.commandPSpawnRadiusAllowCenter && spawnLoc == loc)
+				if (playerSpawn && !AbilityConfig.i().commandPSpawnRadiusAllowCenter && spawnLoc == loc)
 					continue;
 			}
 			else

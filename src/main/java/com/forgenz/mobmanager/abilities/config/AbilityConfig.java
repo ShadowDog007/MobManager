@@ -46,6 +46,12 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
 public class AbilityConfig extends AbstractConfig
 {
+	private static AbilityConfig abilityCfg = null;
+	public static AbilityConfig i()
+	{
+		return abilityCfg;
+	}
+	
 	protected final static String WORLDS_FOLDER = "worlds";
 	protected final static String ABILITY_CONFIG_NAME = "abilities.yml";
 	
@@ -66,7 +72,8 @@ public class AbilityConfig extends AbstractConfig
 	public final WorldAbilityConfig globalCfg;
 	
 	public AbilityConfig()
-	{	
+	{
+		abilityCfg = this;
 		FileConfiguration cfg = getConfig("", AbilityConfig.ABILITY_CONFIG_NAME);
 		
 		/* ################ EnabledWorlds ################ */
@@ -88,17 +95,6 @@ public class AbilityConfig extends AbstractConfig
 		}
 		
 		set(cfg, "EnabledWorlds", list);
-		
-		/* ################ AbilitySets ################ */
-		AbilitySet.resetAbilitySets();
-		
-		List<?> abilitySets = cfg.getList("AbilitySets");
-		if (abilitySets == null)
-			abilitySets = new ArrayList<Object>();
-		set(cfg, "AbilitySets", abilitySets);
-			
-		for (Object obj : abilitySets)
-			AbilitySet.createAbilitySet(MiscUtil.getConfigMap(obj));
 		
 		/* ################ LimitBonusSpawns ################ */
 		limitBonusSpawns = cfg.getBoolean("LimitBonusSpawns", true);
@@ -127,6 +123,17 @@ public class AbilityConfig extends AbstractConfig
 		// Accept center spawn
 		commandPSpawnRadiusAllowCenter = cfg.getBoolean("CommandPSpawnRadiusAllowCenter", false);
 		set(cfg, "CommandPSpawnRadiusAllowCenter", commandPSpawnRadiusAllowCenter);
+		
+		/* ################ AbilitySets ################ */
+		AbilitySet.resetAbilitySets();
+		
+		List<?> abilitySets = cfg.getList("AbilitySets");
+		if (abilitySets == null)
+			abilitySets = new ArrayList<Object>();
+		set(cfg, "AbilitySets", abilitySets);
+			
+		for (Object obj : abilitySets)
+			AbilitySet.createAbilitySet(MiscUtil.getConfigMap(obj));
 		
 		/* ################ Ability Global Config ################ */
 		globalCfg = new WorldAbilityConfig(cfg, "");

@@ -37,8 +37,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
-import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
@@ -62,7 +62,7 @@ public class ItemAbility extends Ability
 		if (item == null)
 			return;
 		
-		MobAbilityConfig ma = P.p().abilityCfg.getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
+		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
 		
 		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
 		

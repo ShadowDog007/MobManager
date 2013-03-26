@@ -37,6 +37,7 @@ import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.RandomLocationGen;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
@@ -90,11 +91,11 @@ public abstract class AbstractSpawnAbility extends Ability
 			if (abilities != null)
 				P.p().abilitiesIgnoreNextSpawn(true);
 			
-			if (!P.p().abilityCfg.limitBonusSpawns)
+			if (!AbilityConfig.i().limitBonusSpawns)
 				P.p().limiterIgnoreNextSpawn(true);
 			
 			Location spawnLoc;
-			if (P.p().abilityCfg.radiusBonusSpawn)
+			if (AbilityConfig.i().radiusBonusSpawn)
 				spawnLoc = RandomLocationGen.getLocation(loc, range, 1, heightRange);
 			else
 				spawnLoc = loc;
@@ -175,8 +176,8 @@ public abstract class AbstractSpawnAbility extends Ability
 			return null;
 		}
 		
-		int range = MiscUtil.getInteger(optMap.get("RANGE"), P.p().abilityCfg.bonusSpawnRange);
-		int heightRange = MiscUtil.getInteger(optMap.get("HEIGHTRANGE"), P.p().abilityCfg.bonusSpawnHeightRange);
+		int range = MiscUtil.getInteger(optMap.get("RANGE"), AbilityConfig.i().bonusSpawnRange);
+		int heightRange = MiscUtil.getInteger(optMap.get("HEIGHTRANGE"), AbilityConfig.i().bonusSpawnHeightRange);
 		
 		switch (type)
 		{

@@ -79,8 +79,7 @@ public class P extends JavaPlugin
 	private MobDespawnTask despawner = null;
 	
 	public AnimalProtection animalProtection = null;
-	
-	public AbilityConfig abilityCfg = null;
+
 	
 	/* Enabled Components */
 	private boolean limiterEnabled;
@@ -238,7 +237,7 @@ public class P extends JavaPlugin
 	
 	private void enableAbilities()
 	{
-		abilityCfg = new AbilityConfig();
+		new AbilityConfig();
 		
 		// Register Mob event listeners
 		getServer().getPluginManager().registerEvents(new AbilitiesMobListener(), this);
@@ -246,7 +245,7 @@ public class P extends JavaPlugin
 	
 	private void disableAbilities()
 	{
-		abilityCfg = null;
+		// Nothing to do here
 	}
 	
 	private void startMetrics()
