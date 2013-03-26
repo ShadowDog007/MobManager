@@ -239,18 +239,19 @@ Keys:
 EXAMPLE:
 MobAbilities:
   ZOMBIE:
-    Armour:
+    ArmourSet:
     - Chance: 1
-      Head:
+      Pieces:
+      - Position: HELMET
         Material: DIAMOND
         Enchantments:
         - PROTECTION_FIRE
-      Chestplate:
+      - Position: CHESTPLATE
         Material: LEATHER
         DropChance: 1.0
-      Leggings:
+      - Position: LEGGINGS
         Material: NONE
-      Boots:
+      - Position: BOOTS
         Material: CHAIN
         DropChance: 0.0
         Enchantments:
