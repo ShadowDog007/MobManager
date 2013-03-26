@@ -71,9 +71,16 @@ public class RandomLocationGen
 			minRange = range ^ minRange;
 			range = range ^ minRange;
 		}
+		
+		if (range < 0)
+			range = 1;
+		if (range == minRange)
+			++range;
+		if (heightRange < 0)
+			heightRange = 1;
 
 		// Calculate the variance in range required
-		int range2 = (range << 1) - minRange;
+		int range2 = range - minRange << 1;
 		// Calculate the total (up/down) range of heightRange
 		int heightRange2 = heightRange << 1;
 
@@ -85,10 +92,10 @@ public class RandomLocationGen
 		{			
 			// Generate coordinates for X/Z
 			// Fetches a random number, shifts the variance to the center
-			int normalizedVariance = rand.nextInt(range2) - range;
-			cacheLoc.setX(normalizedVariance + (-0 & normalizedVariance | 1) * minRange + center.getBlockX() + 0.5);
-			normalizedVariance = rand.nextInt(range2) - range;
-			cacheLoc.setZ(normalizedVariance + (-0 & normalizedVariance | 1) * minRange + center.getBlockZ() + 0.5);
+			int normalizedVariance = rand.nextInt(range2) - range + minRange;
+			cacheLoc.setX(normalizedVariance + (normalizedVariance > 0 ? minRange : -1 * minRange) + center.getBlockX() + 0.5);
+			normalizedVariance = rand.nextInt(range2) - range + minRange;
+			cacheLoc.setZ(normalizedVariance + (normalizedVariance > 0 ? minRange : -1 * minRange) + center.getBlockZ() + 0.5);
 			
 			// Generate coordinates for Y
 			cacheLoc.setY(rand.nextInt(heightRange2) - heightRange + center.getBlockY() + 0.5);
@@ -97,7 +104,7 @@ public class RandomLocationGen
 			cacheLoc.setYaw(rand.nextFloat() * 360.0F);
 			
 			// Check the location is safe
-			Block block = center.getBlock();
+			Block block = cacheLoc.getBlock();
 			
 			// If the location is not safe we try again			
 			if (!(isSafe(block) && isSafe(block.getRelative(BlockFace.UP))))
