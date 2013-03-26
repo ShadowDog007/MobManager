@@ -54,6 +54,9 @@ public class ExtendedEntityType
 			if (eType.isAlive())
 				entityTypes.put(eType.toString(), new ExtendedEntityType(eType, ""));
 		}
+		
+		// Unknown mobs
+		entityTypes.put(EntityType.UNKNOWN.toString(), new ExtendedEntityType(EntityType.UNKNOWN, ""));
 	}
 	
 	public static ExtendedEntityType[] values()
