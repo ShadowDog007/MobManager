@@ -220,7 +220,7 @@ public class P extends JavaPlugin
 			animalProtection.runTaskTimerAsynchronously(this, Config.protectedFarmAnimalSaveInterval, Config.protectedFarmAnimalSaveInterval);
 		}
 		
-		getLogger().info("v" + getDescription().getVersion() + " ennabled with " + worlds.size() + " worlds");
+		getLogger().info("v" + getDescription().getVersion() + " enabled with " + worlds.size() + " worlds");
 	}
 	
 	private void disableLimiter()
