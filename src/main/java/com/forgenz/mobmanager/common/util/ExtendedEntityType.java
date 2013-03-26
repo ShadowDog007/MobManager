@@ -124,28 +124,6 @@ public class ExtendedEntityType
 		return eType.toString() + (dataString.length() != 0 ? getDataSeperator() + dataString : "");
 	}
 	
-	private static String getStringForEntityList(EntityType entityType)
-	{		
-		// Handle special cases
-		if (entityType == EntityType.SKELETON)
-		{
-			String str = entityType.toString();
-			
-			for (SkeletonType type : SkeletonType.values())
-			{
-				if (type != SkeletonType.NORMAL)
-					str += ", " + entityType.toString() + getDataSeperator() + type.toString();
-			}
-			
-			return str;
-		}
-		// Handle general cases
-		else
-		{
-			return entityType.toString();
-		}
-	}
-	
 	public static String getExtendedEntityList()
 	{
 		final int charLimit = 68;
@@ -153,12 +131,9 @@ public class ExtendedEntityType
 		
 		String list = "";
 		
-		for (EntityType type : EntityType.values())
-		{
-			if (!type.isAlive())
-				continue;
-			
-			String addition = getStringForEntityList(type);
+		for (ExtendedEntityType type : entityTypes.values())
+		{			
+			String addition = type.getTypeData();
 			
 			if (currentLoc + addition.length() + 2 > charLimit)
 			{
