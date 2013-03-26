@@ -26,17 +26,6 @@ public class Plotters
 		}
 		
 	};
-	
-	public final static Metrics.Plotter totalComponentsEnabled = new Metrics.Plotter("Total")
-	{
-
-		@Override
-		public int getValue()
-		{
-			return limiterEnabled.getValue() + abilitiesEnabled.getValue();
-		}
-		
-	};
 
 	public final static Plotter version = new Metrics.Plotter(P.p().getDescription().getVersion())
 	{

@@ -255,14 +255,14 @@ public class P extends JavaPlugin
 		{
 			Metrics metrics = new Metrics(this);
 			
-			Metrics.Graph componentGraph = metrics.createGraph("Component Stats");
+			Metrics.Graph componentGraph = metrics.createGraph("Components Used");
 			componentGraph.addPlotter(Plotters.limiterEnabled);
 			componentGraph.addPlotter(Plotters.abilitiesEnabled);
-			componentGraph.addPlotter(Plotters.totalComponentsEnabled);
 			
 			Metrics.Graph versionGraph = metrics.createGraph("Version Stats");
 			versionGraph.addPlotter(Plotters.version);
 			
+			// TODO Remove these
 			// Shows percentage of servers which use the limiter component
 			Metrics.Graph limiterGraph = metrics.createGraph("Limiter Stats");
 			limiterGraph.addPlotter(new Metrics.Plotter("Enabled")
