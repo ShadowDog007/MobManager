@@ -46,6 +46,8 @@ import com.forgenz.mobmanager.limiter.listeners.MobListener;
 import com.forgenz.mobmanager.limiter.tasks.MobDespawnTask;
 import com.forgenz.mobmanager.limiter.util.AnimalProtection;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
+import com.forgenz.mobmanager.metrics.Metrics;
+import com.forgenz.mobmanager.metrics.Plotters;
 
 /**
  * <b>MobManager</b> Components:
@@ -252,6 +254,14 @@ public class P extends JavaPlugin
 		try
 		{
 			Metrics metrics = new Metrics(this);
+			
+			Metrics.Graph componentGraph = metrics.createGraph("Component Stats");
+			componentGraph.addPlotter(Plotters.limiterEnabled);
+			componentGraph.addPlotter(Plotters.abilitiesEnabled);
+			componentGraph.addPlotter(Plotters.totalComponentsEnabled);
+			
+			Metrics.Graph versionGraph = metrics.createGraph("Version Stats");
+			versionGraph.addPlotter(Plotters.version);
 			
 			// Shows percentage of servers which use the limiter component
 			Metrics.Graph limiterGraph = metrics.createGraph("Limiter Stats");
