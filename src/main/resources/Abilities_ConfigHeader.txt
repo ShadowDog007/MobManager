@@ -50,6 +50,8 @@ AbilitySets:
   - BIRTH_SPAWN:
       MobType: VILLAGER
       Count: 2
+      Range: 16
+      HeightRange: 4
   - DEATH_SPAWN
       MobType: ZOMBIE
       Count: 2
@@ -103,4 +105,51 @@ If this is true Bonus spawns (From Birth/Death Spawns) will be
 
 If this is false Bonus spawns (From Birth/Death Spawns) will always
     spawn every mob
+
+#######################################################################
+BonusSpawnRange
+#######################################################################
+This is the default range used as the maximum range a mob can spawn
+    away from....
+    - A player when using /mm pspawn
+    - A parent mob when a Birth/Death spawns occurs
+    
+#######################################################################
+BonusSpawnHeightRange
+#######################################################################
+This is the default height range used as the maximum height a mob
+    can spawn away from....
+    - A player when using /mm pspawn
+    - A parent mob when a Birth/Death spawn occurs
+
+#######################################################################
+BonusSpawnUseRadius
+#######################################################################
+This value determines if Birth/Death spawns uses random locations
+    around the parent mob to spawn child mobs
+true = use random locations
+false = don't use random locations
+
+#######################################################################
+CommandSpawnUseRadius
+#######################################################################
+This value determines if the command /mm spawn uses random locations
+    around the center location to spawn mobs
+true = use random locations
+false = don't use random locations
+
+#######################################################################
+CommandPSpawnUseRadius
+#######################################################################
+This value determines if the command /mm pspawn uses random locations
+    around the players location to spawn mobs
+true = use random locations
+false = don't use random locations
+
+#######################################################################
+CommandPSpawnRadiusAllowCenter
+#######################################################################
+If this is true then /mm pspawn and /mm pspawnset will not allow
+    mobs to spawn on top of a player.
+    This can sometimes happen when the player is in an enclosed space
 

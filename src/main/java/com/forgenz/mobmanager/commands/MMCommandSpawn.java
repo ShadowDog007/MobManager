@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
+import com.forgenz.mobmanager.abilities.util.RandomLocationGen;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
 public class MMCommandSpawn extends MMCommand
@@ -77,9 +78,9 @@ public class MMCommandSpawn extends MMCommand
 		int count = Integer.valueOf(args[2]);
 		
 		if (args[0].equalsIgnoreCase("spawn"))
-			spawn(sender, args[1], loc, count);
+			spawn(sender, args[1], loc, count, false);
 		else
-			spawnset(sender, args[1], loc, count);
+			spawnset(sender, args[1], loc, count, false);
 	}
 	
 	private Location getLocation(CommandSender sender, String[] args)
@@ -113,7 +114,7 @@ public class MMCommandSpawn extends MMCommand
 		}
 	}
 
-	protected static void spawn(CommandSender sender, String mob, Location loc, int count)
+	protected static void spawn(CommandSender sender, String mob, Location loc, int count, boolean playerSpawn)
 	{		
 		ExtendedEntityType entityType = ExtendedEntityType.get(mob);
 		
@@ -123,23 +124,42 @@ public class MMCommandSpawn extends MMCommand
 			return;
 		}
 		
+		int spawnedMobs = 0;
+		
 		for (int i = 0; i < count; ++i)
 		{
 			P.p().limiterIgnoreNextSpawn(true);
 			
-			Entity entity = entityType.spawnMob(loc);
-			
-			if (entity == null)
+			Location spawnLoc;			
+			// Check if we should use the random spawn location generator
+			if (P.p().isAbilitiesEnabled()
+					&& (!playerSpawn && P.p().abilityCfg.commandSpawnUseRadius
+							|| playerSpawn && P.p().abilityCfg.commandPSpawnUseRadius))
 			{
-				sender.sendMessage(ChatColor.RED + "~Failed to spawn entity");
-				return;
+				int minRange = playerSpawn ? P.p().abilityCfg.commandPSpawnMinRange : 1;
+				spawnLoc = RandomLocationGen.getLocation(loc, P.p().abilityCfg.bonusSpawnRange, minRange,
+						P.p().abilityCfg.bonusSpawnHeightRange);
+				// If flag is set, don't allow mobs to spawn ON the player
+				if (playerSpawn && !P.p().abilityCfg.commandPSpawnRadiusAllowCenter && spawnLoc == loc)
+					continue;
+			}
+			else
+			{
+				spawnLoc = loc;
+			}
+			
+			Entity entity = entityType.spawnMob(spawnLoc);
+			
+			if (entity != null)
+			{
+				++spawnedMobs;
 			}
 		}
 		
-		sender.sendMessage(ChatColor.GRAY + "~" + mob + " was spawned");
+		sender.sendMessage(ChatColor.GRAY + "~ Spawned " + spawnedMobs + " " + mob + "s");
 	}
 	
-	protected static void spawnset(CommandSender sender, String mob, Location loc, int count)
+	protected static void spawnset(CommandSender sender, String setName, Location loc, int count, boolean playerSpawn)
 	{
 		if (!P.p().isAbilitiesEnabled())
 		{
@@ -147,11 +167,11 @@ public class MMCommandSpawn extends MMCommand
 			return;
 		}
 		
-		AbilitySet set = AbilitySet.getAbilitySet(mob);
+		AbilitySet set = AbilitySet.getAbilitySet(setName);
 		
 		if (set == null)
 		{
-			sender.sendMessage(ChatColor.RED + "~No AbilitySet named " + mob);
+			sender.sendMessage(ChatColor.RED + "~No AbilitySet named " + setName);
 			return;
 		}
 		
@@ -163,27 +183,43 @@ public class MMCommandSpawn extends MMCommand
 			return;
 		}
 		
+		int spawnedMobs = 0;
 		
 		for (int i = 0; i < count; ++i)
 		{
 			// Make sure the mob spawns without any abilities
 			P.p().ignoreNextSpawn(true);
-			P.p().abilitiesIgnoreNextSpawn(true);
-			P.p().limiterIgnoreNextSpawn(true);
 			
-			Entity entity = entityType.spawnMob(loc);
-			
-			if (entity == null)
+			Location spawnLoc;
+			// Check if we should use the random spawn location generator
+			if (P.p().isAbilitiesEnabled()
+					&& (!playerSpawn && P.p().abilityCfg.commandSpawnUseRadius
+							|| playerSpawn && P.p().abilityCfg.commandPSpawnUseRadius))
 			{
-				sender.sendMessage(ChatColor.RED + "~Failed to spawn entity");
-				return;
+				int minRange = playerSpawn ? P.p().abilityCfg.commandPSpawnMinRange : 1;
+				spawnLoc = RandomLocationGen.getLocation(loc, P.p().abilityCfg.bonusSpawnRange, minRange,
+						P.p().abilityCfg.bonusSpawnHeightRange);
+				// If flag is set, don't allow mobs to spawn ON the player
+				if (playerSpawn && !P.p().abilityCfg.commandPSpawnRadiusAllowCenter && spawnLoc == loc)
+					continue;
+			}
+			else
+			{
+				spawnLoc = loc;
+			}
+			
+			Entity entity = entityType.spawnMob(spawnLoc);
+			
+			if (entity != null)
+			{
+				++spawnedMobs;
 			}
 			
 			if (entity instanceof LivingEntity)
 				set.addAbility((LivingEntity) entity);
 		}
 		
-		sender.sendMessage(ChatColor.GRAY + "~" + mob + " was spawned");
+		sender.sendMessage(ChatColor.GRAY + "~ Spawned " + spawnedMobs + " " + setName + "s");
 	}
 
 	@Override

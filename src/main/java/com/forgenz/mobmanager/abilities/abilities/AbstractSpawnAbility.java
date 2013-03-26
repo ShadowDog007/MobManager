@@ -38,6 +38,7 @@ import org.bukkit.entity.LivingEntity;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
+import com.forgenz.mobmanager.abilities.util.RandomLocationGen;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
@@ -49,12 +50,16 @@ public abstract class AbstractSpawnAbility extends Ability
 	private final ExtendedEntityType type;
 	private final int count;
 	private final String abilitySet;
+	private final int range;
+	private final int heightRange;
 	
-	protected AbstractSpawnAbility(ExtendedEntityType type, int count, String abilitySet)
+	protected AbstractSpawnAbility(ExtendedEntityType type, int count, String abilitySet, int range, int heightRange)
 	{
 		this.type = type;
 		this.count = count;
 		this.abilitySet = abilitySet;
+		this.range = range;
+		this.heightRange = heightRange;
 	}
 
 	@Override
@@ -75,6 +80,9 @@ public abstract class AbstractSpawnAbility extends Ability
 		if (type == null)
 			return;
 		
+		// Copy the entities location into the cache
+		entity.getLocation(loc);
+		
 		// Spawn each mob
 		for (int i = 0; i < count; ++i)
 		{
@@ -84,13 +92,14 @@ public abstract class AbstractSpawnAbility extends Ability
 			
 			if (!P.p().abilityCfg.limitBonusSpawns)
 				P.p().limiterIgnoreNextSpawn(true);
-				P.p().abilitiesIgnoreNextSpawn(true);
 			
-			if (!P.p().abilityCfg.limitBonusSpawns)
-				P.p().limiterIgnoreNextSpawn(true);
-			
+			Location spawnLoc;
+			if (P.p().abilityCfg.radiusBonusSpawn)
+				spawnLoc = RandomLocationGen.getLocation(loc, range, 1, heightRange);
+			else
+				spawnLoc = loc;
 			// Spawn the entity
-			LivingEntity spawnedEntity = type.spawnMob(entity.getLocation(loc));
+			LivingEntity spawnedEntity = type.spawnMob(spawnLoc);
 			
 			if (abilities != null && spawnedEntity != null)
 				abilities.addAbility(spawnedEntity);
@@ -166,12 +175,15 @@ public abstract class AbstractSpawnAbility extends Ability
 			return null;
 		}
 		
+		int range = MiscUtil.getInteger(optMap.get("RANGE"), P.p().abilityCfg.bonusSpawnRange);
+		int heightRange = MiscUtil.getInteger(optMap.get("HEIGHTRANGE"), P.p().abilityCfg.bonusSpawnHeightRange);
+		
 		switch (type)
 		{
 		case BIRTH_SPAWN:
-			return new BirthSpawnAbility(mobType, count, abilitySet);
+			return new BirthSpawnAbility(mobType, count, abilitySet, range, heightRange);
 		case DEATH_SPAWN:
-			return new DeathSpawnAbility(mobType, count, abilitySet);
+			return new DeathSpawnAbility(mobType, count, abilitySet, range, heightRange);
 		default:
 			return null;
 		}

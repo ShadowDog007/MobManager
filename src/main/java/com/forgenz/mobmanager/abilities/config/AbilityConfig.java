@@ -54,6 +54,14 @@ public class AbilityConfig extends AbstractConfig
 	public final HashSet<String> enabledWorlds = new HashSet<String>();
 	
 	public final boolean limitBonusSpawns;
+	public final int bonusSpawnRange;
+	public final int bonusSpawnHeightRange;
+	public final int commandPSpawnMinRange;
+	
+	public final boolean radiusBonusSpawn;
+	public final boolean commandSpawnUseRadius;
+	public final boolean commandPSpawnUseRadius;
+	public final boolean commandPSpawnRadiusAllowCenter;
 	
 	public final WorldAbilityConfig globalCfg;
 	
@@ -94,7 +102,31 @@ public class AbilityConfig extends AbstractConfig
 		
 		/* ################ LimitBonusSpawns ################ */
 		limitBonusSpawns = cfg.getBoolean("LimitBonusSpawns", true);
-		set(cfg, "LimitBonusSpawns", limitBonusSpawns);		
+		set(cfg, "LimitBonusSpawns", limitBonusSpawns);
+		
+		/* ################ SpawnRanges ################ */
+		bonusSpawnRange = cfg.getInt("BonusSpawnRange", 16);
+		set(cfg, "BonusSpawnRange", bonusSpawnRange);
+		
+		bonusSpawnHeightRange = cfg.getInt("BonusSpawnHeightRange", 4);
+		set(cfg, "BonusSpawnHeightRange", bonusSpawnHeightRange);
+		
+		commandPSpawnMinRange = cfg.getInt("CommandPSpawnMinRange", 8);
+		set(cfg, "CommandPSpawnMinRange", commandPSpawnMinRange);
+		
+		// Radius usage toggles
+		radiusBonusSpawn = cfg.getBoolean("BonusSpawnUseRadius", false);
+		set(cfg, "BonusSpawnUseRadius", radiusBonusSpawn);
+		
+		commandSpawnUseRadius = cfg.getBoolean("CommandSpawnUseRadius", false);
+		set(cfg, "CommandSpawnUseRadius", commandSpawnUseRadius);
+		
+		commandPSpawnUseRadius = cfg.getBoolean("CommandPSpawnUseRadius", true);
+		set(cfg, "CommandPSpawnUseRadius", commandPSpawnUseRadius);
+		
+		// Accept center spawn
+		commandPSpawnRadiusAllowCenter = cfg.getBoolean("CommandPSpawnRadiusAllowCenter", false);
+		set(cfg, "CommandPSpawnRadiusAllowCenter", commandPSpawnRadiusAllowCenter);
 		
 		/* ################ Ability Global Config ################ */
 		globalCfg = new WorldAbilityConfig(cfg, "");

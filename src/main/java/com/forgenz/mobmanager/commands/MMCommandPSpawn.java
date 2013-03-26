@@ -68,9 +68,9 @@ public class MMCommandPSpawn extends MMCommand
 		int count = Integer.valueOf(args[2]);
 		
 		if (args[0].equalsIgnoreCase("pspawn"))
-			MMCommandSpawn.spawn(sender, args[1], player.getLocation(), count);
+			MMCommandSpawn.spawn(sender, args[1], player.getLocation(), count, true);
 		else
-			MMCommandSpawn.spawnset(sender, args[1], player.getLocation(), count);
+			MMCommandSpawn.spawnset(sender, args[1], player.getLocation(), count, true);
 	}
 
 	@Override

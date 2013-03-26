@@ -122,6 +122,10 @@ Keys:
     abilities.
 - Count: The number of mobs which will be spawned upon
     birth/death of the mob
+- Range: The range in which bonus mobs will spawn around
+    the original mob
+- HeightRange: The maximum height difference between
+    the original mob and the spawned mobs
     
 NOTE: You must always provide a MobType UNLESS you provide
     an AbilitySet which has a default MobType set.

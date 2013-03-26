@@ -41,9 +41,9 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 public class DeathSpawnAbility extends AbstractSpawnAbility
 {
 	private final static String metadataKey = "MOBMANAGER_SPAWN_DEATH";
-	protected DeathSpawnAbility(ExtendedEntityType type, int count, String abilitySet)
+	protected DeathSpawnAbility(ExtendedEntityType type, int count, String abilitySet, int range, int heightRange)
 	{
-		super(type, count, abilitySet);
+		super(type, count, abilitySet, range, heightRange);
 	}
 
 	@Override

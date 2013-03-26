@@ -36,9 +36,9 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 public class BirthSpawnAbility extends AbstractSpawnAbility
 {
 
-	protected BirthSpawnAbility(ExtendedEntityType type, int count, String abilitySet)
+	protected BirthSpawnAbility(ExtendedEntityType type, int count, String abilitySet, int range, int heightRange)
 	{
-		super(type, count, abilitySet);
+		super(type, count, abilitySet, range, heightRange);
 	}
 
 	@Override
