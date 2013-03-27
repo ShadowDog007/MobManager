@@ -63,17 +63,18 @@ public class RandomLocationGen
 			return center;
 		}
 		
-		// If minRange is more than range, rather than throwing an error
-		// Just swap the values
 		if (range < minRange)
 		{
 			range = range ^ minRange;
 			minRange = range ^ minRange;
 			range = range ^ minRange;
 		}
+		
+		if (heightRange < 0)
+			heightRange = 1;
+		
+		int rangeDiff = range - minRange;
 
-		// Calculate the variance in range required
-		int range2 = (range << 1) - minRange;
 		// Calculate the total (up/down) range of heightRange
 		int heightRange2 = heightRange << 1;
 
@@ -82,13 +83,15 @@ public class RandomLocationGen
 		
 		// Make 10 attempts to find a safe spawning location
 		for (int i = 0; i < 10; ++i)
-		{			
-			// Generate coordinates for X/Z
-			// Fetches a random number, shifts the variance to the center
-			int normalizedVariance = rand.nextInt(range2) - range;
-			cacheLoc.setX(normalizedVariance + (-0 & normalizedVariance | 1) * minRange + center.getBlockX() + 0.5);
-			normalizedVariance = rand.nextInt(range2) - range;
-			cacheLoc.setZ(normalizedVariance + (-0 & normalizedVariance | 1) * minRange + center.getBlockZ() + 0.5);
+		{
+			// Calculate a random direction for the X/Z values
+			double theta = 2 * Math.PI * rand.nextDouble();
+			
+			// Generate random locations for X/Z
+			double trig = Math.cos(theta);
+			cacheLoc.setX(Location.locToBlock(rand.nextDouble() * rangeDiff * trig + minRange * trig) + center.getBlockX() + 0.5);
+			trig = Math.sin(theta);
+			cacheLoc.setZ(Location.locToBlock(rand.nextDouble() * rangeDiff * trig + minRange * trig) + center.getBlockZ() + 0.5);
 			
 			// Generate coordinates for Y
 			cacheLoc.setY(rand.nextInt(heightRange2) - heightRange + center.getBlockY() + 0.5);
@@ -97,7 +100,7 @@ public class RandomLocationGen
 			cacheLoc.setYaw(rand.nextFloat() * 360.0F);
 			
 			// Check the location is safe
-			Block block = center.getBlock();
+			Block block = cacheLoc.getBlock();
 			
 			// If the location is not safe we try again			
 			if (!(isSafe(block) && isSafe(block.getRelative(BlockFace.UP))))
@@ -146,10 +149,9 @@ public class RandomLocationGen
 		switch (mat)
 		{
 		case AIR:
-		case WATER:
-		case STATIONARY_WATER:
 		case WEB:
 		case VINE:
+		case SNOW:
 		case LONG_GRASS:
 		case DEAD_BUSH:
 		case SAPLING:
