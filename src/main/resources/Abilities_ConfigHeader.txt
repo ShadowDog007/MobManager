@@ -41,11 +41,13 @@ AbilitySets:
       - PROTECTION_FALL:2
   - ITEM_HAND: 267
   - DROPS:
-    - ID: 267
-      MinCount: -2
-      MaxCount: 1
-      Enchantments:
-      - DAMAGE_ARTHROPODS:2
+      Replace: true
+      Drops:
+      - ID: 267
+        MinCount: -2
+        MaxCount: 1
+        Enchantments:
+        - DAMAGE_ARTHROPODS:2
   - BABY: null
   - BIRTH_SPAWN:
       MobType: VILLAGER
