@@ -63,8 +63,6 @@ public class RandomLocationGen
 			return center;
 		}
 		
-		// If minRange is more than range, rather than throwing an error
-		// Just swap the values
 		if (range < minRange)
 		{
 			range = range ^ minRange;
@@ -72,15 +70,11 @@ public class RandomLocationGen
 			range = range ^ minRange;
 		}
 		
-		if (range < 0)
-			range = 1;
-		if (range == minRange)
-			++range;
 		if (heightRange < 0)
 			heightRange = 1;
+		
+		int rangeDiff = range - minRange;
 
-		// Calculate the variance in range required
-		int range2 = range - minRange << 1;
 		// Calculate the total (up/down) range of heightRange
 		int heightRange2 = heightRange << 1;
 
@@ -89,13 +83,15 @@ public class RandomLocationGen
 		
 		// Make 10 attempts to find a safe spawning location
 		for (int i = 0; i < 10; ++i)
-		{			
-			// Generate coordinates for X/Z
-			// Fetches a random number, shifts the variance to the center
-			int normalizedVariance = rand.nextInt(range2) - range + minRange;
-			cacheLoc.setX(normalizedVariance + (normalizedVariance > 0 ? minRange : -1 * minRange) + center.getBlockX() + 0.5);
-			normalizedVariance = rand.nextInt(range2) - range + minRange;
-			cacheLoc.setZ(normalizedVariance + (normalizedVariance > 0 ? minRange : -1 * minRange) + center.getBlockZ() + 0.5);
+		{
+			// Calculate a random direction for the X/Z values
+			double theta = 2 * Math.PI * rand.nextDouble();
+			
+			// Generate random locations for X/Z
+			double trig = Math.cos(theta);
+			cacheLoc.setX(Location.locToBlock(rand.nextDouble() * rangeDiff * trig + minRange * trig) + center.getBlockX() + 0.5);
+			trig = Math.sin(theta);
+			cacheLoc.setZ(Location.locToBlock(rand.nextDouble() * rangeDiff * trig + minRange * trig) + center.getBlockZ() + 0.5);
 			
 			// Generate coordinates for Y
 			cacheLoc.setY(rand.nextInt(heightRange2) - heightRange + center.getBlockY() + 0.5);
@@ -153,10 +149,9 @@ public class RandomLocationGen
 		switch (mat)
 		{
 		case AIR:
-		case WATER:
-		case STATIONARY_WATER:
 		case WEB:
 		case VINE:
+		case SNOW:
 		case LONG_GRASS:
 		case DEAD_BUSH:
 		case SAPLING:
