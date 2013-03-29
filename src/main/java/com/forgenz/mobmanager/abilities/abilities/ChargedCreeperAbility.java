@@ -29,6 +29,7 @@
 package com.forgenz.mobmanager.abilities.abilities;
 
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.abilities.AbilityType;
@@ -48,7 +49,7 @@ public class ChargedCreeperAbility extends Ability
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
-		if (entity instanceof Creeper == false)
+		if (entity == null || !isValid(entity.getType()))
 			return;
 		
 		Creeper creeper = (Creeper) entity;
@@ -69,6 +70,14 @@ public class ChargedCreeperAbility extends Ability
 				ability.addAbility(entity);
 			}
 		}
+	}
+	
+	public static boolean isValid(EntityType entity)
+	{
+		if (entity == null || entity.getEntityClass() == null)
+			return false;
+		
+		return Creeper.class.isAssignableFrom(entity.getEntityClass());
 	}
 
 	@Override

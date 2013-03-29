@@ -33,12 +33,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Wolf;
 
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
+import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
+import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
@@ -90,7 +90,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## AngryRate ######## */
-		if (Wolf.class == mob.getBukkitEntityType().getEntityClass())
+		if (AngryAbility.isValid(mob.getBukkitEntityType()))
 		{
 			float angryRate = (float) cfg.getDouble("AngryRate", 0.0F);
 			if (angryRate <= 0.0F)
@@ -104,7 +104,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## ChargedRate ######## */
-		if (Creeper.class == mob.getBukkitEntityType().getEntityClass())
+		if (ChargedCreeperAbility.isValid(mob.getBukkitEntityType()))
 		{
 			float chargedRate = (float) cfg.getDouble("ChargedRate", 0.0F);
 			if (chargedRate <= 0.0F)

@@ -65,10 +65,10 @@ public class BabyAbility extends Ability
 	
 	public static void addByChance(LivingEntity entity, MobAbilityConfig ma)
 	{
-		if (ma == null)
+		if (entity == null || ma == null)
 			return;
 		
-		if ((entity instanceof Ageable || entity instanceof Zombie) && ma.babyRate <= 1.0F && ma.babyRate != 0.0F)
+		if (isValid(entity) && ma.babyRate <= 1.0F && ma.babyRate != 0.0F)
 		{
 			// If the random number is higher than the baby chance we don't turn the mob into a baby
 			if ( ma.babyRate == 1.0F || Config.rand.nextFloat() < ma.babyRate)
@@ -83,7 +83,20 @@ public class BabyAbility extends Ability
 		if (entity == null)
 			return false;
 		
-		return Ageable.class.isAssignableFrom(entity.getBukkitEntityType().getEntityClass()) || entity.getBukkitEntityType() == EntityType.ZOMBIE;
+		return isValid(entity.getBukkitEntityType());
+	}
+	
+	public static boolean isValid(EntityType entity)
+	{
+		if (entity == null || entity.getEntityClass() == null)
+			return false;
+		
+		return Ageable.class.isAssignableFrom(entity.getEntityClass()) || Zombie.class.isAssignableFrom(entity.getEntityClass());
+	}
+	
+	public static boolean isValid(LivingEntity entity)
+	{
+		return entity instanceof Ageable || entity instanceof Zombie;
 	}
 
 	@Override

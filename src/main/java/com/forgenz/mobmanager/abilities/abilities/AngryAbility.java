@@ -28,6 +28,7 @@
 
 package com.forgenz.mobmanager.abilities.abilities;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Wolf;
 
@@ -59,7 +60,7 @@ public class AngryAbility extends Ability
 	
 	public static void addByChance(LivingEntity entity, MobAbilityConfig ma)
 	{
-		if (ma == null || entity instanceof Wolf == false)
+		if (ma == null || !isValid(entity))
 			return;
 		
 		if (ma.angryRate <= 1.0 && ma.angryRate != 0.0)
@@ -70,6 +71,19 @@ public class AngryAbility extends Ability
 				ability.addAbility(entity);
 			}
 		}
+	}
+	
+	public static boolean isValid(LivingEntity entity)
+	{
+		return entity instanceof Wolf;
+	}
+	
+	public static boolean isValid(EntityType entity)
+	{
+		if (entity == null || entity.getEntityClass() == null)
+			return false;
+		
+		return Wolf.class.isAssignableFrom(entity.getEntityClass());
 	}
 
 	@Override
