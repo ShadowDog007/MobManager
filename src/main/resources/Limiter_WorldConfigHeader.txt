@@ -67,7 +67,7 @@ DespawnSearchDistance is the distance in blocks around
 Used as a default for worlds which have
     invalid values set for the same setting
 
-NOTE: If set to -1 the value from limiter.yml will be used
+NOTE: If set to -1 the value from the global limiter.yml will be used
 
 #######################################################################
 UndergroundSearchDistance
@@ -92,7 +92,7 @@ When a mob spawns MobManager searches for players
 DespawnSearchDistance is the distance in blocks above and below
     the spawned mob which MobManager will check for players
     
-NOTE: If set to -1 the value from limiter.yml will be used
+NOTE: If set to -1 the value from the global limiter.yml will be used
 
 #######################################################################
 GroundHeight
