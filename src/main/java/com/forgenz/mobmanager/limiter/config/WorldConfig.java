@@ -106,9 +106,9 @@ public class WorldConfig extends AbstractConfig
 		set(cfg, "UndergroundSearchDistance", undergroundSearchDistance);
 		
 		/* ################ DespawnSearchHeight ################ */
-		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 72));
+		short despawnSearchHeight = (short) cfg.getInt("DespawnSearchHeight", -1);
 		this.despawnSearchHeight = despawnSearchHeight <= 0 ? -1 : (short) (despawnSearchHeight * despawnSearchHeight);
-		set(cfg, "DespawnSearchDistance", despawnSearchHeight);
+		set(cfg, "DespawnSearchHeight", despawnSearchHeight);
 		
 		/* ################ GroundHeight ################ */
 		int defaultHeight = world.getEnvironment() == Environment.NORMAL ? 55 : (world.getEnvironment() == Environment.NETHER ? 32 : -1);
