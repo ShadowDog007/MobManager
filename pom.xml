@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.forgenz</groupId>
   <artifactId>MobManager</artifactId>
-  <version>2_4b_dev</version>
+  <version>2_4b</version>
   
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
