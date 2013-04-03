@@ -28,13 +28,8 @@
 
 package com.forgenz.mobmanager.limiter.listeners;
 
-import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Flying;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -46,6 +41,7 @@ import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
 import com.forgenz.mobmanager.limiter.util.MobType;
+import com.forgenz.mobmanager.limiter.util.PlayerFinder;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 /**
@@ -56,59 +52,7 @@ import com.forgenz.mobmanager.limiter.world.MMWorld;
  *
  */
 public class MobListener implements Listener
-{
-	public static MobListener i = null;
-	
-	public MobListener()
-	{
-		i = this;
-	}
-	
-	public boolean mobFlys(Entity entity)
-	{
-		if (entity instanceof Flying || entity instanceof Bat)
-			return true;
-		return false;
-	}
-	
-	/**
-	 * Scans nearby chunks for players on layers which cross a given height
-	 * 
-	 * @param world The World the chunk is in
-	 * @param chunk The coordinate of the center chunk
-	 * @param y The height to search for players at
-	 * @param flying If true layers further down will be checked for player to allow for more flying mobs
-	 * 
-	 * @return True if there is a player within range of the center chunk and in
-	 *         a layer which overlaps the height 'y'
-	 */
-	public boolean playerNear(MMWorld world, LivingEntity entity, boolean flying)
-	{
-		int searchDist = world.getSearchDistance();
-		int maxY = Config.flyingMobAditionalBlockDepth;
-		
-		Location eLoc = entity.getLocation();
-		Location pLoc = new Location(null, 0, 0, 0);
-		
-		if (eLoc.getBlockY() <= world.worldConf.groundHeight)
-			searchDist = world.worldConf.undergroundSearchDistance;
-		
-		for (Player player : P.p().getServer().getOnlinePlayers())
-		{
-			if (Config.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
-				continue;
-			
-			if (player.getWorld() != eLoc.getWorld())
-				continue;
-			
-			if (player.getLocation(pLoc).distanceSquared(eLoc) <= searchDist
-					&& Math.abs(eLoc.getBlockY() - pLoc.getBlockY()) - (flying ? Config.flyingMobAditionalBlockDepth : 0) <= maxY)
-				return true;
-		}
-		
-		return false;
-	}
-	
+{	
 	// Event listener methods
 	
 	/** Pre-made location object for speedz */
@@ -196,7 +140,7 @@ public class MobListener implements Listener
 		}
 		
 		// Checks that there is a player within range of the creature spawn
-		if (!playerNear(world, event.getEntity(), mobFlys(event.getEntity())))
+		if (!PlayerFinder.playerNear(world, event.getEntity(), PlayerFinder.mobFlys(event.getEntity())))
 		{
 			event.setCancelled(true);
 			return;

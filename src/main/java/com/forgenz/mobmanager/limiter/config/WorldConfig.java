@@ -107,7 +107,7 @@ public class WorldConfig extends AbstractConfig
 		
 		/* ################ DespawnSearchHeight ################ */
 		short despawnSearchHeight = (short) cfg.getInt("DespawnSearchHeight", -1);
-		this.despawnSearchHeight = despawnSearchHeight <= 0 ? -1 : (short) (despawnSearchHeight * despawnSearchHeight);
+		this.despawnSearchHeight = despawnSearchHeight <= 0 ? -1 : despawnSearchHeight;
 		set(cfg, "DespawnSearchHeight", despawnSearchHeight);
 		
 		/* ################ GroundHeight ################ */

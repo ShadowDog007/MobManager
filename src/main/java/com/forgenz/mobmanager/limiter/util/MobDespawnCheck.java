@@ -38,7 +38,6 @@ import org.bukkit.inventory.EntityEquipment;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.Config;
-import com.forgenz.mobmanager.limiter.listeners.MobListener;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class MobDespawnCheck
@@ -154,7 +153,7 @@ public class MobDespawnCheck
 			return true;
 		
 		// Search for a nearby player
-		return !MobListener.i.playerNear(world, entity, MobListener.i.mobFlys(entity));
+		return !PlayerFinder.playerNear(world, entity, PlayerFinder.mobFlys(entity));
 	}
 	
 	public static boolean shouldDespawn(LivingEntity entity)
