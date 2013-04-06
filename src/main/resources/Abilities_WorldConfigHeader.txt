@@ -366,7 +366,7 @@ Keys:
 
 MobAbilities:
   ZOMBIE:
-    AbilitySets:
+    ApplySets:
     - Chance: <Chance>
       SetName: <SetName>
 
