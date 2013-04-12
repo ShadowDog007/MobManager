@@ -77,6 +77,11 @@ public class DropsAbility extends Ability
 			this.range = max - min;
 		}
 		
+		public boolean hasValidCountRange()
+		{
+			return min + range > 0;
+		}
+		
 		public void addEnchantment(Enchantment e, int level)
 		{
 			if (e == null)
@@ -101,7 +106,7 @@ public class DropsAbility extends Ability
 		public List<ItemStack> getItem()
 		{
 			// Calculate the number of items to create
-			int count = range != 0 ? Config.rand.nextInt(range) + min : min;
+			int count = range != 0 ? Config.rand.nextInt(range + 1) + min : min;
 			
 			// Make sure count is more than 0
 			if (count <= 0)
@@ -276,7 +281,10 @@ public class DropsAbility extends Ability
 				
 				// If the material is invalid, check next drop
 				if (material == null)
+				{
+					P.p().getLogger().warning("No such Item ID " + id + " for " + mob);
 					continue;
+				}
 				
 				// Fetch the data for the drop
 				byte data = (byte) MiscUtil.getInteger(dropMap.get("DATA"));
@@ -289,6 +297,13 @@ public class DropsAbility extends Ability
 				
 				// Create a new DropSet and store it in the list
 				DropSet drop = new DropSet(material, data, durability, minCount, maxCount);
+				
+				if (!drop.hasValidCountRange())
+				{
+					P.p().getLogger().warning("DropSet made from " + id + "-" + material + " for " + mob + " will never drop any items.");
+					continue;
+				}
+				
 				dropSets.add(drop);
 				
 				// Fetch enchantments and add them to the DropSet
