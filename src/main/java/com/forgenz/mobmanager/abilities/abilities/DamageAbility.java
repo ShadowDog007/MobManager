@@ -130,7 +130,7 @@ public class DamageAbility extends Ability
 	
 	public static DamageAbility setup(ExtendedEntityType mob, float multi)
 	{
-		if (multi < 0)
+		if (multi < 0.0F)
 		{
 			P.p().getLogger().warning("Damage multipliers must be positive!");
 			multi = 1.0F;
@@ -143,6 +143,14 @@ public class DamageAbility extends Ability
 	{
 		if (obj == null)
 			return null;
+		
+		float multi = MiscUtil.getFloat(obj, Float.MIN_VALUE);
+		
+		if (multi == Float.MIN_VALUE)
+		{
+			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-DamageMulti. The value must be a decimal number", mob.toString()));
+			multi = 1.0F;
+		}
 		
 		return setup(mob, MiscUtil.getFloat(obj));
 	}

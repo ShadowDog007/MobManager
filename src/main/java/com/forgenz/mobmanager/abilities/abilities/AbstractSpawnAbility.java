@@ -195,7 +195,10 @@ public abstract class AbstractSpawnAbility extends Ability
 		Map<String, Object> map = MiscUtil.getConfigMap(opt);
 		
 		if (map == null)
+		{
+			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-%s. The value should be a map", mob.toString(), type.toString()));
 			return null;
+		}
 		
 		return setup(type, mob, map);
 	}

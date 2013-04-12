@@ -35,6 +35,7 @@ import java.util.Map;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 
+import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.JoinableAttribute;
 import com.forgenz.mobmanager.abilities.util.MiscUtil;
@@ -143,6 +144,14 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 		if (bonus == null)
 			return null;
 		
-		return setup(mob, MiscUtil.getInteger(bonus));
+		int itemId = MiscUtil.getInteger(bonus, Integer.MIN_VALUE);
+		
+		if (itemId == Integer.MIN_VALUE)
+		{
+			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-HealthBonus. The value must be a whole number", mob.toString()));
+			itemId = 0;
+		}
+		
+		return setup(mob, itemId);
 	}
 }

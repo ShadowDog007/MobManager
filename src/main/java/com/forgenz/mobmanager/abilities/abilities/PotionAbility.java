@@ -198,6 +198,8 @@ public class PotionAbility extends Ability
 	{
 		if (opt instanceof List)
 			return setup(mob, (List<Object>) opt);
+		
+		P.p().getLogger().warning(String.format("Found an error in abilities config for %s-PotionAbility", mob.toString()));
 		return null;
 	}
 }

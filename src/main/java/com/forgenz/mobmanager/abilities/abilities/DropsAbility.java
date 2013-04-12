@@ -357,6 +357,11 @@ public class DropsAbility extends Ability
 	{
 		Map<String, Object> optMap = MiscUtil.getConfigMap(opt);
 		
+		if (optMap == null)
+		{
+			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-Drops. The value must be a map", mob.toString()));
+		}
+		
 		return optMap == null ? null : setup(mob, optMap);
 	}
 

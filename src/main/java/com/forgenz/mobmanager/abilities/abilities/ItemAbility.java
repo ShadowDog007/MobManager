@@ -37,6 +37,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
+import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
@@ -132,7 +133,15 @@ public class ItemAbility extends Ability
 		if (opt == null)
 			return null;
 		
-		return setup(mob, MiscUtil.getInteger(opt));
+		int itemId = MiscUtil.getInteger(opt, Integer.MIN_VALUE);
+		
+		if (itemId == Integer.MIN_VALUE)
+		{
+			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-ItemAbility. The value must be a whole number", mob.toString()));
+			itemId = 0;
+		}
+		
+		return setup(mob, itemId);
 	}
 
 }

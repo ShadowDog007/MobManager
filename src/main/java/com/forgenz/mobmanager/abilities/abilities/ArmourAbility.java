@@ -360,6 +360,8 @@ public class ArmourAbility extends Ability
 		List<Object> optList = MiscUtil.getList(opt);
 		if (optList != null)
 			return setup(mob, optList);
+		
+		P.p().getLogger().warning(String.format("Found an error in abilities config for %s-ArmourSset. The value must be a list of armour peices", mob.toString()));
 		return null;
 	}
 }
