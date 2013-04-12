@@ -64,6 +64,7 @@ public class AbilityConfig extends AbstractConfig
 	public final int bonusSpawnHeightRange;
 	public final int commandPSpawnMinRange;
 	
+	public final boolean useCircleLocationGeneration;
 	public final boolean radiusBonusSpawn;
 	public final boolean commandSpawnUseRadius;
 	public final boolean commandPSpawnUseRadius;
@@ -109,6 +110,9 @@ public class AbilityConfig extends AbstractConfig
 		
 		commandPSpawnMinRange = cfg.getInt("CommandPSpawnMinRange", 8);
 		set(cfg, "CommandPSpawnMinRange", commandPSpawnMinRange);
+		
+		useCircleLocationGeneration = cfg.getBoolean("UseCircleLocationGeneration", false);
+		set(cfg, "UseCircleLocationGeneration", useCircleLocationGeneration);
 		
 		// Radius usage toggles
 		radiusBonusSpawn = cfg.getBoolean("BonusSpawnUseRadius", false);

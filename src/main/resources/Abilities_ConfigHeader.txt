@@ -124,6 +124,18 @@ This is the default height range used as the maximum height a mob
     - A player when using /mm pspawn
     - A parent mob when a Birth/Death spawn occurs
 
+#######################################################################   
+UseCircleLocationGeneration
+#######################################################################
+If this is true MobManager uses an algorithm which generates random
+    locations in a circle around a center location when spawning
+    mobs.
+    
+If this is false a (About 3.6 times faster) algorithm is used instead which
+    generates random locations in a square around the center location
+    
+It is recommended that this is left as false
+
 #######################################################################
 BonusSpawnUseRadius
 #######################################################################
