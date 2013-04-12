@@ -18,6 +18,7 @@ AbilitySets:
   MobType: ZOMBIE
   ShowName: true
   ShowOverheadName: true
+  DisplayName: '&2Example Zombie'
   Options:
   - POTION:
     - SPEED:2
@@ -81,6 +82,11 @@ Keys:
     ability set (Shown when a mob kills a player)
 - ShowOverheadName: (true/false) Shows the ability sets name
     above the mobs head (Forces ShowName to true)
+- DisplayName: (String) The name which will be used above the
+    mobs head. If this is not given the AbilitySets name
+    is used.
+    Colour can be added using and & then the colour code
+    you wish to use
 
 WARNING: The use of MobType and ShowName is only supported in 
     Minecraft Versions 1.5 and newer. Using these settings

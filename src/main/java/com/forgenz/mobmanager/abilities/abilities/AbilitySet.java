@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
@@ -56,7 +57,7 @@ public class AbilitySet extends Ability
 	
 	private final HashSet<Ability> abilities;
 	protected final ExtendedEntityType type;
-	private final String name;
+	private final String displayName;
 	private final boolean showOverheadName;
 	
 	public static AbilitySet getAbilitySet(String name)
@@ -69,30 +70,33 @@ public class AbilitySet extends Ability
 		return abilitySets.keySet().toArray(new String[abilitySets.size()]);
 	}
 	
-	private AbilitySet(HashSet<Ability> abilities, ExtendedEntityType type, String name, boolean showOverheadName)
+	private AbilitySet(HashSet<Ability> abilities, ExtendedEntityType type, String displayName, boolean showOverheadName)
 	{
-		this.abilities = abilities;
+		if (abilities == null || abilities.size() == 0)
+			this.abilities = null;
+		else
+			this.abilities = abilities;
 		this.type = type;
-		this.name = name;
+		this.displayName = displayName;
 		this.showOverheadName = showOverheadName;
 	}
 
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
-		if (abilities == null)
-			return;
-		
-		// Add each ability to the entity
-		for (Ability ability : abilities)
+		if (abilities != null)
 		{
-			ability.addAbility(entity);
+			// Add each ability to the entity
+			for (Ability ability : abilities)
+			{
+				ability.addAbility(entity);
+			}
 		}
 		
-		// If the entity has a name show it
-		if (name != null)
+		// If the entity has a display name show it
+		if (displayName != null)
 		{
-			entity.setCustomName(name);
+			entity.setCustomName(displayName);
 			if (showOverheadName)
 				entity.setCustomNameVisible(true);
 		}
@@ -127,7 +131,10 @@ public class AbilitySet extends Ability
 		
 		// If no name is given return
 		if (name == null)
+		{
+			P.p().getLogger().warning("Must provide a name for every AbilitySet");
 			return;
+		}
 		
 		// If the name already exists return
 		if (abilitySets.containsKey(name.toLowerCase()))
@@ -206,9 +213,21 @@ public class AbilitySet extends Ability
 		if (showOverheadName == null)
 			showOverheadName = false;
 		
-		// If at least one ability was created we save the ability set
-		if (abilities.size() > 0)
-			abilitySets.put(name.toLowerCase(), new AbilitySet(abilities, entityType, showName || showOverheadName ? name : null, showOverheadName));
+		String displayName = MiscUtil.getString(optMap.get("DISPLAYNAME"));
+		
+		if (displayName == null)
+		{
+			displayName = name;
+		}
+		else
+		{
+			if (displayName.length() > 16)
+				displayName = displayName.substring(0, 16);
+			displayName = ChatColor.translateAlternateColorCodes('&', displayName);
+		}
+		
+		// Create the ability set
+		abilitySets.put(name.toLowerCase(), new AbilitySet(abilities, entityType, showName || showOverheadName ? displayName : null, showOverheadName));
 	} 
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)
