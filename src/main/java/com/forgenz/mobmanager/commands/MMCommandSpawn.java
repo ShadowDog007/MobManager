@@ -49,7 +49,7 @@ public class MMCommandSpawn extends MMCommand
 	
 	MMCommandSpawn()
 	{
-		super(Pattern.compile("spawn|spawnset", Pattern.CASE_INSENSITIVE), Pattern.compile("^([a-zA-Z_]+ \\d{1,2}|[a-zA-Z_]+ \\d{1,2} [a-zA-Z_]+ (-?\\d+ ){2}-?\\d+)$"),
+		super(Pattern.compile("spawn|spawnset", Pattern.CASE_INSENSITIVE), Pattern.compile("^([a-zA-Z_]+ \\d{1,4}|[a-zA-Z_]+ \\d{1,2} [a-zA-Z_\\d]+ (-?\\d+ ){2}-?\\d+)$"),
 				2, 6);
 	}
 
@@ -77,6 +77,12 @@ public class MMCommandSpawn extends MMCommand
 		}
 		
 		int count = Integer.valueOf(args[2]);
+		
+		if (count > 100)
+		{
+			sender.sendMessage(ChatColor.RED + "~Count can't be higher than 100");
+			return;
+		}
 		
 		if (args[0].equalsIgnoreCase("spawn"))
 			spawn(sender, args[1], loc, count, false);
