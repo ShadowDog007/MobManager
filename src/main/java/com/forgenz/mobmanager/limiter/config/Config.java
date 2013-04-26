@@ -185,7 +185,7 @@ public class Config extends AbstractConfig
 		
 		/* ################ DespawnSearchHeight ################ */
 		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 24));
-		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : (short) (despawnSearchHeight * despawnSearchHeight);
+		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : despawnSearchHeight;
 		set(cfg, "DespawnSearchHeight", despawnSearchHeight);
 		
 		/* ################ FlyingMobAditionalBlockDepth ################ */
