@@ -65,7 +65,7 @@ public class MobAbilityConfig extends AbstractConfig
 		
 		/* ######## SpawnRate ######## */
 		float spawnRate = (float) cfg.getDouble("SpawnRate", 1.0F);
-		if (spawnRate <= 0.0F)
+		if (spawnRate < 0.0F)
 			spawnRate = 1.0F;
 		this.spawnRate = spawnRate;
 		set(cfg, "SpawnRate", spawnRate);
