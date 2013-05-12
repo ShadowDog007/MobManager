@@ -41,6 +41,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.config.EnumSettingContainer;
@@ -48,7 +49,7 @@ import com.forgenz.mobmanager.common.config.TSettingContainer;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
-public class Config extends AbstractConfig
+public class LimiterConfig extends AbstractConfig
 {
 	public final static Random rand = new Random();
 	
@@ -82,7 +83,7 @@ public class Config extends AbstractConfig
 	
 	public static HashMap<String, WorldConfig> worldConfigs;
 	
-	public Config()
+	public LimiterConfig()
 	{
 		FileConfiguration cfg = getConfig("", LIMITER_CONFIG_NAME);
 		
@@ -149,7 +150,7 @@ public class Config extends AbstractConfig
 		set(cfg, "IgnoredMobs", ignoredList);
 		String strList = ignoredMobs.toString();
 		if (strList.length() != 0)
-			P.p().getLogger().info("IgnoredMobs: " + strList);
+			MMComponent.getLimiter().info("IgnoredMobs: " + strList);
 		
 		
 		/* ################ DisabledMobs ################ */
@@ -158,7 +159,7 @@ public class Config extends AbstractConfig
 		set(cfg, "DisabledMobs", disabledList);
 		strList = disabledMobs.toString();
 		if (strList.length() != 0)
-			P.p().getLogger().info("DisabledMobs: " + strList);
+			MMComponent.getLimiter().info("DisabledMobs: " + strList);
 		
 		/* ################ EnabledSpawnReasons ################ */
 		enabledSpawnReasons = new EnumSettingContainer(SpawnReason.class, cfg.getList("EnabledSpawnReasons", null), "The Spawn Reason '%s' is invalid");
@@ -176,16 +177,16 @@ public class Config extends AbstractConfig
 		set(cfg, "EnabledSpawnReasons", srList);
 		strList = enabledSpawnReasons.toString();
 		if (strList.length() != 0)
-			P.p().getLogger().info("EnabledSpawnReasons: " + strList);
+			MMComponent.getLimiter().info("EnabledSpawnReasons: " + strList);
 		
 		/* ################ DespawnSearchDistance ################ */
 		short despawnSearchDistance = (short) Math.abs(cfg.getInt("DespawnSearchDistance", 72));
-		Config.despawnSearchDistance = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
+		LimiterConfig.despawnSearchDistance = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
 		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
 		/* ################ DespawnSearchHeight ################ */
-		short despawnSearchHeight = (short) Math.abs(cfg.getInt("DespawnSearchHeight", 24));
-		Config.despawnSearchHeight = despawnSearchHeight <= 0 ? 1 : despawnSearchHeight;
+		short despawnSearchHeight = (short) cfg.getInt("DespawnSearchHeight", 24);
+		LimiterConfig.despawnSearchHeight = despawnSearchHeight <= 0 ? 24 : despawnSearchHeight;
 		set(cfg, "DespawnSearchHeight", despawnSearchHeight);
 		
 		/* ################ FlyingMobAditionalBlockDepth ################ */
@@ -219,7 +220,7 @@ public class Config extends AbstractConfig
 			WorldConfig wc = new WorldConfig(world);
 			
 			worldConfigs.put(world.getName(), wc);
-			P.worlds.put(world.getName(), new MMWorld(world, wc));
+			MMComponent.getLimiter().getWorlds().put(world.getName().toLowerCase(), new MMWorld(world, wc));
 			
 			++numWorlds;
 		}

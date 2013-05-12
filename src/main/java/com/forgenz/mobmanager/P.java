@@ -29,23 +29,15 @@
 package com.forgenz.mobmanager;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.forgenz.mobmanager.abilities.config.AbilityConfig;
-import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
+import com.forgenz.mobmanager.MMComponent.Component;
 import com.forgenz.mobmanager.commands.MMCommandListener;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.listeners.CommonMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
-import com.forgenz.mobmanager.limiter.listeners.ChunkListener;
-import com.forgenz.mobmanager.limiter.listeners.MobListener;
-import com.forgenz.mobmanager.limiter.tasks.MobDespawnTask;
-import com.forgenz.mobmanager.limiter.util.AnimalProtection;
-import com.forgenz.mobmanager.limiter.world.MMWorld;
 import com.forgenz.mobmanager.metrics.Metrics;
 import com.forgenz.mobmanager.metrics.Plotters;
 
@@ -67,37 +59,18 @@ public class P extends JavaPlugin
 		return p;
 	}
 	
-	public static ConcurrentHashMap<String, MMWorld> worlds = null;
-	
 	private PluginIntegration integration = new PluginIntegration();;
 	
 	public PluginIntegration getPluginIntegration()
 	{
 		return integration;
 	}
-	
-	private MobDespawnTask despawner = null;
-	
-	public AnimalProtection animalProtection = null;
 
 	
 	/* Enabled Components */
-	private boolean limiterEnabled;
-	private boolean abilitiesEnabled;
-	
-	public boolean isLimiterEnabled()
-	{
-		return limiterEnabled;
-	}
-	
-	public boolean isAbilitiesEnabled()
-	{
-		return abilitiesEnabled;
-	}
-	
 	private boolean biomeSpecificMobs;
 	
-	public boolean isBioemSpeicficMobsEnabled()
+	public boolean isBiomeSpeicficMobsEnabled()
 	{
 		return biomeSpecificMobs;
 	}
@@ -125,15 +98,22 @@ public class P extends JavaPlugin
 		/* #### CONFIG #### */
 		getConfig();
 		
-		// Check which components should be enabled
-		limiterEnabled = true;
-		abilitiesEnabled = false;
+		// Initialize configuration for components
+		boolean somethingEnabled = false;
+		for (int i = 0; i < Component.values().length; ++i)
+		{
+			if (Component.values()[i].i().initializeConfig())
+			{
+				somethingEnabled = true;
+			}
+		}
 		
-		limiterEnabled = getConfig().getBoolean("EnableLimiter", limiterEnabled);
-		abilitiesEnabled = getConfig().getBoolean("EnableAbilities", abilitiesEnabled);
-		
-		AbstractConfig.set(getConfig(), "EnableLimiter", limiterEnabled);
-		AbstractConfig.set(getConfig(), "EnableAbilities", abilitiesEnabled);
+		// If no components are enabled there is nothing left to do.
+		if (!somethingEnabled)
+		{
+			getLogger().warning("No components enabled :(");
+			return;
+		}
 		
 		// Check if Biome Specific Mobs are enabled
 		biomeSpecificMobs = false;
@@ -147,19 +127,10 @@ public class P extends JavaPlugin
 		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"
 				+ "\n\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList() + AbstractConfig.getResourceAsString("Config_Header.txt"));
 		
-		if (!limiterEnabled && !abilitiesEnabled)
-		{
-			getLogger().warning("No components enabled :(");
-			return;
-		}
-		
 		integration.integrate();
 		
 		// Enable each component
-		if (limiterEnabled)
-			enableLimiter();
-		if (abilitiesEnabled)
-			enableAbilities();
+		Component.enableComponents();
 		
 		getCommand("mm").setExecutor(new MMCommandListener());
 		
@@ -179,74 +150,11 @@ public class P extends JavaPlugin
 		// 'Attempt to' Cancel all tasks
 		getServer().getScheduler().cancelTasks(this);
 		
-		// Disable each component
-		if (limiterEnabled)
-			disableLimiter();
-		if (abilitiesEnabled)
-			disableAbilities();
+		Component.disableComponents();
 		
 		p = null;
 	}
 	
-	private void enableLimiter()
-	{
-		// Load Config
-		Config config = new Config();
-
-		// Setup worlds
-		worlds = new ConcurrentHashMap<String, MMWorld>(2, 0.75F, 2);
-		if (config.setupWorlds() == 0)
-		{
-			getLogger().warning("No valid worlds found");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
-
-		// Register Mob event listeners
-		getServer().getPluginManager().registerEvents(new MobListener(), this);
-		// Register Chunk event listener
-		getServer().getPluginManager().registerEvents(new ChunkListener(), this);
-
-		// Start the despawner task
-		despawner = new MobDespawnTask();
-		despawner.runTaskTimer(this, 1L, Config.ticksPerDespawnScan);
-
-		// Setup animal protection
-		if (Config.enableAnimalDespawning)
-		{
-			animalProtection = new AnimalProtection();
-			
-			getServer().getPluginManager().registerEvents(animalProtection, this);
-			animalProtection.runTaskTimerAsynchronously(this, Config.protectedFarmAnimalSaveInterval, Config.protectedFarmAnimalSaveInterval);
-		}
-		
-		getLogger().info("v" + getDescription().getVersion() + " enabled with " + worlds.size() + " worlds");
-	}
-	
-	private void disableLimiter()
-	{
-		if (despawner != null)
-			despawner.cancel();
-		
-		if (animalProtection != null)
-		{
-			animalProtection.cancel();
-			animalProtection.run();
-		}
-	}
-	
-	private void enableAbilities()
-	{
-		new AbilityConfig();
-		
-		// Register Mob event listeners
-		getServer().getPluginManager().registerEvents(new AbilitiesMobListener(), this);
-	}
-	
-	private void disableAbilities()
-	{
-		// Nothing to do here
-	}
 	
 	private void startMetrics()
 	{
@@ -269,7 +177,7 @@ public class P extends JavaPlugin
 				@Override
 				public int getValue()
 				{
-					return isLimiterEnabled() ? 1 : 0;
+					return MMComponent.getLimiter().isEnabled() ? 1 : 0;
 				}
 			});
 			limiterGraph.addPlotter(new Metrics.Plotter("Disabled")
@@ -277,7 +185,7 @@ public class P extends JavaPlugin
 				@Override
 				public int getValue()
 				{
-					return isLimiterEnabled() ? 0 : 1;
+					return MMComponent.getLimiter().isEnabled() ? 0 : 1;
 				}
 			});
 			
@@ -288,7 +196,7 @@ public class P extends JavaPlugin
 				@Override
 				public int getValue()
 				{
-					return isAbilitiesEnabled() ? 1 : 0;
+					return MMComponent.getAbilities().isEnabled() ? 1 : 0;
 				}
 			});
 			abilitiesGraph.addPlotter(new Metrics.Plotter("Disabled")
@@ -296,7 +204,7 @@ public class P extends JavaPlugin
 				@Override
 				public int getValue()
 				{
-					return isAbilitiesEnabled() ? 0 : 1;
+					return MMComponent.getAbilities().isEnabled() ? 0 : 1;
 				}
 			});
 			

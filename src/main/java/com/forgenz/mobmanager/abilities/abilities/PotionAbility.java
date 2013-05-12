@@ -39,11 +39,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class PotionAbility extends Ability
 {
@@ -146,7 +146,7 @@ public class PotionAbility extends Ability
 			
 			if (!potionMatcher.matcher(optVal).matches())
 			{
-				P.p().getLogger().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityType.POTION);
+				MMComponent.getAbilities().warning("The potion '" + optVal + "' does not exist for MobAtributes." + mob + "." + AbilityType.POTION);
 				return null;
 			}
 			
@@ -174,7 +174,7 @@ public class PotionAbility extends Ability
 			
 			if (potionEffect == null)
 			{
-				P.p().getLogger().warning("No potion effect found named " + optVal);
+				MMComponent.getAbilities().warning("No potion effect found named " + optVal);
 				continue;
 			}
 			
@@ -199,7 +199,7 @@ public class PotionAbility extends Ability
 		if (opt instanceof List)
 			return setup(mob, (List<Object>) opt);
 		
-		P.p().getLogger().warning(String.format("Found an error in abilities config for %s-PotionAbility", mob.toString()));
+		MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-PotionAbility", mob.toString()));
 		return null;
 	}
 }

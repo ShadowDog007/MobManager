@@ -108,6 +108,32 @@ E.G. if ChargedRate was 0.5 there would be a 50% chance that a creeper
 This setting only works for Creepers
 
 ################
+Name (ChanceList)
+################
+A list of names which can be applied to the mob
+
+Keys:
+- Name: (String) The name which will be applied to the mob
+    Colour can be added using and & then the colour code
+    you wish to use
+- ShowOverhead: (true/false) Shows the mobs name above its head
+
+NOTE: If ShowOverhead is false
+    The mobs name is still shown above its head but
+    only when the player looks directly at the mob 
+
+EXAMPLE:
+MobAbilities:
+  ZOMBIE:
+    Name:
+    - Chance: 1
+      Name: Steve
+      ShowOverhead: true
+    - Chance: 1
+      Name: '&aSickSteve'
+      ShowOverhead: true
+
+################
 BirthSpawn / DeathSpawn (ChanceList)
 ################
 A list of mobs which will spawn on a given mob

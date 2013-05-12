@@ -38,7 +38,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class PlayerFinder
@@ -73,13 +73,13 @@ public class PlayerFinder
 		// Fetch the worlds search distance at the given entities height
 		int searchDist = world.getSearchDistance((short) eLoc.getBlockY());
 		// Fetch the worlds search height
-		int searchY = world.getSearchHeight();
+		int searchY = world.getSearchHeight() + (flying ? LimiterConfig.flyingMobAditionalBlockDepth : 0);
 		
 		// Iterate through each player to check if there is a player nearby
 		for (Player player : P.p().getServer().getOnlinePlayers())
 		{
 			// Skip the player if they are in creative mode (And we should be skipping them)
-			if (Config.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
+			if (LimiterConfig.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
 				continue;
 			
 			// If the worlds differ the player is not nearby
@@ -93,7 +93,7 @@ public class PlayerFinder
 			// Then check the if the height difference is small enough
 			// Return true as soon as we find a player which matches these requirements
 			if (Math.pow(pLoc.getX() - eLoc.getX(), 2) + Math.pow(pLoc.getZ() - eLoc.getZ(), 2) <= searchDist
-					&& Math.abs(eLoc.getBlockY() - pLoc.getBlockY()) <= searchY + (flying ? Config.flyingMobAditionalBlockDepth : 0))
+					&& Math.abs(eLoc.getBlockY() - pLoc.getBlockY()) <= searchY)
 				return true;
 		}
 		

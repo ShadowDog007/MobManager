@@ -37,9 +37,10 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.util.PlayerFinder;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
@@ -73,12 +74,12 @@ public class MobListener implements Listener
 			return;
 		
 		// Checks for spawn reasons we want to limit
-		if (!Config.enabledSpawnReasons.containsValue(event.getSpawnReason().toString()))
+		if (!LimiterConfig.enabledSpawnReasons.containsValue(event.getSpawnReason().toString()))
 			return;
 		
 		ExtendedEntityType eMobType = ExtendedEntityType.get(event.getEntity());
 		// Check if the entity is disabled
-		if (Config.disabledMobs.contains(eMobType))
+		if (LimiterConfig.disabledMobs.contains(eMobType))
 		{
 			// Prevent the entity from spawning
 			event.setCancelled(true);
@@ -87,12 +88,12 @@ public class MobListener implements Listener
 		
 		// Checks if we can ignore the creature spawn
 		MobType mob = MobType.valueOf(event.getEntity());
-		if (mob == null || Config.ignoredMobs.contains(eMobType))
+		if (mob == null || LimiterConfig.ignoredMobs.contains(eMobType))
 		{
 			return;
 		}
 
-		final MMWorld world = P.worlds.get(event.getLocation().getWorld().getName());
+		final MMWorld world = MMComponent.getLimiter().getWorld(event.getLocation().getWorld());
 		// If the world is not found we ignore the spawn
 		if (world == null)
 		{
@@ -154,11 +155,11 @@ public class MobListener implements Listener
 	public void countCreatureSpawns(CreatureSpawnEvent event)
 	{
 		// If the mob is being ignored it is not counted towards the limits
-		if (Config.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
+		if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
 			return;
 		
 		// Fetch the world the creature spawned in
-		MMWorld world = P.worlds.get(event.getLocation().getWorld().getName());
+		MMWorld world = MMComponent.getLimiter().getWorld(event.getLocation().getWorld());
 		// Do nothing if the world is inactive
 		if (world == null)
 		{
@@ -178,11 +179,11 @@ public class MobListener implements Listener
 	public void onEntityDeath(final EntityDeathEvent event)
 	{
 		// If the mob is being ignored it was not counted towards the limits
-		if (Config.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
+		if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
 			return;
 		
 		// Fetch the world the spawn occurred in
-		final MMWorld world = P.worlds.get(event.getEntity().getLocation().getWorld().getName());
+		final MMWorld world = MMComponent.getLimiter().getWorld(event.getEntity().getWorld());
 		// Do nothing if the world is inactive
 		if (world == null)
 		{

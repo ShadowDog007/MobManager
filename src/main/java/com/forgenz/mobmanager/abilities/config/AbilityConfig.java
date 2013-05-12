@@ -35,12 +35,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
@@ -92,7 +92,7 @@ public class AbilityConfig extends AbstractConfig
 		
 		for (String world : list)
 		{
-			enabledWorlds.add(world.toUpperCase());
+			enabledWorlds.add(world.toLowerCase());
 		}
 		
 		set(cfg, "EnabledWorlds", list);
@@ -131,13 +131,18 @@ public class AbilityConfig extends AbstractConfig
 		/* ################ AbilitySets ################ */
 		AbilitySet.resetAbilitySets();
 		
-		List<?> abilitySets = cfg.getList("AbilitySets");
+		ConfigurationSection abilitySets = cfg.getConfigurationSection("AbilitySets");
 		if (abilitySets == null)
-			abilitySets = new ArrayList<Object>();
+			abilitySets = cfg.createSection("AbilitySets");
 		set(cfg, "AbilitySets", abilitySets);
 			
-		for (Object obj : abilitySets)
-			AbilitySet.createAbilitySet(MiscUtil.getConfigMap(obj));
+		for (String setName : abilitySets.getKeys(false))
+		{
+			ConfigurationSection as = abilitySets.getConfigurationSection(setName);
+			if (as == null)
+				as = abilitySets.createSection(setName);
+			AbilitySet.createAbilitySet(as);
+		}
 		
 		/* ################ Ability Global Config ################ */
 		globalCfg = new WorldAbilityConfig(cfg, "");
@@ -170,7 +175,7 @@ public class AbilityConfig extends AbstractConfig
 			WorldAbilityConfig worldCfg = new WorldAbilityConfig(cfg, WORLDS_FOLDER + File.separator + worldName);
 			
 			if (worldCfg.worldSettingsEnabled())
-				worlds.put(worldName, worldCfg);
+				worlds.put(worldName.toLowerCase(), worldCfg);
 			
 			copyHeader(cfg, "Abilities_WorldConfigHeader.txt", P.p().getDescription().getName() + " Config " + P.p().getDescription().getVersion() + "\n");
 			saveConfig(WORLDS_FOLDER + File.separator + worldName, ABILITY_CONFIG_NAME, cfg);
@@ -179,7 +184,8 @@ public class AbilityConfig extends AbstractConfig
 	
 	public WorldAbilityConfig getWorldConfig(String world)
 	{
-		if (!enabledWorlds.contains(world.toUpperCase()))
+		world = world.toLowerCase();
+		if (!enabledWorlds.contains(world))
 			return null;
 		
 		WorldAbilityConfig worldCfg = worlds.get(world);

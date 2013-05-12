@@ -29,15 +29,15 @@
 package com.forgenz.mobmanager.limiter.util;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EntityEquipment;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class MobDespawnCheck
@@ -53,7 +53,7 @@ public class MobDespawnCheck
 		if (entity == null)
 			return false;
 		
-		return shouldDespawn(P.worlds.get(entity.getWorld().getName()), entity);
+		return shouldDespawn(MMComponent.getLimiter().getWorld(entity.getWorld()), entity);
 	}
 	
 	/**
@@ -67,9 +67,9 @@ public class MobDespawnCheck
 	{		
 		if (world == null || entity == null)
 		{
-			if (!Config.disableWarnings)
+			if (!LimiterConfig.disableWarnings)
 			{
-				P.p().getLogger().warning("Error when checking whether to despawn a mob");
+				MMComponent.getLimiter().warning("Error when checking whether to despawn a mob");
 				NullPointerException e = new NullPointerException();
 				
 				e.printStackTrace();
@@ -82,7 +82,7 @@ public class MobDespawnCheck
 			return false;
 
 		// Check if the mob has lived long enough
-		if (entity.getTicksLived() <= Config.minTicksLivedForDespawn)
+		if (entity.getTicksLived() <= LimiterConfig.minTicksLivedForDespawn)
 			return false;
 		
 		// Check if other plugins will allow the mob to be despawned
@@ -90,11 +90,11 @@ public class MobDespawnCheck
 			return false;
 
 		// Check if the mob is being ignored
-		if (Config.ignoredMobs.contains(ExtendedEntityType.get(entity)))
+		if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(entity)))
 			return false;
 
 		MobType mob = MobType.valueOf(entity);
-		// If MobManager does not recognise the entity ignore it
+		// If MobManager does not recognize the entity ignore it
 		if (mob == null)
 			return false;
 		
@@ -102,11 +102,11 @@ public class MobDespawnCheck
 		if (mob == MobType.ANIMAL)
 		{
 			// If animal protection is off then despawning of animals is disabled
-			if (P.p().animalProtection == null)
+			if (MMComponent.getLimiter().animalProtection == null)
 				return false;
 			
 			// Check if the animal is tamed
-			if (!Config.removeTamedAnimals && entity instanceof Tameable)
+			if (!LimiterConfig.removeTamedAnimals && entity instanceof Tameable)
 			{
 				Tameable tameable = (Tameable) entity;
 				
@@ -115,7 +115,7 @@ public class MobDespawnCheck
 			}
 			
 			// Check if the animal is being protected
-			if (P.p().animalProtection.checkUUID(entity.getUniqueId()))
+			if (MMComponent.getLimiter().animalProtection.checkUUID(entity.getUniqueId()))
 				return false;
 
 			// If the chunk has more than 'numAnimalsForFarm' then animals are not despawned
@@ -135,7 +135,7 @@ public class MobDespawnCheck
 				return false;
 		}
 		// Does not despawn the entity if it carries players items
-		else if (entity instanceof Zombie || entity instanceof Skeleton)
+		else if (hasEquipment(entity.getType()))
 		{
 			EntityEquipment equipment = entity.getEquipment();
 			
@@ -164,5 +164,18 @@ public class MobDespawnCheck
 	public static boolean shouldDespawn(MMWorld world, LivingEntity entity)
 	{
 		return shouldDespawn(world, entity, true);
+	}
+	
+	private static boolean hasEquipment(EntityType type)
+	{
+		switch (type)
+		{
+		case ZOMBIE:
+		case PIG_ZOMBIE:
+		case SKELETON:
+			return true;
+		default:
+			return false;
+		}
 	}
 }

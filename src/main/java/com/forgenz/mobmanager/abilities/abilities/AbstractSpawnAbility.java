@@ -35,13 +35,14 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
-import com.forgenz.mobmanager.abilities.util.RandomLocationGen;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
+import com.forgenz.mobmanager.common.util.RandomLocationGen;
 
 public abstract class AbstractSpawnAbility extends Ability
 {
@@ -96,7 +97,7 @@ public abstract class AbstractSpawnAbility extends Ability
 			
 			Location spawnLoc;
 			if (AbilityConfig.i().radiusBonusSpawn)
-				spawnLoc = RandomLocationGen.getLocation(loc, range, 1, heightRange);
+				spawnLoc = RandomLocationGen.getLocation(AbilityConfig.i().useCircleLocationGeneration, loc, range, 1, heightRange);
 			else
 				spawnLoc = loc;
 			// Spawn the entity
@@ -154,7 +155,7 @@ public abstract class AbstractSpawnAbility extends Ability
 			
 			if (!mobTypeString.equalsIgnoreCase("NONE") && mobType == null)
 			{
-				P.p().getLogger().warning("No EntityType called " + mobTypeString + " for " + (type == AbilityType.BIRTH_SPAWN ? "Birth" : "Death") + " Spawn");
+				MMComponent.getAbilities().warning("No EntityType called " + mobTypeString + " for " + (type == AbilityType.BIRTH_SPAWN ? "Birth" : "Death") + " Spawn");
 				return null;
 			}
 		}
@@ -172,7 +173,7 @@ public abstract class AbstractSpawnAbility extends Ability
 		// If neither a mob type or an ability set was found the options are invalid 
 		if (mobType == null && abilitySet == null && !mobTypeString.equalsIgnoreCase("NONE"))
 		{
-			P.p().getLogger().warning("You must provide a MobType or AbilitySet in Birth/Death Spawns");
+			MMComponent.getAbilities().warning("You must provide a MobType or AbilitySet in Birth/Death Spawns");
 			return null;
 		}
 		
@@ -196,7 +197,7 @@ public abstract class AbstractSpawnAbility extends Ability
 		
 		if (map == null)
 		{
-			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-%s. The value should be a map", mob.toString(), type.toString()));
+			MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-%s. The value should be a map", mob.toString(), type.toString()));
 			return null;
 		}
 		

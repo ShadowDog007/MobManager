@@ -41,13 +41,14 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 import com.forgenz.mobmanager.common.util.Patterns;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 
 public class DropsAbility extends Ability
 {
@@ -106,7 +107,7 @@ public class DropsAbility extends Ability
 		public List<ItemStack> getItem()
 		{
 			// Calculate the number of items to create
-			int count = range != 0 ? Config.rand.nextInt(range + 1) + min : min;
+			int count = range != 0 ? LimiterConfig.rand.nextInt(range + 1) + min : min;
 			
 			// Make sure count is more than 0
 			if (count <= 0)
@@ -233,7 +234,7 @@ public class DropsAbility extends Ability
 			// Continue if no map was found
 			if (optMap == null)
 			{
-				P.p().getLogger().warning("Invalid options given to " + AbilityType.DROPS + " ability");
+				MMComponent.getAbilities().warning("Invalid options given to " + AbilityType.DROPS + " ability");
 				continue;
 			}
 			
@@ -282,7 +283,7 @@ public class DropsAbility extends Ability
 				// If the material is invalid, check next drop
 				if (material == null)
 				{
-					P.p().getLogger().warning("No such Item ID " + id + " for " + mob);
+					MMComponent.getAbilities().warning("No such Item ID " + id + " for " + mob);
 					continue;
 				}
 				
@@ -300,7 +301,7 @@ public class DropsAbility extends Ability
 				
 				if (!drop.hasValidCountRange())
 				{
-					P.p().getLogger().warning("DropSet made from " + id + "-" + material + " for " + mob + " will never drop any items.");
+					MMComponent.getAbilities().warning("DropSet made from " + id + "-" + material + " for " + mob + " will never drop any items.");
 					continue;
 				}
 				
@@ -335,14 +336,14 @@ public class DropsAbility extends Ability
 					
 					if (enchantment == null)
 					{
-						P.p().getLogger().warning("Invalid enchantment given: " + split[0].toUpperCase());
+						MMComponent.getAbilities().warning("Invalid enchantment given: " + split[0].toUpperCase());
 						continue;
 					}
 					
 					// Make sure you can enchant the given material with the found enchantment
 					if (!enchantment.canEnchantItem(new ItemStack(material)))
 					{
-						P.p().getLogger().warning("Can not enchant " + material.toString() + " with the enchantment: " + enchantment.toString());
+						MMComponent.getAbilities().warning("Can not enchant " + material.toString() + " with the enchantment: " + enchantment.toString());
 						continue;
 					}
 					
@@ -374,7 +375,7 @@ public class DropsAbility extends Ability
 		
 		if (optMap == null)
 		{
-			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-Drops. The value must be a map", mob.toString()));
+			MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-Drops. The value must be a map", mob.toString()));
 		}
 		
 		return optMap == null ? null : setup(mob, optMap);

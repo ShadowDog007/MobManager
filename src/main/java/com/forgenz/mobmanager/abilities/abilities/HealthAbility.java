@@ -35,12 +35,12 @@ import java.util.Map;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.JoinableAttribute;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class HealthAbility extends Ability implements JoinableAttribute<HealthAbility>
 {
@@ -139,19 +139,19 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 		return new HealthAbility(bonus);
 	}
 	
-	public static HealthAbility setup(ExtendedEntityType mob, Object bonus)
+	public static HealthAbility setup(ExtendedEntityType mob, Object opt)
 	{
-		if (bonus == null)
+		if (opt == null)
 			return null;
 		
-		int itemId = MiscUtil.getInteger(bonus, Integer.MIN_VALUE);
+		int bonus = MiscUtil.getInteger(opt, Integer.MIN_VALUE);
 		
-		if (itemId == Integer.MIN_VALUE)
+		if (bonus == Integer.MIN_VALUE)
 		{
-			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-HealthBonus. The value must be a whole number", mob.toString()));
-			itemId = 0;
+			MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-HealthBonus. The value must be a whole number", mob.toString()));
+			bonus = 0;
 		}
 		
-		return setup(mob, itemId);
+		return setup(mob, bonus);
 	}
 }

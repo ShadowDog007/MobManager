@@ -36,6 +36,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
@@ -59,7 +60,7 @@ class MMCommandCount extends MMCommand
 			return;
 		}
 		
-		if (!P.p().isLimiterEnabled())
+		if (!MMComponent.getLimiter().isEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "This command requires EnableLimiter in main config to be true");
 			return;
@@ -72,7 +73,7 @@ class MMCommandCount extends MMCommand
 		
 		if (args.length > 1)
 		{
-			MMWorld world = P.worlds.get(args[1]);
+			MMWorld world = MMComponent.getLimiter().getWorld(args[1]);
 			
 			if (world == null)
 			{
@@ -86,12 +87,13 @@ class MMCommandCount extends MMCommand
 		}
 		else
 		{
-			worldList = P.worlds.values();
+			worldList = MMComponent.getLimiter().getWorlds().values();
 		}
 		
 		if (worldList.size() == 0)
 		{
 			sender.sendMessage("[MobManger] No worlds were found");
+			return;
 		}
 		
 		int totalMonsters = 0;

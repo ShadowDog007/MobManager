@@ -34,7 +34,7 @@ import org.bukkit.entity.Wolf;
 
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 
 public class AngryAbility extends Ability
 {
@@ -66,7 +66,7 @@ public class AngryAbility extends Ability
 		if (ma.angryRate <= 1.0 && ma.angryRate != 0.0)
 		{
 			// If the random number is lower than the angry chance we make shit angry
-			if (ma.angryRate == 1.0F || Config.rand.nextFloat() < ma.angryRate)
+			if (ma.angryRate == 1.0F || LimiterConfig.rand.nextFloat() < ma.angryRate)
 			{
 				ability.addAbility(entity);
 			}

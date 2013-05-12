@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 
@@ -180,12 +181,12 @@ public class PluginIntegration implements Protector
 	/* #### Component Flags #### */
 	public boolean limiterEnabled()
 	{
-		return P.p().isLimiterEnabled();
+		return MMComponent.getLimiter().isEnabled();
 	}
 	
 	public boolean abilitiesEnabled()
 	{
-		return P.p().isAbilitiesEnabled();
+		return MMComponent.getAbilities().isEnabled();
 	}
 	
 	/* #### IgnoreSpawn Flags #### */

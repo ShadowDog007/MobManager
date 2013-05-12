@@ -36,9 +36,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
@@ -60,7 +60,7 @@ public class MMCommandButcher extends MMCommand
 			return;
 		}
 		
-		if (!P.p().isLimiterEnabled())
+		if (!MMComponent.getLimiter().isEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "This command requires EnableLimiter in main config to be true");
 			return;
@@ -69,7 +69,7 @@ public class MMCommandButcher extends MMCommand
 		if (!super.validArgs(sender, maincmd, args))
 			return;
 		
-		ArrayList<MobType> toRemove = new ArrayList<MobType>(1);
+		ArrayList<Object> toRemove = new ArrayList<Object>(1);
 		int numMobs = 0;
 		
 		if (args.length == 1)
@@ -98,16 +98,20 @@ public class MMCommandButcher extends MMCommand
 		sender.sendMessage(ChatColor.GRAY + "~Removed " + numMobs + " mobs");
 	}
 	
-	public int removeMobs(ArrayList<MobType> mobTypes, boolean removeAll)
+	public int removeMobs(ArrayList<Object> mobTypes, boolean removeAll)
 	{
 		int numMobs = 0;
 		
-		for (MMWorld world : P.worlds.values())
+		for (MMWorld world : MMComponent.getLimiter().getWorlds().values())
 		{
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
 				MobType mob = MobType.valueOf(entity);
-				if (mobTypes.contains(mob) && (removeAll || !Config.ignoredMobs.contains(ExtendedEntityType.get(entity))))
+				ExtendedEntityType type = ExtendedEntityType.get(entity);
+				
+				boolean flag = mobTypes.contains(mob) && (removeAll || !LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(entity)));
+				
+				if (flag || mobTypes.contains(type))
 				{
 					world.decrementMobCount(mob);
 					
@@ -120,7 +124,7 @@ public class MMCommandButcher extends MMCommand
 		return numMobs;
 	}
 	
-	public boolean addMobType(ArrayList<MobType> toRemove, String type)
+	public boolean addMobType(ArrayList<Object> toRemove, String type)
 	{
 		if (type.equalsIgnoreCase("monster"))
 		{
@@ -144,7 +148,10 @@ public class MMCommandButcher extends MMCommand
 		}
 		else
 		{
-			return false;
+			ExtendedEntityType entityType = ExtendedEntityType.get(type);
+			if (entityType == null)
+				return false;
+			toRemove.add(entityType);
 		}
 		return true;
 	}

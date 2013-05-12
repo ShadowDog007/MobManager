@@ -36,7 +36,7 @@ import org.bukkit.entity.Zombie;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 
 public class BabyAbility extends Ability
 {
@@ -71,7 +71,7 @@ public class BabyAbility extends Ability
 		if (isValid(entity) && ma.babyRate <= 1.0F && ma.babyRate != 0.0F)
 		{
 			// If the random number is higher than the baby chance we don't turn the mob into a baby
-			if ( ma.babyRate == 1.0F || Config.rand.nextFloat() < ma.babyRate)
+			if ( ma.babyRate == 1.0F || LimiterConfig.rand.nextFloat() < ma.babyRate)
 			{
 				ability.addAbility(entity);
 			}

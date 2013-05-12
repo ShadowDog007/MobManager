@@ -38,12 +38,16 @@ import java.util.regex.Pattern;
  */
 public class Patterns
 {
+	
 	// Stop any instances of this class being created
 	private Patterns() {}
 	
 	// Split patterns
 	public static final Pattern colonSplit = Pattern.compile(":{1}");
+	public static final Pattern commaSplit = Pattern.compile(",{1}");
 	
 	// Check patterns
 	public static final Pattern numberCheck = Pattern.compile("\\d+");
+	public static final Pattern doubleCheck = Pattern.compile("\\d+\\.\\d+");
+	
 }

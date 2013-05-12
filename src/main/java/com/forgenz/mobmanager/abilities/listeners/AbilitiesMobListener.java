@@ -56,7 +56,7 @@ import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 
 public class AbilitiesMobListener implements Listener
 {
@@ -85,7 +85,7 @@ public class AbilitiesMobListener implements Listener
 				return;
 			}
 			// If the random number is higher than the spawn chance we disallow the spawn
-			if (Config.rand.nextFloat() >= ma.spawnRate)
+			if (LimiterConfig.rand.nextFloat() >= ma.spawnRate)
 			{
 				event.setCancelled(true);
 				return;
@@ -226,15 +226,15 @@ public class AbilitiesMobListener implements Listener
 		if (damager == null)
 			return;
 		
-		if (!P.p().getPluginIntegration().canApplyAbilities(damager))
-			return;
-		
 		// Fetch the multiplier for damage caused by the mob
 		float multi = DamageAbility.getMetaValue(damager);
 		
 		// If the multiplier is 1.0F we don't do anything
 		if (multi != 1.0F)
 		{
+			if (!P.p().getPluginIntegration().canApplyAbilities(damager))
+				return;
+			
 			// Calculate the new damage
 			int newDamage = (int) (event.getDamage() * multi);
 			

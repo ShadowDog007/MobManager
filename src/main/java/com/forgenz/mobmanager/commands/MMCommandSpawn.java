@@ -38,18 +38,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
-import com.forgenz.mobmanager.abilities.util.RandomLocationGen;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.RandomLocationGen;
 
 public class MMCommandSpawn extends MMCommand
 {
 	
 	MMCommandSpawn()
 	{
-		super(Pattern.compile("spawn|spawnset", Pattern.CASE_INSENSITIVE), Pattern.compile("^([a-zA-Z_]+ \\d{1,4}|[a-zA-Z_]+ \\d{1,2} [a-zA-Z_\\d]+ (-?\\d+ ){2}-?\\d+)$"),
+		super(Pattern.compile("spawn|spawnset", Pattern.CASE_INSENSITIVE), Pattern.compile("^([a-zA-Z_]+ \\d{1,4}|[a-zA-Z_]+ \\d+ [a-zA-Z_\\d]+ (-?\\d+ ){2}-?\\d+)$"),
 				2, 6);
 	}
 
@@ -139,12 +140,12 @@ public class MMCommandSpawn extends MMCommand
 			
 			Location spawnLoc;			
 			// Check if we should use the random spawn location generator
-			if (P.p().isAbilitiesEnabled()
+			if (MMComponent.getAbilities().isEnabled()
 					&& (!playerSpawn && AbilityConfig.i().commandSpawnUseRadius
 							|| playerSpawn && AbilityConfig.i().commandPSpawnUseRadius))
 			{
 				int minRange = playerSpawn ? AbilityConfig.i().commandPSpawnMinRange : 1;
-				spawnLoc = RandomLocationGen.getLocation(loc, AbilityConfig.i().bonusSpawnRange, minRange,
+				spawnLoc = RandomLocationGen.getLocation(AbilityConfig.i().useCircleLocationGeneration, loc, AbilityConfig.i().bonusSpawnRange, minRange,
 						AbilityConfig.i().bonusSpawnHeightRange);
 				// If flag is set, don't allow mobs to spawn ON the player
 				if (playerSpawn && !AbilityConfig.i().commandPSpawnRadiusAllowCenter && spawnLoc == loc)
@@ -168,7 +169,7 @@ public class MMCommandSpawn extends MMCommand
 	
 	protected static void spawnset(CommandSender sender, String setName, Location loc, int count, boolean playerSpawn)
 	{
-		if (!P.p().isAbilitiesEnabled())
+		if (!MMComponent.getAbilities().isEnabled())
 		{
 			sender.sendMessage(ChatColor.RED + "~Abilities must be enabled to spawn AbilitySet Mobs");
 			return;
@@ -199,12 +200,12 @@ public class MMCommandSpawn extends MMCommand
 			
 			Location spawnLoc;
 			// Check if we should use the random spawn location generator
-			if (P.p().isAbilitiesEnabled()
+			if (MMComponent.getAbilities().isEnabled()
 					&& (!playerSpawn && AbilityConfig.i().commandSpawnUseRadius
 							|| playerSpawn && AbilityConfig.i().commandPSpawnUseRadius))
 			{
 				int minRange = playerSpawn ? AbilityConfig.i().commandPSpawnMinRange : 1;
-				spawnLoc = RandomLocationGen.getLocation(loc, AbilityConfig.i().bonusSpawnRange, minRange,
+				spawnLoc = RandomLocationGen.getLocation(AbilityConfig.i().useCircleLocationGeneration, loc, AbilityConfig.i().bonusSpawnRange, minRange,
 						AbilityConfig.i().bonusSpawnHeightRange);
 				// If flag is set, don't allow mobs to spawn ON the player
 				if (playerSpawn && !AbilityConfig.i().commandPSpawnRadiusAllowCenter && spawnLoc == loc)

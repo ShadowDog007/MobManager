@@ -34,7 +34,7 @@ import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 
 public class ChargedCreeperAbility extends Ability
 {
@@ -65,7 +65,7 @@ public class ChargedCreeperAbility extends Ability
 		if (ma.chargedRate <= 1.0 && ma.chargedRate != 0.0)
 		{
 			// If the random number is lower than the angry chance we make shit angry
-			if (ma.chargedRate == 1.0F || Config.rand.nextFloat() < ma.chargedRate)
+			if (ma.chargedRate == 1.0F || LimiterConfig.rand.nextFloat() < ma.chargedRate)
 			{
 				ability.addAbility(entity);
 			}

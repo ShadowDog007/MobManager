@@ -55,8 +55,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 
 public class AnimalProtection extends BukkitRunnable implements Listener
 {
@@ -72,7 +73,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 	public AnimalProtection()
 	{
 		protectedAnimalsFile = new File(P.p().getDataFolder(), "protectedAnimals.dat");
-		cleanupPeriod = (long) Config.daysTillFarmAnimalCleanup * 24 * 3600 * 1000;
+		cleanupPeriod = (long) LimiterConfig.daysTillFarmAnimalCleanup * 24 * 3600 * 1000;
 
 		if (protectedAnimalsFile.exists())
 		{
@@ -84,7 +85,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			}
 			catch (Exception e)
 			{
-				P.p().getLogger().severe("Failed to load current protected animals");
+				MMComponent.getLimiter().severe("Failed to load current protected animals");
 				protectedAnimals = new ConcurrentHashMap<UUID,Long>(0, 0.75F, 2);
 				
 				return;
@@ -156,11 +157,11 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			numAttempts = 0;
 		} catch (IOException e)
 		{
-			P.p().getLogger().severe("Error writing protected animals list to file");
+			MMComponent.getLimiter().severe("Error writing protected animals list to file");
 			
 			if (++numAttempts >= 5)
 			{
-				P.p().getLogger().severe("Max attempts to write file exceeded, no more attempts will be made");
+				MMComponent.getLimiter().severe("Max attempts to write file exceeded, no more attempts will be made");
 				cancel();
 			}
 			e.printStackTrace();
@@ -213,7 +214,7 @@ public class AnimalProtection extends BukkitRunnable implements Listener
 			return;
 		}
 		
-		P.p().animalProtection.addUUID(event.getRightClicked().getUniqueId());
+		MMComponent.getLimiter().animalProtection.addUUID(event.getRightClicked().getUniqueId());
 	}
 	
 	/**

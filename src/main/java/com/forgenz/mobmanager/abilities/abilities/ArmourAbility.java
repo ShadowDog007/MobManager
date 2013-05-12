@@ -40,11 +40,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 import com.forgenz.mobmanager.common.util.Patterns;
 
 public class ArmourAbility extends Ability
@@ -263,7 +263,7 @@ public class ArmourAbility extends Ability
 		
 		if (tmpStr == null)
 		{
-			P.p().getLogger().warning("Missing armour position in abilities.yml");
+			MMComponent.getAbilities().warning("Missing armour position in abilities.yml");
 			return null;
 		}
 		
@@ -280,7 +280,7 @@ public class ArmourAbility extends Ability
 		
 		if (position == null)
 		{
-			P.p().getLogger().info("Invalid armour position given: " + tmpStr);
+			MMComponent.getAbilities().info("Invalid armour position given: " + tmpStr);
 			return null;
 		}
 		
@@ -291,7 +291,7 @@ public class ArmourAbility extends Ability
 		{
 			if (tmpStr != null)
 			{
-				P.p().getLogger().warning("Invalid armour material given: " + tmpStr);
+				MMComponent.getAbilities().warning("Invalid armour material given: " + tmpStr);
 			}
 			return null;
 		}
@@ -328,7 +328,7 @@ public class ArmourAbility extends Ability
 				
 				if (enchantment == null)
 				{
-					P.p().getLogger().warning("Invalid Enchantment given to ArmourSet: " + split[0]);
+					MMComponent.getAbilities().warning("Invalid Enchantment given to ArmourSet: " + split[0]);
 					continue;
 				}
 				
@@ -361,7 +361,7 @@ public class ArmourAbility extends Ability
 		if (optList != null)
 			return setup(mob, optList);
 		
-		P.p().getLogger().warning(String.format("Found an error in abilities config for %s-ArmourSset. The value must be a list of armour peices", mob.toString()));
+		MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-ArmourSset. The value must be a list of armour peices", mob.toString()));
 		return null;
 	}
 }

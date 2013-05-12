@@ -1,11 +1,12 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 2.5_dev3
+version: 2.5
 website: http://dev.bukkit.org/server-mods/mobmanager/
-authors: [Michael McKnight (ShadowDog007)]
+author: Michael McKnight (ShadowDog007)
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
 
-softdepend: [EpicMobsRecoded]
+# Soft-Depends a few multi-world plugins so the the worlds are deffinately around when MobManager needs them
+softdepend: [EpicMobsRecoded,  Multiverse-Core, My Worlds, MultiWorld]
 
 permissions:
   mobmanager.admin:

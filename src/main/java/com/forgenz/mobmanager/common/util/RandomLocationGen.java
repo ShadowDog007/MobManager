@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.abilities.util;
+package com.forgenz.mobmanager.common.util;
 
 import java.util.Random;
 
@@ -37,7 +37,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 
 public class RandomLocationGen
 {
@@ -55,16 +54,16 @@ public class RandomLocationGen
 	/**
 	 * Generates a random location around the center location
 	 */
-	public static Location getLocation(Location center, int range, int minRange, int heightRange)
+	public static Location getLocation(boolean circle, Location center, int range, int minRange, int heightRange)
 	{
 		Location loc = Bukkit.isPrimaryThread() ? RandomLocationGen.loc : new Location(null, 0.0, 0.0, 0.0);
-		return getLocation(center, range, minRange, heightRange, loc);
+		return getLocation(circle, center, range, minRange, heightRange, loc);
 	}
 	
 	/**
 	 * Generates a random location around the center location
 	 */
-	public static Location getLocation(Location center, int range, int minRange, int heightRange, Location cacheLoc)
+	public static Location getLocation(boolean circle, Location center, int range, int minRange, int heightRange, Location cacheLoc)
 	{
 		// Make sure the centers world is valid
 		if (center.getWorld() == null)
@@ -99,7 +98,7 @@ public class RandomLocationGen
 		for (int i = 0; i < 10; ++i)
 		{
 			// Generate the appropriate type of location
-			if (AbilityConfig.i().useCircleLocationGeneration)
+			if (circle)
 			{
 				getCircularLocation(center, range, minRange, cacheLoc);
 			}

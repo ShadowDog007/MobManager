@@ -34,7 +34,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class ChunkListener implements Listener
@@ -42,7 +42,7 @@ public class ChunkListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChunkLoad(final ChunkLoadEvent event)
 	{
-		final MMWorld world = P.worlds.get(event.getChunk().getWorld().getName());
+		final MMWorld world = MMComponent.getLimiter().getWorld(event.getChunk().getWorld());
 
 		// If the world is not found it must be inactive
 		if (world == null)
@@ -54,7 +54,7 @@ public class ChunkListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onChunkUnload(final ChunkUnloadEvent event)
 	{
-		final MMWorld world = P.worlds.get(event.getChunk().getWorld().getName());
+		final MMWorld world = MMComponent.getLimiter().getWorld(event.getChunk().getWorld());
 
 		// If the world is not found it must be inactive
 		if (world == null)

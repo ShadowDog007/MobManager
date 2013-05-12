@@ -39,15 +39,13 @@ import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class MobAbilityConfig extends AbstractConfig
-{	
-	public final ExtendedEntityType mob;
-	
+{
 	public final float equipmentDropChance;
 	
 	public final float spawnRate;
@@ -57,26 +55,26 @@ public class MobAbilityConfig extends AbstractConfig
 	
 	public final HashMap<AbilityType, ValueChance<Ability>> attributes;
 	
-	public MobAbilityConfig(ExtendedEntityType mob, ConfigurationSection cfg)
+	private MobAbilityConfig(ExtendedEntityType mob, String name, ConfigurationSection cfg, boolean abilitySet)
 	{
 		attributes = new HashMap<AbilityType, ValueChance<Ability>>();
-		
-		this.mob = mob;
 		
 		/* ######## SpawnRate ######## */
 		float spawnRate = (float) cfg.getDouble("SpawnRate", 1.0F);
 		if (spawnRate < 0.0F)
 			spawnRate = 1.0F;
 		this.spawnRate = spawnRate;
-		set(cfg, "SpawnRate", spawnRate);
+		if (mob != null)
+			set(cfg, "SpawnRate", spawnRate);
 		
 		/* ######## EquipmentDropChance ######## */
 		float equipmentDropChance = (float) cfg.getDouble("EquipmentDropChance", 0.15F);
 		this.equipmentDropChance = equipmentDropChance < 0 ? 0.0F : equipmentDropChance;
-		set(cfg, "EquipmentDropChance", this.equipmentDropChance);
+		if (mob != null)
+			set(cfg, "EquipmentDropChance", this.equipmentDropChance);
 		
 		/* ######## BabyRate ######## */
-		if (BabyAbility.isValid(mob))
+		if (mob == null || BabyAbility.isValid(mob))
 		{
 			float babyRate = (float) cfg.getDouble("BabyRate", 0.0F);
 			if (babyRate <= 0.0F)
@@ -90,7 +88,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## AngryRate ######## */
-		if (AngryAbility.isValid(mob.getBukkitEntityType()))
+		if (mob == null || AngryAbility.isValid(mob.getBukkitEntityType()))
 		{
 			float angryRate = (float) cfg.getDouble("AngryRate", 0.0F);
 			if (angryRate <= 0.0F)
@@ -104,7 +102,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## ChargedRate ######## */
-		if (ChargedCreeperAbility.isValid(mob.getBukkitEntityType()))
+		if (mob == null || ChargedCreeperAbility.isValid(mob.getBukkitEntityType()))
 		{
 			float chargedRate = (float) cfg.getDouble("ChargedRate", 0.0F);
 			if (chargedRate <= 0.0F)
@@ -124,6 +122,9 @@ public class MobAbilityConfig extends AbstractConfig
 			if (!ability.isValueChanceAbility())
 				continue;
 			
+			if (abilitySet && ability == AbilityType.ABILITY_SET)
+				continue;
+			
 			ValueChance<Ability> abilityChances = new ValueChance<Ability>();
 			// Fetch String list from config
 			List<Object> optList = MiscUtil.getList(cfg.getList(ability.getConfigPath()));
@@ -135,7 +136,27 @@ public class MobAbilityConfig extends AbstractConfig
 			
 			// Update String list (ability.setup can removes invalid settings)
 			set(cfg, ability.getConfigPath(), optList);
-		}
-			
+		}	
+	}
+	
+	/**
+	 * Used for the creation of AbilitySets
+	 * @param name The name of the ability set
+	 * @param mob The mobType the ability set is aimed at (If exists)
+	 * @param cfg The configuration section providing settings for abilities
+	 */
+	public MobAbilityConfig(String name, ExtendedEntityType mob, ConfigurationSection cfg)
+	{
+		this(mob, name, cfg, true);
+	}
+	
+	/**
+	 * Used for the creation of Mob Abilities
+	 * @param mob The mob the abilities will be applied to
+	 * @param cfg The configuration section providing settings for abilities
+	 */
+	public MobAbilityConfig(ExtendedEntityType mob, ConfigurationSection cfg)
+	{
+		this(mob, mob != null ? mob.toString() : "Unknown", cfg, false);
 	}
 }

@@ -1,5 +1,6 @@
 package com.forgenz.mobmanager.metrics;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.metrics.Metrics.Plotter;
 
@@ -11,7 +12,7 @@ public class Plotters
 		@Override
 		public int getValue()
 		{
-			return P.p().isLimiterEnabled() ? 1 : 0;
+			return MMComponent.getLimiter().isEnabled() ? 1 : 0;
 		}
 		
 	};
@@ -22,7 +23,7 @@ public class Plotters
 		@Override
 		public int getValue()
 		{
-			return P.p().isAbilitiesEnabled() ? 1 : 0;
+			return MMComponent.getAbilities().isEnabled() ? 1 : 0;
 		}
 		
 	};

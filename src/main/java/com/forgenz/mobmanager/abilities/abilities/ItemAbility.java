@@ -37,13 +37,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class ItemAbility extends Ability
 {
@@ -137,7 +137,7 @@ public class ItemAbility extends Ability
 		
 		if (itemId == Integer.MIN_VALUE)
 		{
-			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-ItemAbility. The value must be a whole number", mob.toString()));
+			MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-ItemAbility. The value must be a whole number", mob.toString()));
 			itemId = 0;
 		}
 		

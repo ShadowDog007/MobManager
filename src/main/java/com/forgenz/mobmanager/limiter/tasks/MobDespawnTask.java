@@ -36,8 +36,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.util.MobDespawnCheck;
 import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
@@ -62,10 +63,10 @@ public class MobDespawnTask extends BukkitRunnable
 		 */
 		EntityIterator()
 		{
-			worlds = new ArrayList<MMWorld>(P.worlds.size());
-			iterators = new ArrayList<Iterator<LivingEntity>>(P.worlds.size());
+			worlds = new ArrayList<MMWorld>(MMComponent.getLimiter().getWorlds().size());
+			iterators = new ArrayList<Iterator<LivingEntity>>(MMComponent.getLimiter().getWorlds().size());
 			
-			for (MMWorld world : P.worlds.values())
+			for (MMWorld world : MMComponent.getLimiter().getWorlds().values())
 			{
 				worlds.add(world);
 			}
@@ -145,7 +146,7 @@ public class MobDespawnTask extends BukkitRunnable
 	@Override
 	public void run()
 	{
-		if (P.worlds == null)
+		if (MMComponent.getLimiter().getWorlds() == null)
 		{
 			cancel();
 			return;
@@ -159,7 +160,7 @@ public class MobDespawnTask extends BukkitRunnable
 		// Create the entity iterator object
 		final EntityIterator it = new EntityIterator();
 		
-		final List<LivingEntity> mobsToDespawn = Config.useAsyncDespawnScanner ? new ArrayList<LivingEntity>() : null;
+		final List<LivingEntity> mobsToDespawn = LimiterConfig.useAsyncDespawnScanner ? new ArrayList<LivingEntity>() : null;
 		
 		/* ######## SCANNER CREATION ######## */
 		// Create the despawner task
@@ -176,14 +177,14 @@ public class MobDespawnTask extends BukkitRunnable
 				long start = System.nanoTime();
 				LivingEntity entity;
 				
-				// Iterate through each entity until there are none left or the task has run for 0.2ms
-				while ((entity = it.next()) != null && (System.nanoTime() - start) < 200000L)
+				// Iterate through each entity until there are none left or the task has run for 0.4ms
+				while ((entity = it.next()) != null && (System.nanoTime() - start) < 400000L)
 				{
 					// Check if the mob should be despawned
 					if (MobDespawnCheck.shouldDespawn(it.getWorld(), entity))
 					{
 						// Make sure we don't use bukkit methods in async
-						if (!Config.useAsyncDespawnScanner)
+						if (!LimiterConfig.useAsyncDespawnScanner)
 						{
 							entity.remove();
 							it.getWorld().decrementMobCount(MobType.valueOf(entity));
@@ -199,7 +200,7 @@ public class MobDespawnTask extends BukkitRunnable
 				if (it.hasNext() && P.p() != null)
 				{
 					// Schedule the task to run later
-					if (Config.useAsyncDespawnScanner)
+					if (LimiterConfig.useAsyncDespawnScanner)
 						P.p().getServer().getScheduler().runTaskLaterAsynchronously(P.p(), this, 1L);
 					else
 						P.p().getServer().getScheduler().runTaskLater(P.p(), this, 1L);
@@ -207,7 +208,7 @@ public class MobDespawnTask extends BukkitRunnable
 				// If we are in async we need to schedule a new task to remove the entities
 				else if (P.p() != null)
 				{
-					if (Config.useAsyncDespawnScanner)
+					if (LimiterConfig.useAsyncDespawnScanner)
 					{
 						final LivingEntity[] entities = mobsToDespawn.toArray(new LivingEntity[0]);
 						mobsToDespawn.clear();
@@ -249,7 +250,7 @@ public class MobDespawnTask extends BukkitRunnable
 				{
 					/* ######## SCAN START ######## */
 					// Run the despawner task
-					if (Config.useAsyncDespawnScanner)
+					if (LimiterConfig.useAsyncDespawnScanner)
 						P.p().getServer().getScheduler().runTaskLaterAsynchronously(P.p(), removeQueueFillTask, 1L);
 					else
 						P.p().getServer().getScheduler().runTaskLater(P.p(), removeQueueFillTask, 1L);

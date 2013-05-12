@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.abilities.util;
+package com.forgenz.mobmanager.common.util;
 
 import java.util.HashMap;
 import java.util.List;
@@ -180,5 +180,20 @@ public class MiscUtil
 		}
 		
 		return def;
+	}
+
+	public static boolean getBoolean(Object obj, boolean def)
+	{
+		if (obj == null)
+		{
+			return def;
+		}
+		
+		if (obj instanceof Boolean == false)
+		{
+			return def;
+		}
+		
+		return ((Boolean) obj).booleanValue();
 	}
 }

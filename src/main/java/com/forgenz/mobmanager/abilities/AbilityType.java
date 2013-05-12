@@ -41,6 +41,7 @@ import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.abilities.DropsAbility;
 import com.forgenz.mobmanager.abilities.abilities.HealthAbility;
 import com.forgenz.mobmanager.abilities.abilities.ItemAbility;
+import com.forgenz.mobmanager.abilities.abilities.NameAbility;
 import com.forgenz.mobmanager.abilities.abilities.NullAbility;
 import com.forgenz.mobmanager.abilities.abilities.PotionAbility;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
@@ -49,6 +50,8 @@ import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 public enum AbilityType
 {
 	NONE(null, false),
+	
+	NAME("Name"),
 	
 	BIRTH_SPAWN("BirthSpawn"),
 	
@@ -137,6 +140,9 @@ public enum AbilityType
 		case BIRTH_SPAWN:
 		case DEATH_SPAWN:
 			AbstractSpawnAbility.setup(this, mob, abilityChances, optList);
+			break;
+		case NAME:
+			NameAbility.setup(mob, abilityChances, optList);
 			break;
 		case NONE:
 		case BABY:

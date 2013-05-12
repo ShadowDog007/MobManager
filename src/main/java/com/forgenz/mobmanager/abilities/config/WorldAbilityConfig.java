@@ -34,7 +34,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.config.EnumSettingContainer;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -75,7 +75,7 @@ public class WorldAbilityConfig extends AbstractConfig
 			
 			if (mobType == null)
 			{
-				P.p().getLogger().warning(String.format("No such mob named '%s' in %s:AbilitySets", key, AbilityConfig.ABILITY_CONFIG_NAME));
+				MMComponent.getAbilities().warning(String.format("No such mob named '%s' in %s", key, AbilityConfig.ABILITY_CONFIG_NAME));
 				continue;
 			}
 			

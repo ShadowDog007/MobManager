@@ -34,9 +34,10 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Tameable;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.Config;
+import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.config.WorldConfig;
 import com.forgenz.mobmanager.limiter.util.MobType;
 
@@ -48,7 +49,7 @@ import com.forgenz.mobmanager.limiter.util.MobType;
  */
 public class MMWorld
 {	
-	private static long ticksPerRecount = Config.ticksPerRecount;
+	private static long ticksPerRecount = LimiterConfig.ticksPerRecount;
 	/**
 	 * Bukkit world this object as affiliated with
 	 */
@@ -91,7 +92,7 @@ public class MMWorld
 		final int maxAmbient = worldConf.maximums[MobType.AMBIENT.index];
 		final int maxVillagers = worldConf.maximums[MobType.VILLAGER.index];
 
-		P.p().getLogger().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
+		MMComponent.getLimiter().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
 	}
 	
 	public short getSearchDistance(short y)
@@ -101,12 +102,12 @@ public class MMWorld
 	
 	public short getSearchDistance()
 	{
-		return worldConf.despawnSearchDistance > 0 ? worldConf.despawnSearchDistance : Config.despawnSearchDistance;
+		return worldConf.despawnSearchDistance > 0 ? worldConf.despawnSearchDistance : LimiterConfig.despawnSearchDistance;
 	}
 	
 	public short getSearchHeight()
 	{
-		return worldConf.despawnSearchHeight > 0 ? worldConf.despawnSearchHeight : Config.despawnSearchHeight;
+		return worldConf.despawnSearchHeight > 0 ? worldConf.despawnSearchHeight : LimiterConfig.despawnSearchHeight;
 	}
 	
 	private void resetMobCounts()
@@ -142,7 +143,7 @@ public class MMWorld
 			for (final LivingEntity entity : entities)
 			{
 				// Check if the mob should be ignored
-				if (Config.ignoredMobs.contains(ExtendedEntityType.get(entity)))
+				if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(entity)))
 					continue;
 
 				// Fetch mob type
@@ -155,7 +156,7 @@ public class MMWorld
 				if (mob == MobType.ANIMAL)
 				{
 					// Make sure tameable animals are not counted if it is set to false
-					if (!Config.countTamedAnimals && entity instanceof Tameable)
+					if (!LimiterConfig.countTamedAnimals && entity instanceof Tameable)
 					{
 						Tameable tameable = (Tameable) entity;
 

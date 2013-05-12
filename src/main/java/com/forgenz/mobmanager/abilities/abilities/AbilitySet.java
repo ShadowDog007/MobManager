@@ -29,20 +29,19 @@
 package com.forgenz.mobmanager.abilities.abilities;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.ChatColor;
-import org.bukkit.entity.EntityType;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 
-import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
+import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class AbilitySet extends Ability
 {
@@ -52,13 +51,11 @@ public class AbilitySet extends Ability
 	{
 		abilitySets.clear();
 		// Add default none ability
-		abilitySets.put("none", new AbilitySet(null, null, null, false));
+		abilitySets.put("none", new AbilitySet(null, null));
 	}
 	
-	private final HashSet<Ability> abilities;
 	protected final ExtendedEntityType type;
-	private final String displayName;
-	private final boolean showOverheadName;
+	private final MobAbilityConfig setCfg;
 	
 	public static AbilitySet getAbilitySet(String name)
 	{
@@ -70,35 +67,30 @@ public class AbilitySet extends Ability
 		return abilitySets.keySet().toArray(new String[abilitySets.size()]);
 	}
 	
-	private AbilitySet(HashSet<Ability> abilities, ExtendedEntityType type, String displayName, boolean showOverheadName)
+	public static int getNumAbilitySets()
 	{
-		if (abilities == null || abilities.size() == 0)
-			this.abilities = null;
-		else
-			this.abilities = abilities;
+		return abilitySets.size();
+	}
+	
+	private AbilitySet(MobAbilityConfig setCfg, ExtendedEntityType type)
+	{
+		this.setCfg = setCfg;
 		this.type = type;
-		this.displayName = displayName;
-		this.showOverheadName = showOverheadName;
 	}
 
 	@Override
 	public void addAbility(LivingEntity entity)
 	{
-		if (abilities != null)
+		if (setCfg != null)
 		{
 			// Add each ability to the entity
-			for (Ability ability : abilities)
+			for (ValueChance<Ability> abilityChance : setCfg.attributes.values())
 			{
-				ability.addAbility(entity);
+				Ability ability = abilityChance.getBonus();
+				
+				if (ability != null)
+					ability.addAbility(entity);
 			}
-		}
-		
-		// If the entity has a display name show it
-		if (displayName != null)
-		{
-			entity.setCustomName(displayName);
-			if (showOverheadName)
-				entity.setCustomNameVisible(true);
 		}
 	}
 
@@ -110,9 +102,7 @@ public class AbilitySet extends Ability
 	
 	public int getNumAbilities()
 	{
-		if (abilities == null)
-			return 0;
-		return abilities.size();
+		return setCfg == null ? 0 : setCfg.attributes.size();
 	}
 	
 	public ExtendedEntityType getAbilitySetsEntityType()
@@ -120,114 +110,51 @@ public class AbilitySet extends Ability
 		return type;
 	}
 	
-	public static void createAbilitySet(Map<String, Object> optMap)
+	public static void createAbilitySet(ConfigurationSection cfg)
 	{
 		// If there are no options return
-		if (optMap == null)
+		if (cfg == null)
 			return;
 		
 		// Fetch the Sets name from the map
-		String name = MiscUtil.getMapValue(optMap, "NAME", "AbilitySets", String.class);
+		String name = cfg.getName();
 		
 		// If no name is given return
 		if (name == null)
 		{
-			P.p().getLogger().warning("Must provide a name for every AbilitySet");
+			MMComponent.getAbilities().warning("Must provide a name for every AbilitySet");
 			return;
 		}
 		
 		// If the name already exists return
 		if (abilitySets.containsKey(name.toLowerCase()))
 		{
-			P.p().getLogger().warning("AbilitySet with name " + name + " already exists");
+			MMComponent.getAbilities().warning("AbilitySet with name " + name + " already exists");
 			return;
 		}
 		
 		// Fetch the default mob type if it exists
 		ExtendedEntityType entityType = null;
-		if (optMap.containsKey("MOBTYPE"))
+		if (cfg.contains("MobType"))
 		{
-			String key = MiscUtil.getString(optMap.get("MOBTYPE"));
+			String key = cfg.getString("MobType");
 			if (key != null)
 				entityType = ExtendedEntityType.get(key);
 			
 			if (entityType == null)
 			{
-				P.p().getLogger().warning("Invalid EntityType " + key + " in AbilitySets");
+				MMComponent.getAbilities().warning("Invalid EntityType " + key + " in AbilitySets");
 			}
 		}
 		
-		// Get the list of abilities for the set
-		List<?> optList = MiscUtil.getMapValue(optMap, "OPTIONS", "AbilitySets", List.class);
+		ConfigurationSection abilities = cfg.getConfigurationSection("Abilities");
+		if (abilities == null)
+			abilities = cfg.createSection("Abilities");
 		
-		// If the list is missing return
-		if (optList == null)
-			return;
-		
-		// Create the HashSet which will store the abilities
-		HashSet<Ability> abilities = new HashSet<Ability>();
-		// Iterate through each object in the list
-		for (Object obj : optList)
-		{
-			// If the object is not a map its invalid
-			if (obj instanceof Map == false)
-				continue;
-			
-			// Cast the object to a map
-			Map<?, ?> map = (Map<?, ?>) obj;
-			
-			// If there are no elements in the map it is invalid
-			if (map.size() == 0)
-				continue;
-			
-			// Fetch what should be the only key
-			Object str = map.keySet().toArray(new Object[1])[0];
-			
-			// If the key is not a string the map is invalid
-			if (str instanceof String == false)
-				continue;
-			
-			// Determine which ability type the key is for
-			AbilityType abilityType = AbilityType.getAbilityType((String) str);
-			
-			// If no ability type was found produce an error and continue
-			if (abilityType == null)
-			{
-				P.p().getLogger().warning("The ability " + str + " does not exist");
-				continue;
-			}
-			
-			// Setup the ability
-			Ability ability = abilityType.setup(ExtendedEntityType.get(EntityType.UNKNOWN), map.get(str));
-			
-			// If the ability was successfully created add it to the ability set
-			if (ability != null)
-				abilities.add(ability);
-		}
-		
-		Boolean showName = MiscUtil.getMapValue(optMap, "SHOWNAME", null, Boolean.class);
-		if (showName == null)
-			showName = false;
-		
-		Boolean showOverheadName = MiscUtil.getMapValue(optMap, "SHOWOVERHEADNAME", null, Boolean.class);
-		if (showOverheadName == null)
-			showOverheadName = false;
-		
-		String displayName = MiscUtil.getString(optMap.get("DISPLAYNAME"));
-		
-		if (displayName == null)
-		{
-			displayName = name;
-		}
-		else
-		{
-			if (displayName.length() > 16)
-				displayName = displayName.substring(0, 16);
-			displayName = ChatColor.translateAlternateColorCodes('&', displayName);
-		}
+		MobAbilityConfig setCfg = new MobAbilityConfig(name, entityType, abilities);
 		
 		// Create the ability set
-		abilitySets.put(name.toLowerCase(), new AbilitySet(abilities, entityType, showName || showOverheadName ? displayName : null, showOverheadName));
+		abilitySets.put(name.toLowerCase(), new AbilitySet(setCfg, entityType));
 	} 
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)
@@ -255,7 +182,7 @@ public class AbilitySet extends Ability
 			
 			if (set == null)
 			{
-				P.p().getLogger().warning("Missing SetName " + setName + " for " + mob);
+				MMComponent.getAbilities().warning("Missing SetName " + setName + " for " + mob);
 				continue;
 			}
 			

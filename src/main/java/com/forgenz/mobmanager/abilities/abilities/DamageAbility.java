@@ -36,11 +36,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.util.MiscUtil;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class DamageAbility extends Ability
 {
@@ -120,7 +121,7 @@ public class DamageAbility extends Ability
 			
 			if (multi < 0)
 			{
-				P.p().getLogger().warning("Damage multipliers must be positive!");
+				MMComponent.getAbilities().warning("Damage multipliers must be positive!");
 				multi = 1.0F;
 			}
 			
@@ -132,7 +133,7 @@ public class DamageAbility extends Ability
 	{
 		if (multi < 0.0F)
 		{
-			P.p().getLogger().warning("Damage multipliers must be positive!");
+			MMComponent.getAbilities().warning("Damage multipliers must be positive!");
 			multi = 1.0F;
 		}
 		
@@ -148,7 +149,7 @@ public class DamageAbility extends Ability
 		
 		if (multi == Float.MIN_VALUE)
 		{
-			P.p().getLogger().warning(String.format("Found an error in abilities config for %s-DamageMulti. The value must be a decimal number", mob.toString()));
+			MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-DamageMulti. The value must be a decimal number", mob.toString()));
 			multi = 1.0F;
 		}
 		
