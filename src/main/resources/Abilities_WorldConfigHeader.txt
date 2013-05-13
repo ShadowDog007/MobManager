@@ -330,7 +330,11 @@ Keys:
     - Data: The data to be added to the item
     - MinCount: The minimum number of the item to be dropped
     - MaxCount: The maximum number of the item to be dropped
-    - Durability: The durability on the item
+    - MinDurability: The minimum durability on the item
+    - MaxDurability: The maximum durability on the item
+    - Title: The name to be applied to the item (Supports & colour codes)
+    - Lore: List of strings to be set as the lore for the item
+        (Supports & colour codes)
     - Enchantments: A list of enchantments to add to the item
 
 - Replace: If true, vanilla drops are replaced with new drops

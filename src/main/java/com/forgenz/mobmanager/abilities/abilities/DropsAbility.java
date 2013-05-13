@@ -33,11 +33,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
@@ -54,87 +55,110 @@ public class DropsAbility extends Ability
 {
 	public static class DropSet
 	{
-		public final Material material;
-		public final byte data;
-		public final int min;
+		private final ItemStack item;
+
 		public final int range;
-		public final short durability;
-		private List<Enchantment> enchantments;
-		private List<Integer> enchantmentLevels;
+		public final short durabilityRange;
 		
-		public DropSet(Material material, byte data, int durability, int min, int max)
+		public DropSet(Material material, byte data, short minDurability, short maxDurability, int min, int max, String title, List<String> lore)
 		{
-			this.material = material;
-			this.data = data;
-			this.durability = (short) (durability > material.getMaxDurability() ? material.getMaxDurability() : durability < 0 ? 0 : durability);
-			
+			// Validate min/max counts
 			if (min > max)
 			{
 				min = min ^ max;
 				max = min ^ max;
 				min = min ^ max;
 			}
-			this.min = min;
+			// Calculate the difference between min/max counts
 			this.range = max - min;
+			
+			// Validate min/max durability
+			if (minDurability > maxDurability)
+			{
+				minDurability = (short) (minDurability ^ maxDurability);
+				maxDurability = (short) (minDurability ^ maxDurability);
+				minDurability = (short) (minDurability ^ maxDurability);
+			}
+			// Calculate the difference between min/max durabilities
+			this.durabilityRange = (short) (maxDurability - minDurability);
+			
+			// Create our ItemStack template
+			item = new ItemStack(material, min, minDurability);
+			
+			// If data is not 0 add the data
+			if (data != 0)
+			{
+				item.setData(item.getType().getNewData(data));
+			}
+			
+			// Setup Title/Lore
+			if (title != null || lore != null)
+			{
+				// Fetch an ItemMeta object
+				ItemMeta meta = item.getItemMeta();
+				
+				// Add the title to ItemMeta
+				if (title != null)
+				{
+					meta.setDisplayName(title);
+				}
+				
+				// Add the lore to ItemMeta
+				if (lore != null)
+				{
+					meta.setLore(lore);
+				}
+				
+				item.setItemMeta(meta);
+			}
 		}
 		
 		public boolean hasValidCountRange()
 		{
-			return min + range > 0;
+			return item.getAmount() + range > 0;
 		}
 		
-		public void addEnchantment(Enchantment e, int level)
+		public boolean addEnchantment(Enchantment e, int level)
 		{
 			if (e == null)
-				return;
+				return false;
 			
 			if (level < 0)
 				level = 0;
 			
-			if (enchantments == null)
-			{
-				enchantments = new ArrayList<Enchantment>(1);
-				enchantmentLevels = new ArrayList<Integer>(1);
-			}
+			if (item.containsEnchantment(e))
+				return false;
 			
-			if (enchantments.contains(e))
-				return;
-			
-			enchantments.add(e);
-			enchantmentLevels.add(level);
+			item.addUnsafeEnchantment(e, level);
+			return true;
 		}
 		
 		public List<ItemStack> getItem()
 		{
+			// Drop air? I think not.
+			if (item.getType() == Material.AIR)
+				return null;
+			
 			// Calculate the number of items to create
-			int count = range != 0 ? LimiterConfig.rand.nextInt(range + 1) + min : min;
+			int count = range > 0 ? LimiterConfig.rand.nextInt(range + 1) + item.getAmount() : item.getAmount();
 			
 			// Make sure count is more than 0
 			if (count <= 0)
 				return null;
 			
-			List<ItemStack> itemz = new ArrayList<ItemStack>(count / material.getMaxStackSize() + 1);
+			// Create a list of the perfect size :)
+			List<ItemStack> itemz = new ArrayList<ItemStack>(count / item.getType().getMaxStackSize() + 1);
 			
 			// Create the item stack/stacks
 			while (count > 0)
 			{
-				itemz.add(new ItemStack(material, count > material.getMaxStackSize() ? material.getMaxStackSize() : count, (short) (material.getMaxDurability() - durability)));
-				count -= material.getMaxStackSize();
-			}
-			
-			// If data is not 0 add the data
-			if (data != 0)
-				for (ItemStack item : itemz)
-					item.setData(new MaterialData(material, data));
-			
-			// If there are any enchantments, add them
-			if (enchantments != null)
-			{
-				for (int i = 0; i < enchantments.size(); ++i)
-				{
-					for (ItemStack item : itemz)
-						item.addEnchantment(enchantments.get(i), enchantmentLevels.get(i));
-				}
+				// Clone our template
+				ItemStack clone = item.clone();
+				// Set an appropriate amount for the item stack
+				clone.setAmount(count > item.getType().getMaxStackSize() ? item.getType().getMaxStackSize() : count);
+				
+				itemz.add(clone);
+				count -= item.getType().getMaxStackSize();
 			}
 			
 			// Return the item in question
@@ -288,16 +312,40 @@ public class DropsAbility extends Ability
 				}
 				
 				// Fetch the data for the drop
-				byte data = (byte) MiscUtil.getInteger(dropMap.get("DATA"));
+				byte data = (byte) MiscUtil.getInteger(dropMap.get("DATA"), 0);
 				
 				// Fetch the min and max counts for the drop
 				int minCount = MiscUtil.getInteger(dropMap.get("MINCOUNT"), 1);
 				int maxCount = MiscUtil.getInteger(dropMap.get("MAXCOUNT"), minCount);
 				
-				int durability = MiscUtil.getInteger(dropMap.get("DURABILITY"), material.getMaxDurability());
+				// Fetch the min and max durabilities
+				short minDurability = (short) MiscUtil.getInteger(dropMap.get("MINDURABILITY"), 0);
+				short maxDurability = (short) MiscUtil.getInteger(dropMap.get("MAXDURABILITY"), minDurability);
+				
+				// Fetch the title of the drop
+				String title = MiscUtil.getString(dropMap.get("TITLE"));
+				if (title != null)
+					title = ChatColor.translateAlternateColorCodes('&', title);
+				
+				// Fetch and validate the lore of the drop
+				List<Object> lore = MiscUtil.getList(dropMap.get("LORE"));
+				List<String> colouredLore = null;
+				if (lore != null)
+				{
+					colouredLore = new ArrayList<String>();
+					// Colour the lore and add it to the list
+					for (Object loreLine : lore)
+					{
+						if (loreLine instanceof String)
+							colouredLore.add(ChatColor.translateAlternateColorCodes('&', (String) loreLine));
+					}
+					// If there is no lore? What are we doing?
+					if (colouredLore.isEmpty())
+						colouredLore = null;
+				}
 				
 				// Create a new DropSet and store it in the list
-				DropSet drop = new DropSet(material, data, durability, minCount, maxCount);
+				DropSet drop = new DropSet(material, data, minDurability, maxDurability, minCount, maxCount, title, colouredLore);
 				
 				if (!drop.hasValidCountRange())
 				{
