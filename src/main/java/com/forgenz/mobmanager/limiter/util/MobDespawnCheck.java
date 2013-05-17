@@ -89,11 +89,14 @@ public class MobDespawnCheck
 		if (!P.p().getPluginIntegration().canDespawn(entity))
 			return false;
 
+		// Fetch the entities type
+		ExtendedEntityType eType = ExtendedEntityType.valueOf(entity);
+		
 		// Check if the mob is being ignored
-		if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(entity)))
+		if (LimiterConfig.ignoredMobs.contains(eType))
 			return false;
 
-		MobType mob = MobType.valueOf(entity);
+		MobType mob = eType.getMobType(entity);
 		// If MobManager does not recognize the entity ignore it
 		if (mob == null)
 			return false;
@@ -131,7 +134,7 @@ public class MobDespawnCheck
 		// Only despawn villagers if they are over their limits
 		else if (mob == MobType.VILLAGER)
 		{
-			if (world.withinMobLimit(mob))
+			if (world.withinMobLimit(eType, entity))
 				return false;
 		}
 		// Does not despawn the entity if it carries players items

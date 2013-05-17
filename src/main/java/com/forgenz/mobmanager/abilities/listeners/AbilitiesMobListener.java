@@ -72,7 +72,7 @@ public class AbilitiesMobListener implements Listener
 		if (!P.p().getPluginIntegration().canApplyAbilities(event.getEntity()))
 			return;
 		
-		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.get(event.getEntity()), event.getSpawnReason());
+		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.valueOf(event.getEntity()), event.getSpawnReason());
 		
 		if (ma == null)
 			return;
@@ -122,7 +122,7 @@ public class AbilitiesMobListener implements Listener
 			return;
 		
 		// Fetch the mob config for this entity
-		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), spawnReason);
+		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.valueOf(entity), spawnReason);
 		
 		// If there is not config for the entity there is nothing more to do
 		if (ma == null)

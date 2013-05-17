@@ -105,3 +105,17 @@ For Nether environments the default value of 32 is used as this is
     the default height of lava
 
 #######################################################################
+Mobs.WorldMaximum
+#######################################################################
+Same as WorldMaximum but for individual mobs
+
+Value of -1 means this limit is ignored
+
+#######################################################################
+Mobs.ChunkCalculatedMaximum
+#######################################################################
+Same as ChunkCalculatedMaximum but for individual mobs
+
+Value of -1 means this limit is ignored
+
+#######################################################################

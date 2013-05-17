@@ -107,13 +107,13 @@ public class MMCommandButcher extends MMCommand
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{
 				MobType mob = MobType.valueOf(entity);
-				ExtendedEntityType type = ExtendedEntityType.get(entity);
+				ExtendedEntityType type = ExtendedEntityType.valueOf(entity);
 				
-				boolean flag = mobTypes.contains(mob) && (removeAll || !LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(entity)));
+				boolean flag = mobTypes.contains(mob) && (removeAll || !LimiterConfig.ignoredMobs.contains(ExtendedEntityType.valueOf(entity)));
 				
 				if (flag || mobTypes.contains(type))
 				{
-					world.decrementMobCount(mob);
+					world.decrementMobCount(type, entity);
 					
 					entity.remove();
 					++numMobs;
@@ -148,7 +148,7 @@ public class MMCommandButcher extends MMCommand
 		}
 		else
 		{
-			ExtendedEntityType entityType = ExtendedEntityType.get(type);
+			ExtendedEntityType entityType = ExtendedEntityType.valueOf(type);
 			if (entityType == null)
 				return false;
 			toRemove.add(entityType);

@@ -71,7 +71,7 @@ public class WorldAbilityConfig extends AbstractConfig
 		
 		for (String key : sect.getKeys(false))
 		{
-			ExtendedEntityType mobType = ExtendedEntityType.get(key);
+			ExtendedEntityType mobType = ExtendedEntityType.valueOf(key);
 			
 			if (mobType == null)
 			{

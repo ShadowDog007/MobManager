@@ -139,7 +139,7 @@ public class AbilitySet extends Ability
 		{
 			String key = cfg.getString("MobType");
 			if (key != null)
-				entityType = ExtendedEntityType.get(key);
+				entityType = ExtendedEntityType.valueOf(key);
 			
 			if (entityType == null)
 			{

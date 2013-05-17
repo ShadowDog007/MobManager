@@ -124,7 +124,7 @@ public class MMCommandSpawn extends MMCommand
 
 	protected static void spawn(CommandSender sender, String mob, Location loc, int count, boolean playerSpawn)
 	{		
-		ExtendedEntityType entityType = ExtendedEntityType.get(mob);
+		ExtendedEntityType entityType = ExtendedEntityType.valueOf(mob);
 		
 		if (entityType == null)
 		{

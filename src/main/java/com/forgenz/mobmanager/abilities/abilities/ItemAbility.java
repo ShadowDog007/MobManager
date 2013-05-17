@@ -63,7 +63,7 @@ public class ItemAbility extends Ability
 		if (item == null)
 			return;
 		
-		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.get(entity), null);
+		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.valueOf(entity), null);
 		
 		float dropChance = ma != null ? ma.equipmentDropChance : 0.15F; 
 		

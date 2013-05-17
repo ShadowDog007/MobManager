@@ -145,7 +145,7 @@ public class LimiterConfig extends AbstractConfig
 		
 		/* ################ IgnoredMobs ################ */
 		ignoredMobs =new TSettingContainer<ExtendedEntityType>(ExtendedEntityType.values(), cfg.getList("IgnoredMobs"), "IgnoredMobs");
-		ignoredMobs.addDefaults(ExtendedEntityType.get(EntityType.WITHER), ExtendedEntityType.get(EntityType.VILLAGER));
+		ignoredMobs.addDefaults(ExtendedEntityType.valueOf(EntityType.WITHER), ExtendedEntityType.valueOf(EntityType.VILLAGER));
 		List<String> ignoredList = ignoredMobs.getList();
 		set(cfg, "IgnoredMobs", ignoredList);
 		String strList = ignoredMobs.toString();

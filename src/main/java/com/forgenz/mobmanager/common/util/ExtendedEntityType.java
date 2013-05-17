@@ -37,8 +37,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 
+import com.forgenz.mobmanager.limiter.util.MobType;
+
 public class ExtendedEntityType
 {
+	private static ExtendedEntityType UNKNOWN;
 	private static HashMap<String, ExtendedEntityType> entityTypes = new HashMap<String, ExtendedEntityType>();
 	
 	// Adds entities
@@ -46,17 +49,19 @@ public class ExtendedEntityType
 	{
 		// Wither Skeleton
 		ExtendedEntityType type = new ExtendedEntityType(EntityType.SKELETON, SkeletonType.WITHER);
-		entityTypes.put(type.getTypeData(), type);
+		entityTypes.put(type.getTypeData().toUpperCase(), type);
 		
 		// EntityTypes
 		for (EntityType eType : EntityType.values())
 		{
+			type = new ExtendedEntityType(eType, "");
 			if (eType.isAlive())
-				entityTypes.put(eType.toString(), new ExtendedEntityType(eType, ""));
+				entityTypes.put(type.toString().toUpperCase(), type);
 		}
 		
 		// Unknown mobs
-		entityTypes.put(EntityType.UNKNOWN.toString(), new ExtendedEntityType(EntityType.UNKNOWN, ""));
+		UNKNOWN = new ExtendedEntityType(EntityType.UNKNOWN, "");
+		entityTypes.put(UNKNOWN.getTypeData().toUpperCase(), UNKNOWN);
 	}
 	
 	public static ExtendedEntityType[] values()
@@ -64,19 +69,21 @@ public class ExtendedEntityType
 		return entityTypes.values().toArray(new ExtendedEntityType[entityTypes.size()]);
 	}
 	
-	public static ExtendedEntityType get(EntityType entityType)
+	public static ExtendedEntityType valueOf(EntityType entityType)
 	{
-		return entityTypes.get(entityType.toString());
+		return valueOf(entityType.toString());
 	}
 	
-	public static ExtendedEntityType get(Entity entity)
+	public static ExtendedEntityType valueOf(Entity entity)
 	{
-		return entityTypes.get(getEntityTypeData(entity));
+		return valueOf(getEntityTypeData(entity));
 	}
 	
-	public static ExtendedEntityType get(String string)
+	public static ExtendedEntityType valueOf(String string)
 	{
-		return entityTypes.get(string.toUpperCase());
+		ExtendedEntityType type = entityTypes.get(string.toUpperCase());
+		
+		return type != null ? type : UNKNOWN;
 	}
 	
 	public static String getEntityTypeData(Entity entity)
@@ -87,7 +94,7 @@ public class ExtendedEntityType
 	public static String getEntityData(Entity entity)
 	{
 		// Handle the case for wither skeletons
-		if (entity.getClass() == Skeleton.class && ((Skeleton) entity).getSkeletonType() != SkeletonType.NORMAL)
+		if (entity.getType() == EntityType.SKELETON && ((Skeleton) entity).getSkeletonType() != SkeletonType.NORMAL)
 			return getDataSeperator() + ((Skeleton) entity).getSkeletonType().toString();
 		
 		return "";
@@ -95,16 +102,45 @@ public class ExtendedEntityType
 	
 	private final EntityType eType;
 	private final Object eData;
+	private final MobType mobType;
+	
 	private ExtendedEntityType(EntityType eType, Object eData)
 	{
 		this.eType = eType;
-		
 		this.eData = eData;
+		
+		if (eType != null && eType.getEntityClass() != null)
+			mobType = MobType.valueOf(eType);
+		else
+			mobType = null;
 	}
 	
 	public EntityType getBukkitEntityType()
 	{
 		return eType;
+	}
+	
+	/**
+	 * Returns the pre-calculated mob type for this EntityType
+	 * @return The EntityTypes MobType
+	 */
+	public MobType getMobType()
+	{
+		return mobType;
+	}
+	
+	/**
+	 * Returns the MobType of this entity</br>
+	 * If the MobType is unknown it is calculated given an Entity</br>
+	 * This provides support for mobs which do not exist in Vanilla Minecraft
+	 * @param entity The entity for which we want the MobType for (Should match the EntityType)
+	 * @return The Entities MobType
+	 */
+	public MobType getMobType(LivingEntity entity)
+	{
+		if (mobType == null)
+			return MobType.valueOf(entity);
+		return mobType;
 	}
 	
 	public String getData()
@@ -119,9 +155,9 @@ public class ExtendedEntityType
 	
 	public String getTypeData()
 	{
-		String dataString = eData.toString();
+		String dataString = getData();
 		
-		return eType.toString() + (dataString.length() != 0 ? getDataSeperator() + dataString : "");
+		return String.format("%s%s%s", eType.toString(), dataString.length() != 0 ? getDataSeperator() : "", dataString);
 	}
 	
 	public static String getExtendedEntityList()

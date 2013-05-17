@@ -151,7 +151,7 @@ public abstract class AbstractSpawnAbility extends Ability
 		// Try fetch a mobtype for the spawn
 		if (mobTypeString != null)
 		{
-			mobType = mobTypeString.equalsIgnoreCase("NONE") ? null : ExtendedEntityType.get(mobTypeString);
+			mobType = mobTypeString.equalsIgnoreCase("NONE") ? null : ExtendedEntityType.valueOf(mobTypeString);
 			
 			if (!mobTypeString.equalsIgnoreCase("NONE") && mobType == null)
 			{

@@ -32,6 +32,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
@@ -159,37 +160,9 @@ public enum MobType
 	
 	public static MobType valueOf(LivingEntity entity)
 	{
-		for (Class<? extends LivingEntity> mobType : ANIMAL.mobTypes)
-		{
-			if (mobType.isAssignableFrom(entity.getClass()))
-				return ANIMAL;
-		}
-		
-		for (Class<? extends LivingEntity> mobType : WATER_ANIMAL.mobTypes)
-		{
-			if (mobType.isAssignableFrom(entity.getClass()))
-				return WATER_ANIMAL;
-		}
-		
-		for (Class<? extends LivingEntity> mobType : AMBIENT.mobTypes)
-		{
-			if (mobType.isAssignableFrom(entity.getClass()))
-				return AMBIENT;
-		}
-		
-		for (Class<? extends LivingEntity> mobType : MONSTER.mobTypes)
-		{
-			if (mobType.isAssignableFrom(entity.getClass()))
-				return MONSTER;
-		}
-		
-		for (Class<? extends LivingEntity> mobType : VILLAGER.mobTypes)
-		{
-			if (mobType.isAssignableFrom(entity.getClass()))
-				return VILLAGER;
-		}
-		
-		return null;
+		if (entity == null)
+			return null;
+		return valueOf(entity.getClass());
 	}
 	
 	public static MobType valueOf(Entity entity)
@@ -198,6 +171,36 @@ public enum MobType
 		{
 			return valueOf((LivingEntity) entity);
 		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static MobType valueOf(EntityType eType)
+	{
+		if (eType == null)
+			return null;
+		
+		if (LivingEntity.class.isAssignableFrom(eType.getEntityClass()))
+		{
+			return valueOf((Class<? extends LivingEntity>) eType.getEntityClass());
+		}
+		return null;
+	}
+	
+	public static MobType valueOf(Class<? extends LivingEntity> clazz)
+	{
+		if (clazz == null)
+			return null;
+		
+		for (MobType type : values())
+		{
+			for (Class<? extends LivingEntity> typeClazz : type.mobTypes)
+			{
+				if (typeClazz.isAssignableFrom(clazz))
+					return type;
+			}
+		}
+		
 		return null;
 	}
 }

@@ -114,7 +114,7 @@ public class MMCommandDebug extends MMCommand
 			
 			Player player = (Player) sender;
 			
-			MobAbilityConfig ma = AbilityConfig.i().getMobConfig(player.getWorld().getName(), ExtendedEntityType.get(EntityType.ZOMBIE), null);
+			MobAbilityConfig ma = AbilityConfig.i().getMobConfig(player.getWorld().getName(), ExtendedEntityType.valueOf(EntityType.ZOMBIE), null);
 			
 			if (ma == null)
 			{

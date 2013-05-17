@@ -38,9 +38,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.util.MobDespawnCheck;
-import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 
@@ -187,7 +187,7 @@ public class MobDespawnTask extends BukkitRunnable
 						if (!LimiterConfig.useAsyncDespawnScanner)
 						{
 							entity.remove();
-							it.getWorld().decrementMobCount(MobType.valueOf(entity));
+							it.getWorld().decrementMobCount(ExtendedEntityType.valueOf(entity), entity);
 						}
 						else
 						{

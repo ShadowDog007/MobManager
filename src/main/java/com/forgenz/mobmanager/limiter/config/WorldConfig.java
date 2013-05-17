@@ -29,6 +29,9 @@
 package com.forgenz.mobmanager.limiter.config;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.World;
 import org.bukkit.World.Environment;
@@ -36,6 +39,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
+import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.util.MobType;
 
 public class WorldConfig extends AbstractConfig
@@ -43,8 +47,13 @@ public class WorldConfig extends AbstractConfig
 	public final String worldName;
 	
 	public final boolean limiterEnabled;
+	
 	public final short[] maximums;
 	public final short[] dynMultis;
+	
+	private HashMap<ExtendedEntityType, Short> mobMaximums;
+	private HashMap<ExtendedEntityType, Short> dynMobMultis;
+	
 	public final short breedingLimit;
 	public final short numAnimalsForFarm;
 	
@@ -69,7 +78,7 @@ public class WorldConfig extends AbstractConfig
 		maximums = new short[mobs.length];
 		dynMultis = new short[mobs.length];
 		
-		/* ################ MobLimits ################ */
+		/* ################ MobTypeLimits ################ */
 		for (MobType mob : mobs)
 		{
 			maximums[mob.index] = (short) Math.abs(cfg.getInt("WorldMaximum." + mob.cPath, mob.getDefaultMax(world.getEnvironment())));
@@ -115,6 +124,46 @@ public class WorldConfig extends AbstractConfig
 		groundHeight = cfg.getInt("GroundHeight", defaultHeight);
 		set(cfg, "GroundHeight", groundHeight);
 		
+		/* ################ MobsLimits ################ */
+		for (ExtendedEntityType type : ExtendedEntityType.values())
+		{
+			if (type.getMobType() == null)
+			{
+				continue;
+			}
+			
+			String wm = String.format("Mobs.WorldMaximum.%s", type.getTypeData());
+			String dm = String.format("Mobs.ChunkCalculatedMaximum.%s", type.getTypeData());
+			
+			short max = (short) cfg.getInt(wm, -1);
+			short dynMulti = (short) cfg.getInt(dm, -1);
+			
+			if (max < -1)
+				max = -1;
+			if (dynMulti < -1)
+				dynMulti = -1;
+			
+			if (max != -1)
+			{
+				if (mobMaximums == null)
+					mobMaximums = new HashMap<ExtendedEntityType, Short>();
+				mobMaximums.put(type, max);
+			}
+			if (dynMulti != -1)
+			{
+				if (dynMobMultis == null)
+					dynMobMultis = new HashMap<ExtendedEntityType, Short>();
+				dynMobMultis.put(type, dynMulti);
+			}
+			
+			set(cfg, wm, max);
+			set(cfg, dm, dynMulti);
+		}
+		
+		set(cfg, "Mobs.WorldMaximum", cfg.getConfigurationSection("Mobs.WorldMaximum"));
+		set(cfg, "Mobs.ChunkCalculatedMaximum", cfg.getConfigurationSection("Mobs.ChunkCalculatedMaximum"));
+		set(cfg, "Mobs", cfg.getConfigurationSection("Mobs"));
+		
 		
 		// Remove old Settings
 		cfg.set("SpawnChunkSearchDistance", null);
@@ -122,5 +171,45 @@ public class WorldConfig extends AbstractConfig
 		
 		copyHeader(cfg, "Limiter_WorldConfigHeader.txt", P.p().getDescription().getName() + " Limiter World Config " + P.p().getDescription().getVersion() + "\n");
 		saveConfig(WORLDS_FOLDER + File.separator + world.getName(), LIMITER_CONFIG_NAME, cfg);
+	}
+	
+	public int getMaximum(ExtendedEntityType type, int chunks)
+	{
+		Short max = mobMaximums != null ? mobMaximums.get(type) : null;
+		if (max == null)
+			max = Short.MAX_VALUE;
+		
+		Short dynMulti = dynMobMultis != null ? dynMobMultis.get(type) : null;
+		if (dynMulti == null)
+			return max;
+		
+		int dynCount = (dynMulti.intValue() * chunks) >> 8;
+		
+		return dynCount < max ? dynCount : max;
+	}
+	
+	public List<ExtendedEntityType> getIndividualMobs()
+	{
+		List<ExtendedEntityType> types = new ArrayList<ExtendedEntityType>();
+		
+		if (mobMaximums != null)
+		{
+			for (ExtendedEntityType type : mobMaximums.keySet())
+			{
+				types.add(type);
+			}
+		}
+		
+		if (dynMobMultis != null)
+		{
+			for (ExtendedEntityType type : dynMobMultis.keySet())
+			{
+				// Make sure we haven't already added the entitytype
+				if (!types.contains(type))
+					types.add(type);
+			}
+		}
+		
+		return types;
 	}
 }

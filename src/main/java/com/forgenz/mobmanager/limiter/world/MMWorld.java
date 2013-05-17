@@ -28,6 +28,7 @@
 
 package com.forgenz.mobmanager.limiter.world;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.World;
@@ -72,9 +73,14 @@ public class MMWorld
 	
 	
 	/**
-	 * Stores all mob counts
+	 * Stores all mob type counts
 	 */
 	private int[] mobCounts;
+	
+	/**
+	 * Stores mob counts of individual mobs (Only if they have limits)
+	 */
+	private HashMap<ExtendedEntityType, Integer> individualMobCounts;
 	
 	
 	public MMWorld(final World world, WorldConfig worldConf)
@@ -83,6 +89,17 @@ public class MMWorld
 		this.worldConf = worldConf;
 		
 		mobCounts = new int[worldConf.maximums.length];
+		
+		List<ExtendedEntityType> types = worldConf.getIndividualMobs();
+		if (types.size() > 0)
+		{
+			individualMobCounts = new HashMap<ExtendedEntityType, Integer>();
+			
+			for (ExtendedEntityType type : types)
+			{
+				individualMobCounts.put(type, 0);
+			}
+		}
 		
 		updateMobCounts();
 
@@ -116,6 +133,14 @@ public class MMWorld
 		{
 			mobCounts[mob.index] = 0;
 		}
+		
+		if (individualMobCounts != null)
+		{
+			for (ExtendedEntityType type : individualMobCounts.keySet())
+			{
+				individualMobCounts.put(type, 0);
+			}
+		}
 	}
 	
 	public boolean updateMobCounts()
@@ -142,12 +167,25 @@ public class MMWorld
 			// Loop through each loaded chunk in the world
 			for (final LivingEntity entity : entities)
 			{
+				ExtendedEntityType eType = ExtendedEntityType.valueOf(entity);
+				
 				// Check if the mob should be ignored
-				if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(entity)))
+				if (LimiterConfig.ignoredMobs.contains(eType))
 					continue;
+				
+				// Add individual mob counts
+				if (individualMobCounts != null)
+				{
+					// Check to see if the mob should be counted
+					Integer count = individualMobCounts.get(eType);
+					if (count != null)
+					{
+						individualMobCounts.put(eType, count + 1);
+					}
+				}
 
 				// Fetch mob type
-				MobType mob = MobType.valueOf(entity);
+				MobType mob = eType.getMobType(entity);
 				// If the mob type is null ignore the entity
 				if (mob == null)
 					continue;
@@ -207,7 +245,7 @@ public class MMWorld
 	}
 	
 	/**
-	 * Calculates the maximum number of monsters currently allowed in the world
+	 * Calculates the maximum number of one mobtype currently allowed in the world
 	 * @return The max number of monsters
 	 */
 	public short maxMobs(final MobType mob)
@@ -219,8 +257,35 @@ public class MMWorld
 			
 		return worldConf.maximums[mob.index] < dynMax ? worldConf.maximums[mob.index] : dynMax;
 	}
+	
+	/**
+	 * Checks to see if the specific mob is within its limits
+	 */
+	public boolean withinMobLimit(ExtendedEntityType mob, LivingEntity entity)
+	{
+		if (mob == null)
+		{
+			mob = ExtendedEntityType.valueOf(entity);
+		}
+		
+		// If the mob is not within its types counts return false
+		if (!withinMobLimit(mob.getMobType()))
+			return false;
+		
+		if (individualMobCounts == null)
+			return true;
+		
+		// Fetch the number of this mob which exist in the world
+		Integer count = individualMobCounts.get(mob);
+	
+		// If the count is null we are not counting this mob
+		if (count == null)
+			return true;
+		// Return true if the count is under the maximum for the mob
+		return worldConf.getMaximum(mob, numChunks) > count;
+	}
 
-	public boolean withinMobLimit(MobType mob)
+	private boolean withinMobLimit(MobType mob)
 	{
 		if (mob == null)
 			return true;
@@ -229,15 +294,57 @@ public class MMWorld
 		
 		return maxMobs(mob) > mobCounts[mob.index];
 	}
+	
+	/**
+	 * Increments the mob counts for this mob
+	 * @param mob The specific mob which is being counted
+	 */
+	public void incrementMobCount(ExtendedEntityType mob, LivingEntity entity)
+	{
+		if (mob == null)
+			return;
+		// Increment the MobTypes count
+		incrementMobCount(mob.getMobType(entity));
+		
+		if (individualMobCounts == null)
+			return;
+		
+		// Check for an existing mob count
+		Integer mobCount = individualMobCounts.get(mob);
+		// If it is missing we ignore the individual count
+		if (mobCount == null)
+			return;
+		// Increment the count and update the reference
+		individualMobCounts.put(mob, ++mobCount);
+	}
+	
+	public void decrementMobCount(ExtendedEntityType mob, LivingEntity entity)
+	{
+		if (mob == null)
+			return;
+		// Decrement the MobTypes count
+		decrementMobCount(mob.getMobType(entity));
+		
+		if (individualMobCounts == null)
+			return;
+		
+		// Check for an existing mob count
+		Integer mobCount = individualMobCounts.get(mob);
+		// If it is missing we ignore the individual count
+		if (mobCount == null)
+			return;
+		// Decrement the count and update the reference
+		individualMobCounts.put(mob, --mobCount);
+	}
 
-	public void incrementMobCount(MobType mob)
+	private void incrementMobCount(MobType mob)
 	{
 		if (mob == null)
 			return;
 		++mobCounts[mob.index];
 	}
 	
-	public void decrementMobCount(MobType mob)
+	private void decrementMobCount(MobType mob)
 	{
 		if (mob == null)
 			return;

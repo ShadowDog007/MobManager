@@ -77,7 +77,7 @@ public class MobListener implements Listener
 		if (!LimiterConfig.enabledSpawnReasons.containsValue(event.getSpawnReason().toString()))
 			return;
 		
-		ExtendedEntityType eMobType = ExtendedEntityType.get(event.getEntity());
+		ExtendedEntityType eMobType = ExtendedEntityType.valueOf(event.getEntity());
 		// Check if the entity is disabled
 		if (LimiterConfig.disabledMobs.contains(eMobType))
 		{
@@ -87,7 +87,7 @@ public class MobListener implements Listener
 		}
 		
 		// Checks if we can ignore the creature spawn
-		MobType mob = MobType.valueOf(event.getEntity());
+		MobType mob = eMobType.getMobType(event.getEntity());
 		if (mob == null || LimiterConfig.ignoredMobs.contains(eMobType))
 		{
 			return;
@@ -134,7 +134,7 @@ public class MobListener implements Listener
 		// Try to update the number of mobs in this world
 		
 		// Check if we are within spawn limits
-		if (!world.withinMobLimit(mob))
+		if (!world.withinMobLimit(eMobType, event.getEntity()))
 		{
 			event.setCancelled(true);
 			return;
@@ -154,10 +154,6 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void countCreatureSpawns(CreatureSpawnEvent event)
 	{
-		// If the mob is being ignored it is not counted towards the limits
-		if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
-			return;
-		
 		// Fetch the world the creature spawned in
 		MMWorld world = MMComponent.getLimiter().getWorld(event.getLocation().getWorld());
 		// Do nothing if the world is inactive
@@ -166,8 +162,15 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		MobType mob = MobType.valueOf(event.getEntity());
-		world.incrementMobCount(mob);
+		// Fetch the entitys type
+		ExtendedEntityType eType = ExtendedEntityType.valueOf(event.getEntity());
+		
+		// If the mob is being ignored it is not counted towards the limits
+		if (LimiterConfig.ignoredMobs.contains(eType))
+			return;
+		
+		// Increment counts for the mob
+		world.incrementMobCount(eType, event.getEntity());
 	}
 	
 	/**
@@ -178,10 +181,6 @@ public class MobListener implements Listener
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDeath(final EntityDeathEvent event)
 	{
-		// If the mob is being ignored it was not counted towards the limits
-		if (LimiterConfig.ignoredMobs.contains(ExtendedEntityType.get(event.getEntity())))
-			return;
-		
 		// Fetch the world the spawn occurred in
 		final MMWorld world = MMComponent.getLimiter().getWorld(event.getEntity().getWorld());
 		// Do nothing if the world is inactive
@@ -190,7 +189,13 @@ public class MobListener implements Listener
 			return;
 		}
 		
-		MobType mob = MobType.valueOf(event.getEntity());
-		world.decrementMobCount(mob);
+		// Fetch the entity type
+		ExtendedEntityType eType = ExtendedEntityType.valueOf(event.getEntity());
+		// If the mob is being ignored it was not counted towards the limits
+		if (LimiterConfig.ignoredMobs.contains(eType))
+			return;
+		
+		// Decrement counts for the entity
+		world.decrementMobCount(eType, event.getEntity());
 	}
 }
