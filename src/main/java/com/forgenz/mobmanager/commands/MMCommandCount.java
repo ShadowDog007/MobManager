@@ -87,7 +87,12 @@ class MMCommandCount extends MMCommand
 		}
 		else
 		{
-			worldList = MMComponent.getLimiter().getWorlds().values();
+			MMWorld[] worlds = MMComponent.getLimiter().getWorlds();;
+			worldList = new ArrayList<MMWorld>(worlds.length);
+			for (MMWorld world : worlds)
+			{
+				worldList.add(world);
+			}
 		}
 		
 		if (worldList.size() == 0)

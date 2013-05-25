@@ -91,14 +91,14 @@ public class MobDespawnCheck
 
 		// Fetch the entities type
 		ExtendedEntityType eType = ExtendedEntityType.valueOf(entity);
-		
-		// Check if the mob is being ignored
-		if (LimiterConfig.ignoredMobs.contains(eType))
-			return false;
 
 		MobType mob = eType.getMobType(entity);
 		// If MobManager does not recognize the entity ignore it
 		if (mob == null)
+			return false;
+		
+		// Check if the mob is being ignored
+		if (LimiterConfig.ignoredMobs.contains(eType))
 			return false;
 		
 		// Check if the mob is an animal

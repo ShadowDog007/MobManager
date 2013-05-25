@@ -41,6 +41,7 @@ import com.forgenz.mobmanager.limiter.util.MobType;
 
 public class ExtendedEntityType
 {
+	private static int nextId = 0;
 	private static ExtendedEntityType UNKNOWN;
 	private static HashMap<String, ExtendedEntityType> entityTypes = new HashMap<String, ExtendedEntityType>();
 	
@@ -48,25 +49,33 @@ public class ExtendedEntityType
 	static
 	{
 		// Wither Skeleton
-		ExtendedEntityType type = new ExtendedEntityType(EntityType.SKELETON, SkeletonType.WITHER);
-		entityTypes.put(type.getTypeData().toUpperCase(), type);
+		new ExtendedEntityType(EntityType.SKELETON, SkeletonType.WITHER);
 		
 		// EntityTypes
 		for (EntityType eType : EntityType.values())
 		{
-			type = new ExtendedEntityType(eType, "");
 			if (eType.isAlive())
-				entityTypes.put(type.toString().toUpperCase(), type);
+				new ExtendedEntityType(eType, "");
 		}
 		
 		// Unknown mobs
 		UNKNOWN = new ExtendedEntityType(EntityType.UNKNOWN, "");
-		entityTypes.put(UNKNOWN.getTypeData().toUpperCase(), UNKNOWN);
 	}
 	
 	public static ExtendedEntityType[] values()
 	{
 		return entityTypes.values().toArray(new ExtendedEntityType[entityTypes.size()]);
+	}
+	
+	public static ExtendedEntityType valueOf(int id)
+	{
+		for (ExtendedEntityType type : values())
+		{
+			if (type.id == id)
+				return type;
+		}
+		
+		return null;
 	}
 	
 	public static ExtendedEntityType valueOf(EntityType entityType)
@@ -88,24 +97,30 @@ public class ExtendedEntityType
 	
 	public static String getEntityTypeData(Entity entity)
 	{
-		return entity.getType().toString() + getEntityData(entity);
+		String entityData = getEntityData(entity);
+		
+		if (entityData.length() != 0)
+			return String.format("%s%s%s", entity.getType().toString(), getDataSeperator(), entityData);
+		return entity.getType().toString();
 	}
 	
 	public static String getEntityData(Entity entity)
 	{
 		// Handle the case for wither skeletons
 		if (entity.getType() == EntityType.SKELETON && ((Skeleton) entity).getSkeletonType() != SkeletonType.NORMAL)
-			return getDataSeperator() + ((Skeleton) entity).getSkeletonType().toString();
+			return ((Skeleton) entity).getSkeletonType().toString();
 		
 		return "";
 	}
 	
+	private final int id;
 	private final EntityType eType;
 	private final Object eData;
 	private final MobType mobType;
 	
 	private ExtendedEntityType(EntityType eType, Object eData)
 	{
+		id = nextId++;
 		this.eType = eType;
 		this.eData = eData;
 		
@@ -113,6 +128,8 @@ public class ExtendedEntityType
 			mobType = MobType.valueOf(eType);
 		else
 			mobType = null;
+		
+		entityTypes.put(getTypeData().toUpperCase(), this);
 	}
 	
 	public EntityType getBukkitEntityType()
@@ -209,5 +226,10 @@ public class ExtendedEntityType
 		}
 		
 		return entity;
+	}
+
+	public int ordinal()
+	{
+		return id;
 	}
 }

@@ -168,9 +168,14 @@ public class LimiterComponent extends MMComponent
 		return config;
 	}
 	
-	public ConcurrentHashMap<String, MMWorld> getWorlds()
+	public void addWorld(MMWorld world)
 	{
-		return worlds;
+		worlds.put(world.getWorld().getName().toLowerCase(), world);
+	}
+	
+	public MMWorld[] getWorlds()
+	{
+		return worlds.values().toArray(new MMWorld[worlds.size()]);
 	}
 	
 	public MMWorld getWorld(World world)

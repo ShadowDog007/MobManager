@@ -30,7 +30,6 @@ package com.forgenz.mobmanager.limiter.config;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.World;
@@ -51,8 +50,8 @@ public class WorldConfig extends AbstractConfig
 	public final short[] maximums;
 	public final short[] dynMultis;
 	
-	private HashMap<ExtendedEntityType, Short> mobMaximums;
-	private HashMap<ExtendedEntityType, Short> dynMobMultis;
+	private final short[] mobMaximums;
+	private final short[] dynMobMultis;
 	
 	public final short breedingLimit;
 	public final short numAnimalsForFarm;
@@ -81,15 +80,15 @@ public class WorldConfig extends AbstractConfig
 		/* ################ MobTypeLimits ################ */
 		for (MobType mob : mobs)
 		{
-			maximums[mob.index] = (short) Math.abs(cfg.getInt("WorldMaximum." + mob.cPath, mob.getDefaultMax(world.getEnvironment())));
-			dynMultis[mob.index] = (short) Math.abs(cfg.getInt("ChunkCalculatedMaximum." + mob.cPath, mob.getDefaultDynMulti(world.getEnvironment())));
+			maximums[mob.ordinal()] = (short) Math.abs(cfg.getInt("WorldMaximum." + mob.cPath, mob.getDefaultMax(world.getEnvironment())));
+			dynMultis[mob.ordinal()] = (short) Math.abs(cfg.getInt("ChunkCalculatedMaximum." + mob.cPath, mob.getDefaultDynMulti(world.getEnvironment())));
 			
 			// Limit dynamic multi so to prevent ending up with -ve limits
-			if (dynMultis[mob.index] > 1000)
-				dynMultis[mob.index] = 1000;
+			if (dynMultis[mob.ordinal()] > 1000)
+				dynMultis[mob.ordinal()] = 1000;
 			
-			set(cfg, "WorldMaximum." + mob.cPath, maximums[mob.index]);
-			set(cfg, "ChunkCalculatedMaximum." + mob.cPath, dynMultis[mob.index]);
+			set(cfg, "WorldMaximum." + mob.cPath, maximums[mob.ordinal()]);
+			set(cfg, "ChunkCalculatedMaximum." + mob.cPath, dynMultis[mob.ordinal()]);
 		}
 		
 		set(cfg, "WorldMaximum", cfg.getConfigurationSection("WorldMaximum"));
@@ -125,6 +124,15 @@ public class WorldConfig extends AbstractConfig
 		set(cfg, "GroundHeight", groundHeight);
 		
 		/* ################ MobsLimits ################ */
+		int size = ExtendedEntityType.values().length;
+		mobMaximums = new short[size];
+		dynMobMultis = new short[size];
+		
+		for (int i = 0; i < size; ++i)
+		{
+			mobMaximums[i] = dynMobMultis[i] = Short.MAX_VALUE;
+		}
+		
 		for (ExtendedEntityType type : ExtendedEntityType.values())
 		{
 			if (type.getMobType() == null)
@@ -145,15 +153,11 @@ public class WorldConfig extends AbstractConfig
 			
 			if (max != -1)
 			{
-				if (mobMaximums == null)
-					mobMaximums = new HashMap<ExtendedEntityType, Short>();
-				mobMaximums.put(type, max);
+				mobMaximums[type.ordinal()] =  max;
 			}
 			if (dynMulti != -1)
 			{
-				if (dynMobMultis == null)
-					dynMobMultis = new HashMap<ExtendedEntityType, Short>();
-				dynMobMultis.put(type, dynMulti);
+				dynMobMultis[type.ordinal()] = dynMulti;
 			}
 			
 			set(cfg, wm, max);
@@ -175,15 +179,14 @@ public class WorldConfig extends AbstractConfig
 	
 	public int getMaximum(ExtendedEntityType type, int chunks)
 	{
-		Short max = mobMaximums != null ? mobMaximums.get(type) : null;
-		if (max == null)
-			max = Short.MAX_VALUE;
+		short max = mobMaximums[type.ordinal()];
+		int dynCount = dynMobMultis[type.ordinal()];
 		
-		Short dynMulti = dynMobMultis != null ? dynMobMultis.get(type) : null;
-		if (dynMulti == null)
+		// If the dynMulti more than max we just return max
+		if (dynCount >= max)
 			return max;
 		
-		int dynCount = (dynMulti.intValue() * chunks) >> 8;
+		dynCount = (dynCount * chunks) >> 8;
 		
 		return dynCount < max ? dynCount : max;
 	}
@@ -194,17 +197,24 @@ public class WorldConfig extends AbstractConfig
 		
 		if (mobMaximums != null)
 		{
-			for (ExtendedEntityType type : mobMaximums.keySet())
+			for (int i = 0; i < mobMaximums.length; ++i)
 			{
-				types.add(type);
+				if (mobMaximums[i] != Short.MAX_VALUE)
+				{
+					types.add(ExtendedEntityType.valueOf(i));
+				}
 			}
 		}
 		
 		if (dynMobMultis != null)
 		{
-			for (ExtendedEntityType type : dynMobMultis.keySet())
+			for (int i = 0; i < dynMobMultis.length; ++i)
 			{
-				// Make sure we haven't already added the entitytype
+				if (dynMobMultis[i] == Short.MAX_VALUE)
+					continue;
+				ExtendedEntityType type = ExtendedEntityType.valueOf(i);
+				
+				// Make sure we haven't already added the entity type
 				if (!types.contains(type))
 					types.add(type);
 			}

@@ -107,15 +107,15 @@ public class TSettingContainer<T>
 		if (container == null)
 			return "";
 		
-		String str = "";
+		StringBuilder str = new StringBuilder();
 		
 		for (T t : container)
 		{
 			if (str.length() != 0)
-				str += ",";
-			str += t.toString();
+				str.append(',');
+			str.append(t.toString());
 		}
 		
-		return str;
+		return str.toString();
 	}
 }

@@ -67,8 +67,9 @@ public class PlayerFinder
 	{		
 		// Fetch the entities location and sets the pLoc object to use
 		// If the function is run in the primary thread we use a cached object else we make new ones
-		Location eLoc = Bukkit.isPrimaryThread() ? entity.getLocation(PlayerFinder.eLoc) : entity.getLocation();
-		Location pLoc = Bukkit.isPrimaryThread() ? PlayerFinder.pLoc : new Location(null, 0.0, 0.0, 0.0);
+		boolean pThread = Bukkit.isPrimaryThread();
+		Location eLoc = pThread ? entity.getLocation(PlayerFinder.eLoc) : entity.getLocation();
+		Location pLoc = pThread ? PlayerFinder.pLoc : new Location(null, 0.0, 0.0, 0.0);
 		
 		// Fetch the worlds search distance at the given entities height
 		int searchDist = world.getSearchDistance((short) eLoc.getBlockY());

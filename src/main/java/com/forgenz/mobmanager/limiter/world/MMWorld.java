@@ -28,7 +28,6 @@
 
 package com.forgenz.mobmanager.limiter.world;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.World;
@@ -80,8 +79,7 @@ public class MMWorld
 	/**
 	 * Stores mob counts of individual mobs (Only if they have limits)
 	 */
-	private HashMap<ExtendedEntityType, Integer> individualMobCounts;
-	
+	private int[] individualMobCounts;
 	
 	public MMWorld(final World world, WorldConfig worldConf)
 	{
@@ -91,23 +89,28 @@ public class MMWorld
 		mobCounts = new int[worldConf.maximums.length];
 		
 		List<ExtendedEntityType> types = worldConf.getIndividualMobs();
-		if (types.size() > 0)
+		
+		// Create the array to store individual mob counts
+		individualMobCounts = new int[ExtendedEntityType.values().length];
+		// Initialise the array counts
+		for (int i = 0; i < individualMobCounts.length; ++i)
 		{
-			individualMobCounts = new HashMap<ExtendedEntityType, Integer>();
-			
-			for (ExtendedEntityType type : types)
-			{
-				individualMobCounts.put(type, 0);
-			}
+			individualMobCounts[i] = -1;
+		}
+		
+		// Initialise counts of mobs we want to keep track of
+		for (ExtendedEntityType type : types)
+		{
+			individualMobCounts[type.ordinal()] = 0;
 		}
 		
 		updateMobCounts();
 
-		final int maxMonsters = worldConf.maximums[MobType.MONSTER.index];
-		final int maxAnimals = worldConf.maximums[MobType.ANIMAL.index];
-		final int maxWater = worldConf.maximums[MobType.WATER_ANIMAL.index];
-		final int maxAmbient = worldConf.maximums[MobType.AMBIENT.index];
-		final int maxVillagers = worldConf.maximums[MobType.VILLAGER.index];
+		final int maxMonsters = worldConf.maximums[MobType.MONSTER.ordinal()];
+		final int maxAnimals = worldConf.maximums[MobType.ANIMAL.ordinal()];
+		final int maxWater = worldConf.maximums[MobType.WATER_ANIMAL.ordinal()];
+		final int maxAmbient = worldConf.maximums[MobType.AMBIENT.ordinal()];
+		final int maxVillagers = worldConf.maximums[MobType.VILLAGER.ordinal()];
 
 		MMComponent.getLimiter().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
 	}
@@ -131,15 +134,13 @@ public class MMWorld
 	{
 		for (MobType mob : MobType.values())
 		{
-			mobCounts[mob.index] = 0;
+			mobCounts[mob.ordinal()] = 0;
 		}
 		
-		if (individualMobCounts != null)
+		for (int i = 0; i < individualMobCounts.length; ++i)
 		{
-			for (ExtendedEntityType type : individualMobCounts.keySet())
-			{
-				individualMobCounts.put(type, 0);
-			}
+			if (individualMobCounts[i] != -1)
+				individualMobCounts[i] = 0;
 		}
 	}
 	
@@ -177,10 +178,9 @@ public class MMWorld
 				if (individualMobCounts != null)
 				{
 					// Check to see if the mob should be counted
-					Integer count = individualMobCounts.get(eType);
-					if (count != null)
+					if (individualMobCounts[eType.ordinal()] != -1)
 					{
-						individualMobCounts.put(eType, count + 1);
+						++individualMobCounts[eType.ordinal()];
 					}
 				}
 
@@ -204,7 +204,7 @@ public class MMWorld
 				}
 
 				// Increment counter
-				++mobCounts[mob.index];
+				++mobCounts[mob.ordinal()];
 			}
 			
 			// Reset 'updatedThisTick' so updates can be run again later
@@ -241,7 +241,7 @@ public class MMWorld
 		
 		updateMobCounts();
 		
-		return mobCounts[mob.index];
+		return mobCounts[mob.ordinal()];
 	}
 	
 	/**
@@ -253,9 +253,9 @@ public class MMWorld
 		if (mob == null)
 			return Short.MAX_VALUE;
 
-		short dynMax = (short) (worldConf.dynMultis[mob.index] * numChunks >> 8);
+		short dynMax = (short) (worldConf.dynMultis[mob.ordinal()] * numChunks >> 8);
 			
-		return worldConf.maximums[mob.index] < dynMax ? worldConf.maximums[mob.index] : dynMax;
+		return worldConf.maximums[mob.ordinal()] < dynMax ? worldConf.maximums[mob.ordinal()] : dynMax;
 	}
 	
 	/**
@@ -272,17 +272,12 @@ public class MMWorld
 		if (!withinMobLimit(mob.getMobType()))
 			return false;
 		
-		if (individualMobCounts == null)
+		// If the count is -1 we are not counting this mob
+		if (individualMobCounts[mob.ordinal()] == -1)
 			return true;
 		
-		// Fetch the number of this mob which exist in the world
-		Integer count = individualMobCounts.get(mob);
-	
-		// If the count is null we are not counting this mob
-		if (count == null)
-			return true;
 		// Return true if the count is under the maximum for the mob
-		return worldConf.getMaximum(mob, numChunks) > count;
+		return worldConf.getMaximum(mob, numChunks) > individualMobCounts[mob.ordinal()];
 	}
 
 	private boolean withinMobLimit(MobType mob)
@@ -292,63 +287,64 @@ public class MMWorld
 		
 		updateMobCounts();
 		
-		return maxMobs(mob) > mobCounts[mob.index];
+		return maxMobs(mob) > mobCounts[mob.ordinal()];
 	}
 	
 	/**
 	 * Increments the mob counts for this mob
-	 * @param mob The specific mob which is being counted
+	 * @param mob The mob type which is being counted
+	 * @param entity The actual mob being counted 
 	 */
 	public void incrementMobCount(ExtendedEntityType mob, LivingEntity entity)
 	{
 		if (mob == null)
 			return;
+		
 		// Increment the MobTypes count
 		incrementMobCount(mob.getMobType(entity));
 		
 		if (individualMobCounts == null)
 			return;
 		
-		// Check for an existing mob count
-		Integer mobCount = individualMobCounts.get(mob);
-		// If it is missing we ignore the individual count
-		if (mobCount == null)
-			return;
-		// Increment the count and update the reference
-		individualMobCounts.put(mob, ++mobCount);
+		// Increment the mobs count if we should be counting it
+		if (individualMobCounts[mob.ordinal()] != -1)
+			++individualMobCounts[mob.ordinal()];
 	}
 	
+	/**
+	 * Decrements the mob counts for this mob
+	 * @param mob The mob type which is being counted
+	 * @param entity The actual mob being counted 
+	 */
 	public void decrementMobCount(ExtendedEntityType mob, LivingEntity entity)
 	{
 		if (mob == null)
 			return;
+		
 		// Decrement the MobTypes count
 		decrementMobCount(mob.getMobType(entity));
 		
 		if (individualMobCounts == null)
 			return;
 		
-		// Check for an existing mob count
-		Integer mobCount = individualMobCounts.get(mob);
-		// If it is missing we ignore the individual count
-		if (mobCount == null)
-			return;
-		// Decrement the count and update the reference
-		individualMobCounts.put(mob, --mobCount);
+		// Decrement the mobs count if we should be counting it
+		if (individualMobCounts[mob.ordinal()] != -1)
+			--individualMobCounts[mob.ordinal()];
 	}
 
 	private void incrementMobCount(MobType mob)
 	{
 		if (mob == null)
 			return;
-		++mobCounts[mob.index];
+		
+		++mobCounts[mob.ordinal()];
 	}
 	
 	private void decrementMobCount(MobType mob)
 	{
 		if (mob == null)
 			return;
-		--mobCounts[mob.index];
+		--mobCounts[mob.ordinal()];
 	}
 
 	public void incrementChunkCount()

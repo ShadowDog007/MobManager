@@ -144,7 +144,6 @@ public class MobListener implements Listener
 		if (!PlayerFinder.playerNear(world, event.getEntity(), PlayerFinder.mobFlys(event.getEntity())))
 		{
 			event.setCancelled(true);
-			return;
 		}
 	}
 	

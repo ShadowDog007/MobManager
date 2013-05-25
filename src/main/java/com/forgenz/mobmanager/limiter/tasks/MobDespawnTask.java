@@ -45,100 +45,7 @@ import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 
 public class MobDespawnTask extends BukkitRunnable
-{
-	/**
-	 * This class is responsible for making sure the iterators are accessed while still knowing which world they belong to</br>
-	 * Used to make it easier to spread the task over multiple ticks
-	 * @author Michael McKnight (ShadowDog007)
-	 *
-	 */
-	private class EntityIterator
-	{
-		private int currentIndex = 0;
-		private final ArrayList<MMWorld> worlds;
-		private final ArrayList<Iterator<LivingEntity>> iterators;
-		
-		/**
-		 * Sets up the iterators required
-		 */
-		EntityIterator()
-		{
-			worlds = new ArrayList<MMWorld>(MMComponent.getLimiter().getWorlds().size());
-			iterators = new ArrayList<Iterator<LivingEntity>>(MMComponent.getLimiter().getWorlds().size());
-			
-			for (MMWorld world : MMComponent.getLimiter().getWorlds().values())
-			{
-				worlds.add(world);
-			}
-		}
-		
-		/**
-		 * Sets up iterators for entities in each world one by one
-		 * @return False when there are no more worlds to setup
-		 */
-		public boolean setupNextWorld()
-		{			
-			MMWorld world = worlds.get(currentIndex);
-			
-			List<LivingEntity> entities = world.getWorld().getLivingEntities();
-			
-			iterators.add(entities.iterator());
-			
-			world.updateMobCounts(entities);
-			
-			if (++currentIndex >= worlds.size())
-			{
-				currentIndex = 0;
-				return false;
-			}
-			
-			return true;
-		}
-		
-		/**
-		 * Fetches the world we are currently iterating over
-		 */
-		public MMWorld getWorld()
-		{
-			return worlds.get(currentIndex);
-		}
-		
-		/**
-		 * Checks if there are more entities to check</br>
-		 * Also iterates to the next iterator when the current one is finished
-		 */
-		public boolean hasNext()
-		{
-			if (currentIndex >= iterators.size())
-				return false;
-			
-			if (iterators.get(currentIndex) == null)
-			{
-				++currentIndex;
-				return hasNext();
-			}
-			
-			if (iterators.get(currentIndex).hasNext())
-				return true;
-			
-			if (++currentIndex >= iterators.size())
-				return false;
-			
-			return hasNext();
-		}
-		
-		/**
-		 * Fetches the next entity
-		 */
-		public LivingEntity next()
-		{
-			if (!hasNext())
-				return null;
-			
-			return iterators.get(currentIndex).next();
-		}
-	}
-	
+{	
 	private AtomicBoolean running = new AtomicBoolean(false);
 	/**
 	 * Sets up the despawn scan
@@ -152,110 +59,218 @@ public class MobDespawnTask extends BukkitRunnable
 			return;
 		}
 		
-		/* ######## START TASK ######## */
 		// Make sure the task is not run more than once at a time
 		if (!running.compareAndSet(false, true))
 			return;
 		
-		// Create the entity iterator object
-		final EntityIterator it = new EntityIterator();
-		
-		final List<LivingEntity> mobsToDespawn = LimiterConfig.useAsyncDespawnScanner ? new ArrayList<LivingEntity>() : null;
-		
-		/* ######## SCANNER CREATION ######## */
-		// Create the despawner task
-		final Runnable removeQueueFillTask = new Runnable()
-		{
-			
-			/**
-			 * Scans for and removes entities which are not required
-			 */
-			@Override
-			public void run()
-			{
-				// Note the time we start
-				long start = System.nanoTime();
-				LivingEntity entity;
-				
-				// Iterate through each entity until there are none left or the task has run for 0.4ms
-				while ((entity = it.next()) != null && (System.nanoTime() - start) < 400000L)
-				{
-					// Check if the mob should be despawned
-					if (MobDespawnCheck.shouldDespawn(it.getWorld(), entity))
-					{
-						// Make sure we don't use bukkit methods in async
-						if (!LimiterConfig.useAsyncDespawnScanner)
-						{
-							entity.remove();
-							it.getWorld().decrementMobCount(ExtendedEntityType.valueOf(entity), entity);
-						}
-						else
-						{
-							mobsToDespawn.add(entity);
-						}
-					}
-				}
-				
-				// Check if there is more to go
-				if (it.hasNext() && P.p() != null)
-				{
-					// Schedule the task to run later
-					if (LimiterConfig.useAsyncDespawnScanner)
-						P.p().getServer().getScheduler().runTaskLaterAsynchronously(P.p(), this, 1L);
-					else
-						P.p().getServer().getScheduler().runTaskLater(P.p(), this, 1L);
-				}
-				// If we are in async we need to schedule a new task to remove the entities
-				else if (P.p() != null)
-				{
-					if (LimiterConfig.useAsyncDespawnScanner)
-					{
-						final LivingEntity[] entities = mobsToDespawn.toArray(new LivingEntity[0]);
-						mobsToDespawn.clear();
-						
-						P.p().getServer().getScheduler().runTaskLater(P.p(), new Runnable()
-						{
-
-							@Override
-							public void run()
-							{
-								for (int i = 0; i < entities.length; ++i)
-								{
-									if (entities[i].isValid())
-									{
-										entities[i].remove();
-									}
-								}
-							}
-							
-						}, 1L);
-					}
-					
-					/* ######## END TASK ######## */
-					running.compareAndSet(true, false);
-				}
-			}
-		};
-		
-		/* ######## SETUP TASK START ######## */
 		// Setups up each world, one per tick then starts the despawn scanner
-		P.p().getServer().getScheduler().runTaskLater(P.p(), new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (it.setupNextWorld())
-					P.p().getServer().getScheduler().runTaskLater(P.p(), this, 1L);
-				else
-				{
-					/* ######## SCAN START ######## */
-					// Run the despawner task
-					if (LimiterConfig.useAsyncDespawnScanner)
-						P.p().getServer().getScheduler().runTaskLaterAsynchronously(P.p(), removeQueueFillTask, 1L);
-					else
-						P.p().getServer().getScheduler().runTaskLater(P.p(), removeQueueFillTask, 1L);
-				}	
-			}
-		}, 1L);
+		(new DespawnSetup(running)).runTaskTimer(P.p(), 1L, 1L);
 	}
 }
+
+/**
+ * This class is responsible for making sure the iterators are accessed while still knowing which world they belong to</br>
+ * Used to make it easier to spread the task over multiple ticks
+ * @author Michael McKnight (ShadowDog007)
+ *
+ */
+class EntityIterator
+{
+	private int currentIndex = 0;
+	private final ArrayList<MMWorld> worlds;
+	private final ArrayList<Iterator<LivingEntity>> iterators;
+	
+	/**
+	 * Sets up the iterators required
+	 */
+	EntityIterator()
+	{
+		// Fetch the worlds to be checked
+		MMWorld[] mmWorlds = MMComponent.getLimiter().getWorlds();
+		
+		worlds = new ArrayList<MMWorld>(mmWorlds.length);
+		iterators = new ArrayList<Iterator<LivingEntity>>(mmWorlds.length);
+		
+		// Add each world to the list
+		for (MMWorld world : mmWorlds)
+		{
+			worlds.add(world);
+		}
+	}
+	
+	/**
+	 * Sets up iterators for entities in each world one by one
+	 * @return False when there are no more worlds to setup
+	 */
+	public boolean setupNextWorld()
+	{	
+		// Fetch the current world we are setting up
+		MMWorld world = worlds.get(currentIndex);
+		
+		// Fetch a list of entities in the world
+		List<LivingEntity> entities = world.getWorld().getLivingEntities();
+		
+		// Add the iterator for the entity list to our list
+		iterators.add(entities.iterator());
+		
+		// Update the mob counts of the world so we know they are up to date
+		world.updateMobCounts(entities);
+		
+		// Increment the index and return false if we are finished
+		if (++currentIndex >= worlds.size())
+		{
+			// Reset the current index for the iterator
+			currentIndex = 0;
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Fetches the world we are currently iterating over
+	 */
+	public MMWorld getWorld()
+	{
+		return worlds.get(currentIndex);
+	}
+	
+	/**
+	 * Checks if there are more entities to check</br>
+	 * Also iterates to the next iterator when the current one is finished
+	 */
+	public boolean hasNext()
+	{
+		// If the index is too high we have no more iterators left
+		if (currentIndex >= iterators.size())
+			return false;
+		
+		// If the iterator at the current index is null we skip it
+		if (iterators.get(currentIndex) == null)
+		{
+			++currentIndex;
+			return hasNext();
+		}
+		
+		// If the current iterator has another entity we return true
+		if (iterators.get(currentIndex).hasNext())
+			return true;
+		
+		// If there are no more iterators we are done
+		if (++currentIndex >= iterators.size())
+			return false;
+		
+		return hasNext();
+	}
+	
+	/**
+	 * Fetches the next entity
+	 */
+	public LivingEntity next()
+	{
+		if (!hasNext())
+			return null;
+		
+		return iterators.get(currentIndex).next();
+	}
+	
+	public void empty()
+	{
+		currentIndex = iterators.size();
+	}
+}
+
+class DespawnSetup extends BukkitRunnable
+{
+	private final AtomicBoolean running;
+	private final EntityIterator it;
+	
+	DespawnSetup(AtomicBoolean running)
+	{
+		this.running = running;
+		this.it = new EntityIterator();
+	}
+	
+	public void run()
+	{
+		if (!it.setupNextWorld())
+		{
+			// Stop the setup task
+			cancel();
+			
+			DespawnTask task = new DespawnTask(running, it);
+			// Run the despawner task
+			if (LimiterConfig.useAsyncDespawnScanner)
+				task.runTaskTimerAsynchronously(P.p(), 1L, 1L);
+			else
+				task.runTaskTimer(P.p(), 1L, 1L);
+		}	
+	}
+}
+
+class DespawnTask extends BukkitRunnable
+{
+	private boolean warning = false;
+	private final AtomicBoolean running;
+	private final EntityIterator it;
+	
+	DespawnTask(AtomicBoolean running, EntityIterator it)
+	{
+		this.running = running;
+		this.it = it;
+	}
+	
+	
+	/**
+	 * Scans for and removes entities which are not required
+	 */
+	@Override
+	public void run()
+	{
+		// Note the time we start
+		long start = System.nanoTime();
+		LivingEntity entity;
+		
+		// Iterate through each entity until there are none left or the task has run for 0.5ms
+		while ((entity = it.next()) != null && (System.nanoTime() - start) < 500000L)
+		{
+			// Check if the mob should be despawned
+			if (MobDespawnCheck.shouldDespawn(it.getWorld(), entity, true))
+			{
+				// try/catch just in case Bukkit decide to add an event for removing entities
+				try
+				{
+					entity.remove();
+				}
+				catch (Exception e)
+				{
+					// Make sure this isn't spamed
+					if (!warning)
+					{
+						warning = true;
+						MMComponent.getLimiter().warning("Please disable \"UseAsyncDespawnScanner\" it needs to be fixed. Please notify ShadowDog007");
+						MMComponent.getLimiter().warning("Automatically switching to Synchronous Despawn Scanner");
+						LimiterConfig.useAsyncDespawnScanner = false;
+						
+						// Empty the iterator
+						it.empty();
+						break;
+					}
+				}
+				
+				it.getWorld().decrementMobCount(ExtendedEntityType.valueOf(entity), entity);
+			}
+		}
+		
+		boolean finished = !it.hasNext() || P.p() == null;
+		
+		// The task is finished, and allow a new one to start
+		if (finished)
+		{			
+			/* ######## END TASK ######## */
+			cancel();
+			running.compareAndSet(true, false);
+		}
+	}
+}
+

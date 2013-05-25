@@ -47,6 +47,7 @@ import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.config.EnumSettingContainer;
 import com.forgenz.mobmanager.common.config.TSettingContainer;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class LimiterConfig extends AbstractConfig
@@ -76,6 +77,8 @@ public class LimiterConfig extends AbstractConfig
 	
 	public static TSettingContainer<ExtendedEntityType> ignoredMobs;
 	public static TSettingContainer<ExtendedEntityType> disabledMobs;
+	
+	private static boolean[] mobOfTypeBeingIgnored;
 	
 	public static EnumSettingContainer enabledSpawnReasons;
 	
@@ -132,11 +135,11 @@ public class LimiterConfig extends AbstractConfig
 		set(cfg, "ProtectedFarmAnimalSaveInterval", protectedFarmAnimalSaveInterval);
 		
 		/* ################ TicksPerRecount ################ */
-		ticksPerRecount = cfg.getInt("TicksPerRecount", 100);
+		ticksPerRecount = cfg.getInt("TicksPerRecount", 600);
 		set(cfg, "TicksPerRecount", ticksPerRecount);
 		
 		/* ################ TicksPerDespawnScan ################ */
-		ticksPerDespawnScan = cfg.getInt("TicksPerDespawnScan", 100);
+		ticksPerDespawnScan = cfg.getInt("TicksPerDespawnScan", 300);
 		set(cfg, "TicksPerDespawnScan", ticksPerDespawnScan);
 		
 		/* ################ MinTicksLivedForDespawn ################ */
@@ -151,7 +154,6 @@ public class LimiterConfig extends AbstractConfig
 		String strList = ignoredMobs.toString();
 		if (strList.length() != 0)
 			MMComponent.getLimiter().info("IgnoredMobs: " + strList);
-		
 		
 		/* ################ DisabledMobs ################ */
 		disabledMobs = new TSettingContainer<ExtendedEntityType>(ExtendedEntityType.values(), cfg.getList("DisabledMobs"), "DisabledMobs");
@@ -220,11 +222,19 @@ public class LimiterConfig extends AbstractConfig
 			WorldConfig wc = new WorldConfig(world);
 			
 			worldConfigs.put(world.getName(), wc);
-			MMComponent.getLimiter().getWorlds().put(world.getName().toLowerCase(), new MMWorld(world, wc));
+			MMComponent.getLimiter().addWorld(new MMWorld(world, wc));
 			
 			++numWorlds;
 		}
 		
 		return numWorlds;
+	}
+	
+	public static boolean isIgnoringMobType(MobType type)
+	{
+		if (type == null)
+			return true;
+		
+		return LimiterConfig.mobOfTypeBeingIgnored[type.ordinal()];
 	}
 }

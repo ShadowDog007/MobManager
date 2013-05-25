@@ -102,7 +102,7 @@ public class MMCommandButcher extends MMCommand
 	{
 		int numMobs = 0;
 		
-		for (MMWorld world : MMComponent.getLimiter().getWorlds().values())
+		for (MMWorld world : MMComponent.getLimiter().getWorlds())
 		{
 			for (LivingEntity entity : world.getWorld().getLivingEntities())
 			{

@@ -72,7 +72,8 @@ public abstract class AbstractConfig
 		if (headerStream == null)
 			return "";
 		
-		String header = "";
+		StringBuilder header = new StringBuilder();
+		
 		int numBytes = 1;
 		while (numBytes > 0)
 		{
@@ -87,13 +88,15 @@ public abstract class AbstractConfig
 				e.printStackTrace();
 			}
 			
+			header.ensureCapacity(numBytes + header.length());
+			
 			for (int i = 0; i < numBytes; ++i)
 			{
-				header += (char) bytes[i];
+				header.append((char) bytes[i]);
 			}
 		}
 		
-		return header;
+		return header.toString();
 	}
 	public static void copyHeader(FileConfiguration cfg, String resource)
 	{		
