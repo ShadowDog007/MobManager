@@ -42,7 +42,7 @@ import com.forgenz.mobmanager.limiter.util.MobType;
 public class ExtendedEntityType
 {
 	private static int nextId = 0;
-	private static ExtendedEntityType UNKNOWN;
+	public static final ExtendedEntityType UNKNOWN;
 	private static HashMap<String, ExtendedEntityType> entityTypes = new HashMap<String, ExtendedEntityType>();
 	
 	// Adds entities

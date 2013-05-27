@@ -57,6 +57,9 @@ public class MobAbilityConfig extends AbstractConfig
 	
 	private MobAbilityConfig(ExtendedEntityType mob, String name, ConfigurationSection cfg, boolean abilitySet)
 	{
+		if (mob == null)
+			mob = ExtendedEntityType.UNKNOWN;
+		
 		attributes = new HashMap<AbilityType, ValueChance<Ability>>();
 		
 		/* ######## SpawnRate ######## */
@@ -64,17 +67,15 @@ public class MobAbilityConfig extends AbstractConfig
 		if (spawnRate < 0.0F)
 			spawnRate = 1.0F;
 		this.spawnRate = spawnRate;
-		if (mob != null)
-			set(cfg, "SpawnRate", spawnRate);
+		set(cfg, "SpawnRate", spawnRate);
 		
 		/* ######## EquipmentDropChance ######## */
 		float equipmentDropChance = (float) cfg.getDouble("EquipmentDropChance", 0.15F);
 		this.equipmentDropChance = equipmentDropChance < 0 ? 0.0F : equipmentDropChance;
-		if (mob != null)
-			set(cfg, "EquipmentDropChance", this.equipmentDropChance);
+		set(cfg, "EquipmentDropChance", this.equipmentDropChance);
 		
 		/* ######## BabyRate ######## */
-		if (mob == null || BabyAbility.isValid(mob))
+		if (mob == ExtendedEntityType.UNKNOWN || BabyAbility.isValid(mob))
 		{
 			float babyRate = (float) cfg.getDouble("BabyRate", 0.0F);
 			if (babyRate <= 0.0F)
@@ -88,7 +89,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## AngryRate ######## */
-		if (mob == null || AngryAbility.isValid(mob.getBukkitEntityType()))
+		if (mob == ExtendedEntityType.UNKNOWN || AngryAbility.isValid(mob.getBukkitEntityType()))
 		{
 			float angryRate = (float) cfg.getDouble("AngryRate", 0.0F);
 			if (angryRate <= 0.0F)
@@ -102,7 +103,7 @@ public class MobAbilityConfig extends AbstractConfig
 		}
 		
 		/* ######## ChargedRate ######## */
-		if (mob == null || ChargedCreeperAbility.isValid(mob.getBukkitEntityType()))
+		if (mob == ExtendedEntityType.UNKNOWN || ChargedCreeperAbility.isValid(mob.getBukkitEntityType()))
 		{
 			float chargedRate = (float) cfg.getDouble("ChargedRate", 0.0F);
 			if (chargedRate <= 0.0F)
