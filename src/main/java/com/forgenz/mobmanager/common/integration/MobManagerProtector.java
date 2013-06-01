@@ -60,7 +60,7 @@ public class MobManagerProtector implements Protector
 			return true;
 		}
 		
-		return protectedEntities.containsKey(entity.getUniqueId());
+		return !protectedEntities.containsKey(entity.getUniqueId());
 	}
 
 	@Override

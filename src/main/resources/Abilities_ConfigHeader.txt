@@ -42,7 +42,8 @@ AbilitySets:
     Abilities:
       ChargedRate: 1.0
         
-  MiscExample:
+  MiscExampleSet:
+    MobType: ZOMBIE
     ProtectFromDespawner: true
     ApplyNormalAbilities: true
     Abilities: {}
