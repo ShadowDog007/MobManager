@@ -65,9 +65,11 @@ public class PluginIntegration implements Protector
 	
 	public void integrate()
 	{
+		/* MobManager integration */
+		new MobManagerProtector();
 		/* Plugins Integrated by me :) */
 		if (P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true))
-			new EpicBossRecoded();
+			new EpicBossRecodedProtector();
 		AbstractConfig.set(P.p().getConfig(), "Integration.EpicBossRecoded", P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true));
 	}
 	

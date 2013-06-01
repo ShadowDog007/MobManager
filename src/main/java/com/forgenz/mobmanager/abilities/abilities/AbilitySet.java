@@ -40,6 +40,7 @@ import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
+import com.forgenz.mobmanager.common.integration.MobManagerProtector;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.common.util.MiscUtil;
 
@@ -51,11 +52,12 @@ public class AbilitySet extends Ability
 	{
 		abilitySets.clear();
 		// Add default none ability
-		abilitySets.put("none", new AbilitySet(null, null));
+		abilitySets.put("none", new AbilitySet(null, null, false));
 	}
 	
 	protected final ExtendedEntityType type;
 	private final MobAbilityConfig setCfg;
+	private final boolean protectFromDespawner;
 	
 	public static AbilitySet getAbilitySet(String name)
 	{
@@ -72,10 +74,11 @@ public class AbilitySet extends Ability
 		return abilitySets.size();
 	}
 	
-	private AbilitySet(MobAbilityConfig setCfg, ExtendedEntityType type)
+	private AbilitySet(MobAbilityConfig setCfg, ExtendedEntityType type, boolean protectFromDespawner)
 	{
 		this.setCfg = setCfg;
 		this.type = type;
+		this.protectFromDespawner = protectFromDespawner;
 	}
 
 	@Override
@@ -83,6 +86,12 @@ public class AbilitySet extends Ability
 	{
 		if (setCfg != null)
 		{
+			// Make sure we prevent the mob from being despawned
+			if (protectFromDespawner)
+			{
+				MobManagerProtector.getInstance().addProtectedEntity(entity);
+			}
+			
 			// Add each ability to the entity
 			for (ValueChance<Ability> abilityChance : setCfg.attributes.values())
 			{
@@ -147,6 +156,8 @@ public class AbilitySet extends Ability
 			}
 		}
 		
+		boolean protectFromDespawner = cfg.getBoolean("ProtectFromDespawner", false);
+		
 		ConfigurationSection abilities = cfg.getConfigurationSection("Abilities");
 		if (abilities == null)
 			abilities = cfg.createSection("Abilities");
@@ -154,7 +165,7 @@ public class AbilitySet extends Ability
 		MobAbilityConfig setCfg = new MobAbilityConfig(name, entityType, abilities);
 		
 		// Create the ability set
-		abilitySets.put(name.toLowerCase(), new AbilitySet(setCfg, entityType));
+		abilitySets.put(name.toLowerCase(), new AbilitySet(setCfg, entityType, protectFromDespawner));
 	} 
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)

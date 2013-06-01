@@ -38,12 +38,18 @@ AbilitySets:
       AngryRate: 1.0
   
   CreeperExample:
-      MobType: CREEPER
-      Abilities:
-        ChargedRate: 1.0
+    MobType: CREEPER
+    Abilities:
+      ChargedRate: 1.0
+        
+  ProtectedAbilitySet:
+    ProtectFromDespawner: true
+    Abilities: {}
 
 Nodes:
 - MobType: Defines the default type of this Ability Set
+- ProtectFromDespawner: If true, mobs with this Ability Set
+    will be protected from MobManagers despawner
 - Abilities: Defines the abilities which will be applied
     to the set
     

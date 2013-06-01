@@ -35,11 +35,11 @@ import org.bukkit.plugin.Plugin;
 
 import com.forgenz.mobmanager.P;
 
-public class EpicBossRecoded implements Protector
+public class EpicBossRecodedProtector implements Protector
 {
 	public final EpicBoss epicboss;
 	
-	protected EpicBossRecoded()
+	protected EpicBossRecodedProtector()
 	{
 		Plugin plugin = P.p().getServer().getPluginManager().getPlugin("EpicBossRecoded");
 		
