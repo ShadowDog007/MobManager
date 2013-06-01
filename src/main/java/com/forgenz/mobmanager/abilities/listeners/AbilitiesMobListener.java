@@ -137,14 +137,25 @@ public class AbilitiesMobListener implements Listener
 			AbilitySet ability = (AbilitySet) abilityChance.getBonus();
 			// If there is no ability or the 'none' ability set is given
 			// we allow other abilities to be applied
-			if (ability != null && ability.getNumAbilities() > 0)
+			if (ability != null)
 			{
+				// If we want to apply normal abilities to the entity we do that before applying the sets abilities
+				if (ability.applyNormalAbilities())
+				{
+					applyNormalAbilities(entity, ma);
+				}
 				// Add the ability and return to prevent other abilities being applied
 				ability.addAbility(entity);
 				return;
 			}
 		}
 		
+		applyNormalAbilities(entity, ma);
+	}
+	
+	private static void applyNormalAbilities(LivingEntity entity, MobAbilityConfig ma)
+	{
+		ValueChance<Ability> abilityChance;
 		// Cycle through each type of ability and apply them 
 		// Note: Make sure we do not apply abilitySets (hence i < types.length - 1)
 		AbilityType[] types = AbilityType.values();

@@ -42,14 +42,18 @@ AbilitySets:
     Abilities:
       ChargedRate: 1.0
         
-  ProtectedAbilitySet:
+  MiscExample:
     ProtectFromDespawner: true
+    ApplyNormalAbilities: true
     Abilities: {}
 
 Nodes:
 - MobType: Defines the default type of this Ability Set
 - ProtectFromDespawner: If true, mobs with this Ability Set
     will be protected from MobManagers despawner
+- ApplyNormalAbilities: If true, normal abilities will be applied
+    on top of the Ability Sets abilities.
+    (Ability Set abilities will override normal ones if they exist)
 - Abilities: Defines the abilities which will be applied
     to the set
     
