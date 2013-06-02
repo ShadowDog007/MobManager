@@ -29,6 +29,7 @@
 package com.forgenz.mobmanager;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,7 +40,6 @@ import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.listeners.CommonMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.metrics.Metrics;
-import com.forgenz.mobmanager.metrics.Plotters;
 
 /**
  * <b>MobManager</b> Components:
@@ -80,6 +80,24 @@ public class P extends JavaPlugin
 	public boolean isVersionCheckEnabled()
 	{
 		return versionCheckEnabled;
+	}
+	
+	public String getHeaderString()
+	{
+		String header = String.format("MobManager v%s by ", getDescription().getVersion());
+		
+		List<String> authors = getDescription().getAuthors();
+		
+		for (int i = 0; i < authors.size(); ++i)
+		{
+			if (i != 0 && i != authors.size() - 1)
+				header += ", ";
+			header += authors.get(i);
+		}
+		
+		header += "\nhttp://dev.bukkit.org/bukkit-mods/mobmanager/\n";
+		
+		return header;
 	}
 
 	@Override
@@ -124,8 +142,8 @@ public class P extends JavaPlugin
 		AbstractConfig.set(getConfig(), "EnableVersionCheck", versionCheckEnabled);
 		
 		// Copy the Config header into config.yml
-		AbstractConfig.copyHeader(getConfig(), AbstractConfig.getResourceAsString("configHeader.txt"), "MobManager Config v" + getDescription().getVersion() + "\n"
-				+ "\n\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList() + AbstractConfig.getResourceAsString("Config_Header.txt"));
+		AbstractConfig.copyHeader(getConfig(), "Config_Header.txt", "Global Config\n"
+				+ "\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList());
 		
 		integration.integrate();
 		
@@ -162,51 +180,42 @@ public class P extends JavaPlugin
 		{
 			Metrics metrics = new Metrics(this);
 			
-			Metrics.Graph componentGraph = metrics.createGraph("Components Used");
-			componentGraph.addPlotter(Plotters.limiterEnabled);
-			componentGraph.addPlotter(Plotters.abilitiesEnabled);
-			
-			Metrics.Graph versionGraph = metrics.createGraph("Version Stats");
-			versionGraph.addPlotter(Plotters.version);
-			
-			// TODO Remove these
-			// Shows percentage of servers which use the limiter component
-			Metrics.Graph limiterGraph = metrics.createGraph("Limiter Stats");
-			limiterGraph.addPlotter(new Metrics.Plotter("Enabled")
+			Metrics.Graph componentLineGraph = metrics.createGraph("Components Used");
+			for (final Component c : Component.values())
 			{
-				@Override
-				public int getValue()
+				String name = c.getFancyName();
+				
+				// Line graph comparing component usage together
+				componentLineGraph.addPlotter(new Metrics.Plotter(name)
 				{
-					return MMComponent.getLimiter().isEnabled() ? 1 : 0;
-				}
-			});
-			limiterGraph.addPlotter(new Metrics.Plotter("Disabled")
-			{
-				@Override
-				public int getValue()
+					@Override
+					public int getValue()
+					{
+						return c.i().isEnabled() ? 1 : 0;
+					}
+				});
+				
+				
+				// Pie graph of the component Enabled/Disabled
+				Metrics.Graph componentStatsGraph = metrics.createGraph(name + " Stats");
+				componentStatsGraph.addPlotter(new Metrics.Plotter("Enabled")
 				{
-					return MMComponent.getLimiter().isEnabled() ? 0 : 1;
-				}
-			});
-			
-			// Shows percentage of servers which use the abilities component
-			Metrics.Graph abilitiesGraph = metrics.createGraph("Abilities Stats");
-			abilitiesGraph.addPlotter(new Metrics.Plotter("Enabled")
-			{
-				@Override
-				public int getValue()
+					@Override
+					public int getValue()
+					{
+						return c.i().isEnabled() ? 1 : 0;
+					}
+				});
+				componentStatsGraph.addPlotter(new Metrics.Plotter("Disabled")
 				{
-					return MMComponent.getAbilities().isEnabled() ? 1 : 0;
-				}
-			});
-			abilitiesGraph.addPlotter(new Metrics.Plotter("Disabled")
-			{
-				@Override
-				public int getValue()
-				{
-					return MMComponent.getAbilities().isEnabled() ? 0 : 1;
-				}
-			});
+					@Override
+					public int getValue()
+					{
+						return c.i().isEnabled() ? 0 : 1;
+					}
+				});
+				
+			}
 			
 			// Done :)
 			metrics.start();

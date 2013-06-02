@@ -1,0 +1,58 @@
+#######################################################################
+UseWorldSettings
+#######################################################################
+Boolean, if true the below settings (In the header) will be used
+    for the world that this config file represents
+    
+Note: For the global config this does nothing
+
+#######################################################################
+AllowPetKills
+#######################################################################
+Boolean, if true if a players pet (e.g. tamed wolf) kills a mob
+    the player will receive a reward/fine
+    
+Players must have the permission 'mobmanager.bounty.petreward'
+    to get rewards from their pets (Defaults true)
+
+#######################################################################
+ShowMobName
+#######################################################################
+If this is true and a mob has a custom name set the player message will
+    have '%mob%' replaced with the custom name instead of the
+    mobs type name
+
+Note: This takes priority over the mobs AbilitySet name if
+    one is set
+
+#######################################################################
+ShowAbilitySetName
+#######################################################################
+If this is true and a mob has an AbilitySet the player message will
+    have '%mob%' replaced with the AbilitySets name instead of the
+    mobs type name
+
+#######################################################################
+Rewards
+#######################################################################
+Rewards defines the base amount which players receive for killing each
+    mob type.
+    
+A reward of 0.0 specifies that the player will get no rewards for
+    killing that mob.
+    
+A positive reward specifies that a player will get a reward for
+    killing that mob.
+    
+A negative reward specifies that a player will be fined for killing
+    that mob.
+    
+Note: When new mobs are added to Minecraft they should automatically
+    appear here with a reward of 0.0, no need to have to wait for
+    an update to MobManager :)
+    
+Note: The permission 'mobmanager.bounty.rewards' is required to
+    receive rewards (This is defaulted as true)
+
+
+#######################################################################

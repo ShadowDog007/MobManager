@@ -26,73 +26,31 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.common.integration;
+package com.forgenz.mobmanager.bounty.config.multipliers;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.bukkit.entity.LivingEntity;
-
-import com.forgenz.mobmanager.P;
-
-public class MobManagerProtector implements Protector
+public enum TimeMultiplier
 {
-	private static MobManagerProtector i;
-	private final ConcurrentHashMap<UUID, UUID> protectedEntities = new ConcurrentHashMap<UUID, UUID>();
-
-	protected MobManagerProtector()
+	DAY(0),
+	DUSK(12000),
+	NIGHT(14000),
+	DAWN(23000);
+	
+	private final int uptoTime;
+	
+	private TimeMultiplier(int uptoTime)
 	{
-		P.p().getPluginIntegration().registerProtector(P.p(), this);
+		this.uptoTime = uptoTime;
+	}
+	
+	public static TimeMultiplier valueOf(int time)
+	{
+		time = Math.abs(time);
+		time %= 24000;
 		
-		i = this;
-	}
-	
-	public static MobManagerProtector getInstance()
-	{
-		return i;
-	}
-	
-	@Override
-	public boolean canDespawn(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return true;
-		}
+		TimeMultiplier[] values = values();
+		int i;
+		for (i = 1; i < values.length && values[i].uptoTime < time; ++i) {}
 		
-		return !protectedEntities.containsKey(entity.getUniqueId());
-	}
-
-	@Override
-	public boolean canApplyAbilities(LivingEntity entity)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean supportsAsynchronousUsage()
-	{
-		return true;
-	}
-	
-	public void addProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-
-		UUID id = entity.getUniqueId();
-		protectedEntities.put(id, id);
-	}
-	
-	public void remoteProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-		
-		protectedEntities.remove(entity.getUniqueId());
+		return values[i-1];
 	}
 }

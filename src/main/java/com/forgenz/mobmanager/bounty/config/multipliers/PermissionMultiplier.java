@@ -26,73 +26,33 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.common.integration;
+package com.forgenz.mobmanager.bounty.config.multipliers;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.entity.Player;
 
-import org.bukkit.entity.LivingEntity;
-
-import com.forgenz.mobmanager.P;
-
-public class MobManagerProtector implements Protector
+public class PermissionMultiplier
 {
-	private static MobManagerProtector i;
-	private final ConcurrentHashMap<UUID, UUID> protectedEntities = new ConcurrentHashMap<UUID, UUID>();
-
-	protected MobManagerProtector()
+	private final String permission;
+	private final double multiplier;
+	
+	public PermissionMultiplier(String permission, double multiplier)
 	{
-		P.p().getPluginIntegration().registerProtector(P.p(), this);
-		
-		i = this;
+		this.permission = permission;
+		this.multiplier = multiplier;
 	}
 	
-	public static MobManagerProtector getInstance()
+	public double getMultiplier()
 	{
-		return i;
+		return multiplier;
 	}
 	
-	@Override
-	public boolean canDespawn(LivingEntity entity)
+	public boolean hasPermission(Player player)
 	{
-		if (entity == null)
-		{
-			return true;
-		}
-		
-		return !protectedEntities.containsKey(entity.getUniqueId());
+		return player != null ? player.hasPermission(permission) : false;
 	}
 
-	@Override
-	public boolean canApplyAbilities(LivingEntity entity)
+	public String getPermission()
 	{
-		return true;
-	}
-
-	@Override
-	public boolean supportsAsynchronousUsage()
-	{
-		return true;
-	}
-	
-	public void addProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-
-		UUID id = entity.getUniqueId();
-		protectedEntities.put(id, id);
-	}
-	
-	public void remoteProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-		
-		protectedEntities.remove(entity.getUniqueId());
+		return permission;
 	}
 }

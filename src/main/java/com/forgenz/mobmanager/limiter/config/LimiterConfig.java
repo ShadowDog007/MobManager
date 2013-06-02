@@ -203,7 +203,7 @@ public class LimiterConfig extends AbstractConfig
 		cfg.set("FlyingMobAditionalLayerDepth", null);
 		
 		// Copy the header to the file
-		copyHeader(cfg, "Limiter_ConfigHeader.txt", P.p().getDescription().getName() + " Limiter Global Config " + P.p().getDescription().getVersion() + "\n");
+		copyHeader(cfg, "Limiter_ConfigHeader.txt", "Limiter Global Config\n");
 		saveConfig("", LIMITER_CONFIG_NAME, cfg);
 	}
 	

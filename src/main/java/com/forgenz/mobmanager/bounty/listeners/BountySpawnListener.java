@@ -26,73 +26,41 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.common.integration;
+package com.forgenz.mobmanager.bounty.listeners;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 import com.forgenz.mobmanager.P;
 
-public class MobManagerProtector implements Protector
+public class BountySpawnListener implements Listener
 {
-	private static MobManagerProtector i;
-	private final ConcurrentHashMap<UUID, UUID> protectedEntities = new ConcurrentHashMap<UUID, UUID>();
-
-	protected MobManagerProtector()
+	private static final String SPAWNER_META = "MOBMANAGER_SPAWNER_MOB";
+	
+	public static boolean spawnerMob(LivingEntity entity)
 	{
-		P.p().getPluginIntegration().registerProtector(P.p(), this);
+		List<MetadataValue> metaList = entity.getMetadata(SPAWNER_META);
 		
-		i = this;
+		return metaList.size() > 0;
 	}
 	
-	public static MobManagerProtector getInstance()
+	/**
+	 * Flag the entity as being spawned by a spawner
+	 */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onCreatureSpawn(CreatureSpawnEvent event)
 	{
-		return i;
-	}
-	
-	@Override
-	public boolean canDespawn(LivingEntity entity)
-	{
-		if (entity == null)
+		if (event.getSpawnReason() == SpawnReason.SPAWNER)
 		{
-			return true;
+			event.getEntity().setMetadata(SPAWNER_META, new FixedMetadataValue(P.p(), true));
 		}
-		
-		return !protectedEntities.containsKey(entity.getUniqueId());
-	}
-
-	@Override
-	public boolean canApplyAbilities(LivingEntity entity)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean supportsAsynchronousUsage()
-	{
-		return true;
-	}
-	
-	public void addProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-
-		UUID id = entity.getUniqueId();
-		protectedEntities.put(id, id);
-	}
-	
-	public void remoteProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-		
-		protectedEntities.remove(entity.getUniqueId());
 	}
 }

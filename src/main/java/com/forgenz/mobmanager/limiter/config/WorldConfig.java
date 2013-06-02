@@ -36,7 +36,6 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.limiter.util.MobType;
@@ -173,7 +172,7 @@ public class WorldConfig extends AbstractConfig
 		cfg.set("SpawnChunkSearchDistance", null);
 		cfg.set("UndergroundSpawnChunkSearchDistance", null);
 		
-		copyHeader(cfg, "Limiter_WorldConfigHeader.txt", P.p().getDescription().getName() + " Limiter World Config " + P.p().getDescription().getVersion() + "\n");
+		copyHeader(cfg, "Limiter_WorldConfigHeader.txt", "Limiter World Config\n");
 		saveConfig(WORLDS_FOLDER + File.separator + world.getName(), LIMITER_CONFIG_NAME, cfg);
 	}
 	

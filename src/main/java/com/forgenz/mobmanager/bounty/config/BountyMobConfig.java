@@ -26,73 +26,49 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.common.integration;
+package com.forgenz.mobmanager.bounty.config;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.configuration.ConfigurationSection;
 
-import org.bukkit.entity.LivingEntity;
+import com.forgenz.mobmanager.common.config.AbstractConfig;
 
-import com.forgenz.mobmanager.P;
-
-public class MobManagerProtector implements Protector
+public class BountyMobConfig extends AbstractConfig
 {
-	private static MobManagerProtector i;
-	private final ConcurrentHashMap<UUID, UUID> protectedEntities = new ConcurrentHashMap<UUID, UUID>();
+	private final double minReward;
+	private final double extra;
+	
+	public BountyMobConfig(ConfigurationSection cfg)
+	{
+		double minReward = cfg.getDouble("MinReward", 0.0);
+		double maxReward = cfg.getDouble("MaxReward", 0.0);
 
-	protected MobManagerProtector()
-	{
-		P.p().getPluginIntegration().registerProtector(P.p(), this);
+		set(cfg, "MinReward", minReward);
+		set(cfg, "MaxReward", maxReward);
 		
-		i = this;
-	}
-	
-	public static MobManagerProtector getInstance()
-	{
-		return i;
-	}
-	
-	@Override
-	public boolean canDespawn(LivingEntity entity)
-	{
-		if (entity == null)
+		// Make sure MinReward is actually the smaller one
+		if (minReward > maxReward)
 		{
-			return true;
+			double temp = maxReward;
+			maxReward = minReward;
+			minReward = temp;
 		}
 		
-		return !protectedEntities.containsKey(entity.getUniqueId());
-	}
-
-	@Override
-	public boolean canApplyAbilities(LivingEntity entity)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean supportsAsynchronousUsage()
-	{
-		return true;
+		this.minReward = minReward;
+		this.extra = maxReward - minReward;
 	}
 	
-	public void addProtectedEntity(LivingEntity entity)
+	public double getReward()
 	{
-		if (entity == null)
-		{
-			return;
-		}
-
-		UUID id = entity.getUniqueId();
-		protectedEntities.put(id, id);
+		return Math.random() * extra + minReward;
 	}
 	
-	public void remoteProtectedEntity(LivingEntity entity)
+	public double getMinReward()
 	{
-		if (entity == null)
-		{
-			return;
-		}
-		
-		protectedEntities.remove(entity.getUniqueId());
+		return minReward;
+	}
+	
+	public double getDifference()
+	{
+		return extra;
 	}
 }

@@ -80,7 +80,7 @@ public class LimiterComponent extends MMComponent
 	}
 	
 	@Override
-	public void enable(boolean force)
+	public void enable(boolean force) throws IllegalStateException
 	{
 		// Make sure MobManager is enabled
 		if (P.p() == null || !P.p().isEnabled())
@@ -136,7 +136,7 @@ public class LimiterComponent extends MMComponent
 	}
 	
 	@Override
-	public void disable(boolean force)
+	public void disable(boolean force) throws IllegalStateException
 	{
 		// Check if the Spawner was already disabled
 		if (!this.isEnabled())
@@ -158,7 +158,7 @@ public class LimiterComponent extends MMComponent
 	}
 	
 	@Override
-	public LimiterConfig getConfig()
+	public LimiterConfig getConfig() throws IllegalStateException
 	{
 		if (!this.isEnabled())
 		{

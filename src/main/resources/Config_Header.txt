@@ -26,6 +26,16 @@ MobManager's Abilities aims to allow you to fully customize the
     
 Abilities all have chances, so you can have variety between mobs
     i.e. (You can have 1 in 100 zombies be very strong)
+    
+#######################################################################
+EnableBounty
+#######################################################################
+Enables the Bounty component of MobManager
+
+MobMananger's Bounty allows you to provide players with rewards
+    (Or fines) to players when they kill mobs.
+    
+Rewards can be Money, Items or Experience
 
 #######################################################################
 EnableVersionCheck
@@ -40,5 +50,6 @@ Enables integration of EpicBossRecoded to prevent EpicBosses from
     having their abilities messed up or from being de-spawned
     
 EpicBoss-BukkitDev: http://dev.bukkit.org/server-mods/epicboss/
+
 
 #######################################################################

@@ -1,12 +1,12 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 2.5e_dev
+version: 2.6
 website: http://dev.bukkit.org/server-mods/mobmanager/
 author: Michael McKnight (ShadowDog007)
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
 
 # Soft-Depends a few multi-world plugins so the the worlds are deffinately around when MobManager needs them
-softdepend: [EpicMobsRecoded,  Multiverse-Core, My Worlds, MultiWorld]
+softdepend: [Vault, EpicMobsRecoded,  Multiverse-Core, My Worlds, MultiWorld]
 
 permissions:
   mobmanager.admin:
@@ -41,6 +41,13 @@ permissions:
     description: Gives access to the /mm version command
   mobmanager.debug:
     description: Gives access to the /mm debug command
+  # Bounty Permissions
+  mobmanager.bounty.rewards:
+    description: Lets players get rewards
+    default: true
+  mobmanager.bounty.petreward:
+    description: Lets players get rewards from their pets
+    default: true
 
 commands:
   mm:

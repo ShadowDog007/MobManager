@@ -39,6 +39,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
@@ -52,10 +53,9 @@ public class AbilityConfig extends AbstractConfig
 		return abilityCfg;
 	}
 	
-	protected final static String WORLDS_FOLDER = "worlds";
 	protected final static String ABILITY_CONFIG_NAME = "abilities.yml";
 	
-	private final HashMap<String, WorldAbilityConfig> worlds = new HashMap<String, WorldAbilityConfig>();
+	private final HashMap<String, AbilityWorldConfig> worlds = new HashMap<String, AbilityWorldConfig>();
 	
 	public final HashSet<String> enabledWorlds = new HashSet<String>();
 	
@@ -70,7 +70,7 @@ public class AbilityConfig extends AbstractConfig
 	public final boolean commandPSpawnUseRadius;
 	public final boolean commandPSpawnRadiusAllowCenter;
 	
-	public final WorldAbilityConfig globalCfg;
+	public final AbilityWorldConfig globalCfg;
 	
 	public AbilityConfig()
 	{
@@ -145,16 +145,14 @@ public class AbilityConfig extends AbstractConfig
 		}
 		
 		/* ################ Ability Global Config ################ */
-		globalCfg = new WorldAbilityConfig(cfg, "");
+		globalCfg = new AbilityWorldConfig(cfg, "");
 		
-		String headerVersion = P.p().getDescription().getName() + " Ability %s " + P.p().getDescription().getVersion() + "\n";
 		String worldHeader = getResourceAsString("Abilities_WorldConfigHeader.txt");
 		
-		copyHeader(String.format(headerVersion, "Global Config") + getResourceAsString("Abilities_ConfigHeader.txt") + worldHeader, cfg);
+		copyHeader("Ability Global Config\n" + getResourceAsString("Abilities_ConfigHeader.txt") + worldHeader, cfg);
 		saveConfig("", ABILITY_CONFIG_NAME, cfg);
 		
 		/* ################ Ability World Config's ################ */
-		headerVersion = String.format(headerVersion, "World Configs");
 		for (String worldName : list)
 		{
 			boolean found = false;
@@ -169,33 +167,36 @@ public class AbilityConfig extends AbstractConfig
 			}
 			
 			if (!found)
+			{
+				MMComponent.getAbilities().warning("Failed to find world " + worldName);
 				continue;
+			}
 			
 			cfg = getConfig(WORLDS_FOLDER + File.separator + worldName, ABILITY_CONFIG_NAME);
-			WorldAbilityConfig worldCfg = new WorldAbilityConfig(cfg, WORLDS_FOLDER + File.separator + worldName);
+			AbilityWorldConfig worldCfg = new AbilityWorldConfig(cfg, WORLDS_FOLDER + File.separator + worldName);
 			
 			if (worldCfg.worldSettingsEnabled())
 				worlds.put(worldName.toLowerCase(), worldCfg);
 			
-			copyHeader(cfg, "Abilities_WorldConfigHeader.txt", P.p().getDescription().getName() + " Config " + P.p().getDescription().getVersion() + "\n");
+			copyHeader(cfg, "Abilities_WorldConfigHeader.txt", "Ability World Config\n");
 			saveConfig(WORLDS_FOLDER + File.separator + worldName, ABILITY_CONFIG_NAME, cfg);
 		}
 	}
 	
-	public WorldAbilityConfig getWorldConfig(String world)
+	public AbilityWorldConfig getWorldConfig(String world)
 	{
 		world = world.toLowerCase();
 		if (!enabledWorlds.contains(world))
 			return null;
 		
-		WorldAbilityConfig worldCfg = worlds.get(world);
+		AbilityWorldConfig worldCfg = worlds.get(world);
 		
 		return worldCfg != null && worldCfg.worldSettingsEnabled() ? worldCfg : globalCfg;
 	}
 	
 	public MobAbilityConfig getMobConfig(String world, ExtendedEntityType mobType, SpawnReason spawnReason)
 	{
-		WorldAbilityConfig worldCfg = getWorldConfig(world);
+		AbilityWorldConfig worldCfg = getWorldConfig(world);
 		
 		if (worldCfg == null)
 			return null;

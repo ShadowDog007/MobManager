@@ -77,6 +77,10 @@ public class MobDespawnCheck
 			return false;
 		}
 		
+		// Despawn a player? I don't think so..
+		if (entity.getType() == EntityType.PLAYER)
+			return false;
+		
 		// Make sure the entity is alive and valid
 		if (!entity.isValid())
 			return false;

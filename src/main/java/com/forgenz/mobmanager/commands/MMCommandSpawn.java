@@ -42,6 +42,7 @@ import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
+import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.common.util.RandomLocationGen;
 
@@ -224,7 +225,13 @@ public class MMCommandSpawn extends MMCommand
 			}
 			
 			if (entity instanceof LivingEntity)
+			{
 				set.addAbility((LivingEntity) entity);
+				if (set.applyNormalAbilities())
+				{
+					AbilitiesMobListener.applyNormalAbilities((LivingEntity) entity, null);
+				}
+			}
 		}
 		
 		sender.sendMessage(ChatColor.GRAY + "~ Spawned " + spawnedMobs + " " + setName + "s");

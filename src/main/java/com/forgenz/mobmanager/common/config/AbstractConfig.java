@@ -47,7 +47,6 @@ public abstract class AbstractConfig
 {
 	public final static String WORLDS_FOLDER = "worlds";
 	public final static String LIMITER_CONFIG_NAME = "limiter.yml";
-	public final static String ABILITY_CONFIG_NAME = "abilities.yml";
 	
 	public static FileConfiguration getConfig(String folder, String config)
 	{
@@ -110,8 +109,17 @@ public abstract class AbstractConfig
 	
 	public static void copyHeader(String header, FileConfiguration cfg)
 	{
-		cfg.options().header(header);
+		cfg.options().header(P.p().getHeaderString() + header);
 		cfg.options().copyHeader(true);
+	}
+	
+	public static ConfigurationSection getConfigurationSection(ConfigurationSection cfg, String path)
+	{
+		ConfigurationSection sect = cfg.getConfigurationSection(path);
+		if (sect == null)
+			sect = cfg.createSection(path);
+		set(cfg, path, sect);
+		return sect;
 	}
 	
 	public static void set(ConfigurationSection cfg, String path, Object obj)

@@ -112,7 +112,7 @@ public class PluginIntegration implements Protector
 	public boolean canDespawn(LivingEntity entity)
 	{
 		if (entity == null)
-			return true;
+			return false;
 		
 		final boolean async = !P.p().getServer().isPrimaryThread();
 		
@@ -135,6 +135,9 @@ public class PluginIntegration implements Protector
 			{
 				P.p().getLogger().severe("Caught Exception while checking if a mob could despawn");
 				e.printStackTrace();
+			}
+			catch (Throwable e)
+			{
 			}
 		}
 		

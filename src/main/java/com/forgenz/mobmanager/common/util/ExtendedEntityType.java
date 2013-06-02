@@ -83,7 +83,7 @@ public class ExtendedEntityType
 		return valueOf(entityType.toString());
 	}
 	
-	public static ExtendedEntityType valueOf(Entity entity)
+	public static ExtendedEntityType valueOf(LivingEntity entity)
 	{
 		return valueOf(getEntityTypeData(entity));
 	}
@@ -95,7 +95,7 @@ public class ExtendedEntityType
 		return type != null ? type : UNKNOWN;
 	}
 	
-	public static String getEntityTypeData(Entity entity)
+	public static String getEntityTypeData(LivingEntity entity)
 	{
 		String entityData = getEntityData(entity);
 		
@@ -104,7 +104,7 @@ public class ExtendedEntityType
 		return entity.getType().toString();
 	}
 	
-	public static String getEntityData(Entity entity)
+	public static String getEntityData(LivingEntity entity)
 	{
 		// Handle the case for wither skeletons
 		if (entity.getType() == EntityType.SKELETON && ((Skeleton) entity).getSkeletonType() != SkeletonType.NORMAL)

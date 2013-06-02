@@ -26,73 +26,17 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.common.integration;
+package com.forgenz.mobmanager.bounty.listeners;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
-import org.bukkit.entity.LivingEntity;
+import com.forgenz.mobmanager.MMComponent;
 
-import com.forgenz.mobmanager.P;
-
-public class MobManagerProtector implements Protector
+public class BountyLoginListener implements Listener
 {
-	private static MobManagerProtector i;
-	private final ConcurrentHashMap<UUID, UUID> protectedEntities = new ConcurrentHashMap<UUID, UUID>();
-
-	protected MobManagerProtector()
+	public void onPlayerJoin(PlayerJoinEvent event)
 	{
-		P.p().getPluginIntegration().registerProtector(P.p(), this);
-		
-		i = this;
-	}
-	
-	public static MobManagerProtector getInstance()
-	{
-		return i;
-	}
-	
-	@Override
-	public boolean canDespawn(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return true;
-		}
-		
-		return !protectedEntities.containsKey(entity.getUniqueId());
-	}
-
-	@Override
-	public boolean canApplyAbilities(LivingEntity entity)
-	{
-		return true;
-	}
-
-	@Override
-	public boolean supportsAsynchronousUsage()
-	{
-		return true;
-	}
-	
-	public void addProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-
-		UUID id = entity.getUniqueId();
-		protectedEntities.put(id, id);
-	}
-	
-	public void remoteProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-		
-		protectedEntities.remove(entity.getUniqueId());
+		MMComponent.getBounties().getConfig().playedLoggedIn(event.getPlayer());
 	}
 }

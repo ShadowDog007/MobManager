@@ -35,8 +35,11 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 import com.forgenz.mobmanager.MMComponent;
+import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
@@ -46,15 +49,19 @@ import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class AbilitySet extends Ability
 {
+	/** Used to store the name of the ability set applied to a mob */
+	public final static String ABILITYSET_META_STORAGE = "MOBMANAGER_ABILITY_SET";
+	
 	/** Stores all the ability sets */
 	private final static HashMap<String, AbilitySet> abilitySets = new HashMap<String, AbilitySet>();
 	public static void resetAbilitySets()
 	{
 		abilitySets.clear();
 		// Add default none ability
-		abilitySets.put("none", new AbilitySet(null, null, false, true));
+		new AbilitySet("none", null, null, false, true);
 	}
 	
+	private final String name;
 	protected final ExtendedEntityType type;
 	private final MobAbilityConfig setCfg;
 	private final boolean protectFromDespawner;
@@ -75,17 +82,21 @@ public class AbilitySet extends Ability
 		return abilitySets.size();
 	}
 	
-	private AbilitySet(MobAbilityConfig setCfg, ExtendedEntityType type, boolean protectFromDespawner, boolean allowNormalAbilities)
+	private AbilitySet(String name, MobAbilityConfig setCfg, ExtendedEntityType type, boolean protectFromDespawner, boolean allowNormalAbilities)
 	{
+		name = name.toLowerCase();
+		this.name = name;
 		this.setCfg = setCfg;
 		this.type = type;
 		this.protectFromDespawner = protectFromDespawner;
 		this.applyNormalAbilities = allowNormalAbilities;
+		
+		abilitySets.put(name, this);
 	}
 
 	@Override
 	public void addAbility(LivingEntity entity)
-	{		
+	{
 		if (setCfg != null)
 		{
 			// Make sure we prevent the mob from being despawned
@@ -102,6 +113,9 @@ public class AbilitySet extends Ability
 				if (ability != null)
 					ability.addAbility(entity);
 			}
+			
+			// Add the name of the ability set to metadata
+			entity.setMetadata(ABILITYSET_META_STORAGE, new FixedMetadataValue(P.p(), name));
 		}
 	}
 
@@ -109,6 +123,11 @@ public class AbilitySet extends Ability
 	public AbilityType getAbilityType()
 	{
 		return AbilityType.ABILITY_SET;
+	}
+	
+	public String getName()
+	{
+		return name;
 	}
 	
 	public int getNumAbilities()
@@ -124,6 +143,22 @@ public class AbilitySet extends Ability
 	public ExtendedEntityType getAbilitySetsEntityType()
 	{
 		return type;
+	}
+	
+	public static String getMeta(LivingEntity entity)
+	{
+		List<MetadataValue> metaList = entity.getMetadata(ABILITYSET_META_STORAGE);
+		
+		for (MetadataValue meta : metaList)
+		{
+			if (meta.getOwningPlugin() != P.p())
+				continue;
+			
+			if (meta.value() instanceof String)
+				return (String) meta.value();
+		}
+		
+		return null;
 	}
 	
 	public static void createAbilitySet(ConfigurationSection cfg)
@@ -173,7 +208,7 @@ public class AbilitySet extends Ability
 		MobAbilityConfig setCfg = new MobAbilityConfig(name, entityType, abilities);
 		
 		// Create the ability set
-		abilitySets.put(name.toLowerCase(), new AbilitySet(setCfg, entityType, protectFromDespawner, applyNormalAbilities));
+		new AbilitySet(name.toLowerCase(), setCfg, entityType, protectFromDespawner, applyNormalAbilities);
 	} 
 
 	public static void setup(ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)

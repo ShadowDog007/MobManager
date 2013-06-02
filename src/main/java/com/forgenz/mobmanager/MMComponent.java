@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.forgenz.mobmanager.abilities.AbilitiesComponent;
+import com.forgenz.mobmanager.bounty.BountyComponent;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.MMLogger;
 import com.forgenz.mobmanager.limiter.LimiterComponent;
@@ -44,6 +45,7 @@ public abstract class MMComponent
 		//COMMON(CommonComponent.class, "MobManager", (Component[]) null),
 		LIMITER(LimiterComponent.class, "MobManager-Limiter", (Component[]) null),
 		ABILITIES(AbilitiesComponent.class,"MobManager-Abilities", (Component[]) null),
+		BOUNTY(BountyComponent.class, "MobManager-Bounty", (Component[]) null),
 		SPAWNER(SpawnerComponent.class, "MobManager-Spawner", Component.LIMITER);
 		
 		private final MMComponent instance;
@@ -154,6 +156,13 @@ public abstract class MMComponent
 					values[i].i().disable(false);
 			}
 		}
+		
+		public String getFancyName()
+		{
+			String name = toString();
+			
+			return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
+		}
 	}
 	
 	private Component c;
@@ -219,6 +228,11 @@ public abstract class MMComponent
 	public static AbilitiesComponent getAbilities()
 	{
 		return (AbilitiesComponent) Component.ABILITIES.i();
+	}
+	
+	public static BountyComponent getBounties()
+	{
+		return (BountyComponent) Component.BOUNTY.i();
 	}
 	
 	public static SpawnerComponent getSpawner()

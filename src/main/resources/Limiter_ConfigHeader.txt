@@ -214,4 +214,3 @@ How many extra layers below normal will be checked
 This allows a higher chance for flying mobs to spawn
 
 #######################################################################
-

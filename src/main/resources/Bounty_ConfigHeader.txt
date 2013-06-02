@@ -1,0 +1,203 @@
+#######################################################################
+EnabledWorlds
+#######################################################################
+A list of worlds in which to allow mob bounties
+
+#######################################################################
+BountyType
+#######################################################################
+A string which determine what type of bounty players will be given
+
+The default BountyType is MONEY
+
+Valid BountyTypes:
+- MONEY: Players are given money as a reward for killing mobs
+    (Players can also have money taken away from them if you set
+    negative rewards)
+    MONEY is the only BountyType which has a plugin dependency.
+    MONEY requires Vault be installed on your server
+
+- ITEM: Mobs which players kill drop the item specified upon dying
+    Rewards work slightly differently for ITEM.
+    
+    Final Reward Examples:
+    - 0.5: The mob would have a 50% chance to drop 1 of the given item
+    - 1.0: The mob would have a 100% chance to drop 1 of the given item
+    - 1.5: The mob would drop at least 1 of the given item
+        and have a 50% chance to drop an additional 1 of the given item
+    - 2.5: The mob would drop at least 2 of the given item
+        and have a 50% chance to drop an additional 1 of the given item
+        
+    Note: ITEM rewards can never be negative
+
+- EXP: Players are given experience as a reward for killing mobs
+    Experience is added directly to the player, or removed if a fine
+    is applied
+    
+#######################################################################
+PlayerMessages
+#######################################################################
+These are messages which are sent to players upon receiving a reward
+    or a fine.
+    
+You can use & colour codes in the messages
+There are also two replace strings:
+- %amount%: Replaced with the amount a player received as a reward/fine
+- %mob%: Replaced with the mob which the player killed
+
+################
+Reward
+################
+The message sent to players upon receiving a reward
+
+################
+Fine
+################
+The message sent to players upon receiving a fine
+
+#######################################################################
+ItemDrop
+#######################################################################
+The name of the material which will be dropped after killing a mob
+    IF the BountyType ITEM is used
+    
+A list of valid materials can be found here:
+http://jd.bukkit.org/beta/apidocs/org/bukkit/Material.html
+
+#######################################################################
+Multipliers
+#######################################################################
+Multipliers which are added to your initial reward to increase gains
+    under certain conditions
+    
+################
+World
+################
+Set of multipliers to be applied when players are in a given world
+
+################
+Time
+################
+Set of multipliers to be applied at a given time of day
+
+Valid Times:
+- DAY: 0 min to 12 min
+- DUSK: 12 min to 14 min
+- NIGHT: 14 min to 23 min
+- DAWN: 23 min to 0 min 
+
+################
+Biome
+################
+Set of multipliers to be applied when killing a mob in a given biome
+
+################
+Permission
+################
+Multipliers which are applied to players rewards which have the
+    given permission
+    
+Example:
+Multipliers:
+  Permission:
+    mobmanager_bounty_multiplier_double: 2.0
+    mobmanager_bounty_multiplier_triple: 3.0
+
+Permissions should have their .'s replaced with _'s
+
+In the above example if the player has the permission
+    'mobmanager.bounty.multiplier.double' their reward is doubled
+If they have both permissions, only the highest multiplier is applied
+    (3.0 times multiplier in this example)
+    
+################
+AbilitySets
+################
+Multipliers which are applied to players rewards when they kill
+    a mob which has been given a certain AbilitySet
+
+Note: The Abilities component must be enabled for this node
+    to work or even appear 
+
+#######################################################################
+Exploits
+#######################################################################
+These are used to prevent players from exploiting certain situations
+    on your server to gain money fast.
+
+Each exploit prevention technique can be enabled/disabled individually.
+
+Note: NONE of these apply when players receive fines.
+
+################
+Cooldown
+################
+This limits players to only receiving rewards every 'Time' seconds.
+
+Nodes:
+- Use: True if this technique is enabled
+- Time: Time in seconds in which players can receive rewards
+    between kills
+
+################
+LoginTimer
+################
+Prevents players from earning rewards for 'Time' seconds after joining
+    the server
+    
+Nodes:
+- Use: True if this technique is enabled
+- Time: Time in seconds in which players can't receive rewards for
+    killing mobs
+
+################
+SpawnerProtection
+################
+Adds a multiplier to the players reward after killing 'Cap' mobs
+    which were spawned from spawners in a row
+
+Nodes:
+- Use: True if this technique is enabled
+- Cap: The limit of how many mobs players can kill in a row before
+    having the Capped multiplier applied to their reward
+- Multi: The multiplier to use after players reach the mob cap
+
+################
+NearbyMobCap
+################
+Adds a multiplier to the players reward after killing 'Cap' mobs
+    within an area.
+
+When a player kills a mob, it stores the location of that killed mob.
+If the next mob the player kills is within range of the last one
+    their 'nearbyKillCount' increases.
+Once their 'nearbyKillCount' reaches the mob cap the capped multiplier
+    is applied to their reward.
+After killing a mob which is out of range of their last kill the
+    players 'nearbyKillCount' is reset.
+
+Nodes:
+- Use: True if this technique is enabled
+- Range: The distance between the players last and current kill  for
+    them to be considered 'nearby'
+- Cap: How high the players 'nearbyKillCount' can get before the capped
+    multiplier is applied to their reward
+- Multi: The multiplier applied to the players reward after reaching
+    the nearby mob cap
+
+################
+DepreciativeReturn
+################
+This adds a multiplier to the player for every mob they kill
+    of the same type in a row
+
+If the multi was 0.5, and the player killed 2 zombies in a row
+    they would have their reward multiplied by 0.5.
+If they then killed another zombie, their reward
+    would then be multiplied by 0.5 * 0.5 (i.e. 0.25)
+After killing a mob of a different type the multiplier is reset
+
+Nodes:
+- Use: True if this technique is enabled
+- Multi: The multiplier which is applied to the players reward
+

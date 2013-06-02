@@ -42,6 +42,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
@@ -153,8 +154,16 @@ public class AbilitiesMobListener implements Listener
 		applyNormalAbilities(entity, ma);
 	}
 	
-	private static void applyNormalAbilities(LivingEntity entity, MobAbilityConfig ma)
+	public static void applyNormalAbilities(LivingEntity entity, MobAbilityConfig ma)
 	{
+		if (ma == null)
+		{
+			ma = MMComponent.getAbilities().getConfig().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.valueOf(entity), null);
+			if (ma == null)
+			{
+				return;
+			}
+		}
 		ValueChance<Ability> abilityChance;
 		// Cycle through each type of ability and apply them 
 		// Note: Make sure we do not apply abilitySets (hence i < types.length - 1)

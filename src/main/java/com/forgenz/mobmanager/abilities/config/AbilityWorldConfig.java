@@ -39,14 +39,14 @@ import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.config.EnumSettingContainer;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 
-public class WorldAbilityConfig extends AbstractConfig
+public class AbilityWorldConfig extends AbstractConfig
 {	
 	private boolean useWorldSettings = true;
 	public final EnumSettingContainer enabledSpawnReasons;
 	
 	public final HashMap<ExtendedEntityType, MobAbilityConfig> mobs = new HashMap<ExtendedEntityType, MobAbilityConfig>();
 	
-	protected WorldAbilityConfig(FileConfiguration cfg, String folder)
+	protected AbilityWorldConfig(FileConfiguration cfg, String folder)
 	{		
 		/* ################ UseWorldSettings ################ */
 		if (folder.length() != 0)
