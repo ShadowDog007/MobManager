@@ -154,10 +154,10 @@ public class BountyConfig extends AbstractConfig
 			MMComponent.getBounties().warning(String.format("The material %s does not exist, defaulting ItemDrop to emerald"));
 			material = Material.EMERALD;
 		}
-		else
+		
+		if (material == null || material == Material.AIR)
 		{
-			if (material == Material.AIR)
-				material = Material.EMERALD;
+			material = Material.EMERALD;
 		}
 		itemDrop = material;
 		set(cfg, "ItemDrop", material.toString());
@@ -170,7 +170,7 @@ public class BountyConfig extends AbstractConfig
 			/* ################ World Multipliers ################ */
 			multiSect = getConfigurationSection(sect, "World");
 			
-			for (String world : enabledWorlds)
+			for (String world : this.enabledWorlds)
 			{
 				double multi = multiSect.getDouble(world, 1.0);
 				

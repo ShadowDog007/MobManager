@@ -150,7 +150,14 @@ public class LimiterComponent extends MMComponent
 		if (animalProtection != null)
 		{
 			animalProtection.cancel();
-			animalProtection.run();
+			try
+			{
+				animalProtection.run();
+			}
+			catch (Exception e)
+			{
+				
+			}
 		}
 		
 		info("Disabled");

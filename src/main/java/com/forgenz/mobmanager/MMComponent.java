@@ -46,8 +46,9 @@ public abstract class MMComponent
 		LIMITER(LimiterComponent.class, "MobManager-Limiter", (Component[]) null),
 		ABILITIES(AbilitiesComponent.class,"MobManager-Abilities", (Component[]) null),
 		BOUNTY(BountyComponent.class, "MobManager-Bounty", (Component[]) null),
-		SPAWNER(SpawnerComponent.class, "MobManager-Spawner", Component.LIMITER);
+		SPAWNER(false, SpawnerComponent.class, "MobManager-Spawner", Component.LIMITER);
 		
+		private final boolean canEnable;
 		private final MMComponent instance;
 		private final Logger log;
 		private ArrayList<Component> depends = null;
@@ -55,6 +56,12 @@ public abstract class MMComponent
 		
 		Component(Class<? extends MMComponent> clazz, String loggerName, Component... dependencies)
 		{
+			this(true, clazz, loggerName, dependencies);
+		}
+		
+		Component(boolean canEnable, Class<? extends MMComponent> clazz, String loggerName, Component... dependencies)
+		{
+			this.canEnable = canEnable;
 			this.log = new MMLogger(clazz, loggerName);
 			
 			MMComponent instance = null;
@@ -79,6 +86,11 @@ public abstract class MMComponent
 					c.iDependOnYou(this);
 				}
 			}
+		}
+		
+		public boolean canEnable()
+		{
+			return canEnable;
 		}
 		
 		/**
@@ -141,8 +153,19 @@ public abstract class MMComponent
 			
 			for (int i = 0; i < values.length; ++i)
 			{
-				if (!values[i].i().isEnabled())
-					values[i].i().enable(false);
+				Component c = values[i];
+				if (c.canEnable() && !c.i().isEnabled())
+				{
+					try
+					{
+						c.i().enable(false);
+					}
+					catch (Exception e)
+					{
+						c.severe("Error when enabling component");
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		
@@ -152,8 +175,19 @@ public abstract class MMComponent
 			// Disable each component backwards
 			for (int i = values.length - 1; i >= 0; --i)
 			{
-				if (values[i].i().isEnabled())
-					values[i].i().disable(false);
+				Component c = values[i];
+				if (c.canEnable() && c.i().isEnabled())
+				{
+					try
+					{
+						c.i().disable(false);
+					}
+					catch (Exception e)
+					{
+						c.severe("Error when disabling component");
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		
