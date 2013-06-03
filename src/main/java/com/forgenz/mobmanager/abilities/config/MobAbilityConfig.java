@@ -62,17 +62,25 @@ public class MobAbilityConfig extends AbstractConfig
 		
 		attributes = new HashMap<AbilityType, ValueChance<Ability>>();
 		
-		/* ######## SpawnRate ######## */
-		float spawnRate = (float) cfg.getDouble("SpawnRate", 1.0F);
-		if (spawnRate < 0.0F)
+		if (!abilitySet)
+		{
+			/* ######## SpawnRate ######## */
+			float spawnRate = (float) cfg.getDouble("SpawnRate", 1.0F);
+			if (spawnRate < 0.0F)
+				spawnRate = 1.0F;
+			this.spawnRate = spawnRate;
+			set(cfg, "SpawnRate", spawnRate);
+			
+			/* ######## EquipmentDropChance ######## */
+			float equipmentDropChance = (float) cfg.getDouble("EquipmentDropChance", 0.15F);
+			this.equipmentDropChance = equipmentDropChance < 0 ? 0.0F : equipmentDropChance;
+			set(cfg, "EquipmentDropChance", this.equipmentDropChance);
+		}
+		else
+		{
 			spawnRate = 1.0F;
-		this.spawnRate = spawnRate;
-		set(cfg, "SpawnRate", spawnRate);
-		
-		/* ######## EquipmentDropChance ######## */
-		float equipmentDropChance = (float) cfg.getDouble("EquipmentDropChance", 0.15F);
-		this.equipmentDropChance = equipmentDropChance < 0 ? 0.0F : equipmentDropChance;
-		set(cfg, "EquipmentDropChance", this.equipmentDropChance);
+			equipmentDropChance = 1.0F;
+		}
 		
 		/* ######## BabyRate ######## */
 		if (mob == ExtendedEntityType.UNKNOWN || BabyAbility.isValid(mob))

@@ -118,6 +118,11 @@ public class AbilitySet extends Ability
 			entity.setMetadata(ABILITYSET_META_STORAGE, new FixedMetadataValue(P.p(), name));
 		}
 	}
+	
+	public MobAbilityConfig getAbilityConfig()
+	{
+		return setCfg;
+	}
 
 	@Override
 	public AbilityType getAbilityType()

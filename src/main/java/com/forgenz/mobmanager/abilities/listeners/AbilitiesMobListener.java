@@ -63,7 +63,7 @@ import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 public class AbilitiesMobListener implements Listener
 {
 	/**
-	 * Handles random chance rates
+	 * Handles random chance spawn rates
 	 */
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void rates(CreatureSpawnEvent event)
@@ -72,7 +72,10 @@ public class AbilitiesMobListener implements Listener
 			return;
 		
 		if (!P.p().getPluginIntegration().canApplyAbilities(event.getEntity()))
+		{
+			P.p().abilitiesIgnoreNextSpawn(true);
 			return;
+		}
 		
 		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(event.getLocation().getWorld().getName(), ExtendedEntityType.valueOf(event.getEntity()), event.getSpawnReason());
 		
@@ -93,11 +96,6 @@ public class AbilitiesMobListener implements Listener
 				return;
 			}
 		}
-		
-		BabyAbility.addByChance(event.getEntity(), ma);
-		
-		AngryAbility.addByChance(event.getEntity(), ma);
-		ChargedCreeperAbility.addByChance(event.getEntity(), ma);
 	}
 	
 	/**
@@ -119,12 +117,9 @@ public class AbilitiesMobListener implements Listener
 	 */
 	public static void addAbilities(LivingEntity entity, SpawnReason spawnReason)
 	{
-		// Check if any plugins are protecting this entity
-		if (!P.p().getPluginIntegration().canApplyAbilities(entity))
-			return;
-		
 		// Fetch the mob config for this entity
 		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.valueOf(entity), spawnReason);
+		MobAbilityConfig rateMa = ma;
 		
 		// If there is not config for the entity there is nothing more to do
 		if (ma == null)
@@ -132,26 +127,44 @@ public class AbilitiesMobListener implements Listener
 		
 		// Fetch Ability Sets
 		ValueChance<Ability> abilityChance = ma.attributes.get(AbilityType.ABILITY_SET);
+		AbilitySet abilitySet = null;
 		if (abilityChance != null)
 		{
 			// Fetch an ability
-			AbilitySet ability = (AbilitySet) abilityChance.getBonus();
-			// If there is no ability or the 'none' ability set is given
-			// we allow other abilities to be applied
-			if (ability != null)
+			abilitySet = (AbilitySet) abilityChance.getBonus();
+			
+			// If it is the 'none' ability we ignore it
+			if (abilitySet != null && abilitySet.getAbilityConfig() == null)
 			{
-				// If we want to apply normal abilities to the entity we do that before applying the sets abilities
-				if (ability.applyNormalAbilities())
-				{
-					applyNormalAbilities(entity, ma);
-				}
-				// Add the ability and return to prevent other abilities being applied
-				ability.addAbility(entity);
-				return;
+				abilitySet = null;
 			}
 		}
 		
-		applyNormalAbilities(entity, ma);
+		boolean applyNormalAbilities = true;
+		
+		// If there is no ability or the 'none' ability set is given
+		// we allow other abilities to be applied
+		if (abilitySet != null)
+		{
+			// Only apply normal abilities if the ability set allows it
+			applyNormalAbilities = abilitySet.applyNormalAbilities();
+			
+			// Make sure rates which are applied are the AbilitySets ones
+			rateMa = abilitySet.getAbilityConfig();
+			
+			// Add the ability and return to prevent other abilities being applied
+			abilitySet.addAbility(entity);
+		}
+		
+		// Apply rates to the mob
+		BabyAbility.addByChance(entity, rateMa);
+		AngryAbility.addByChance(entity, rateMa);
+		ChargedCreeperAbility.addByChance(entity, rateMa);
+		
+		if (applyNormalAbilities)
+		{
+			applyNormalAbilities(entity, rateMa);
+		}
 	}
 	
 	public static void applyNormalAbilities(LivingEntity entity, MobAbilityConfig ma)
