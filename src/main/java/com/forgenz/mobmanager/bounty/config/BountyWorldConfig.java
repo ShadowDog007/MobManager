@@ -55,7 +55,7 @@ public class BountyWorldConfig extends AbstractConfig
 		if (folder.length() != 0)
 		{
 			useWorldSettings = cfg.getBoolean("UseWorldSettings", false);
-			set(cfg, "UseWorldsettings", useWorldSettings);
+			set(cfg, "UseWorldSettings", useWorldSettings);
 		}
 		else
 		{
