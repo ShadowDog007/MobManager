@@ -39,6 +39,7 @@ import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
+import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.common.util.MiscUtil;
@@ -104,7 +105,15 @@ public abstract class AbstractSpawnAbility extends Ability
 			LivingEntity spawnedEntity = type.spawnMob(spawnLoc);
 			
 			if (abilities != null && spawnedEntity != null)
-				abilities.addAbility(spawnedEntity);
+			{
+				abilities.addAbility((LivingEntity) entity);
+				abilities.getAbilityConfig().applyRates((LivingEntity) entity);
+				
+				if (abilities.applyNormalAbilities())
+				{
+					AbilitiesMobListener.applyNormalAbilities((LivingEntity) entity, null);
+				}
+			}
 		}
 		
 		// Make sure we can spawn more mobs later :)
