@@ -43,10 +43,10 @@ public abstract class MMComponent
 	public enum Component
 	{
 		//COMMON(CommonComponent.class, "MobManager", (Component[]) null),
-		LIMITER(LimiterComponent.class, "MobManager-Limiter", (Component[]) null),
-		ABILITIES(AbilitiesComponent.class,"MobManager-Abilities", (Component[]) null),
-		BOUNTY(BountyComponent.class, "MobManager-Bounty", (Component[]) null),
-		SPAWNER(false, SpawnerComponent.class, "MobManager-Spawner", Component.LIMITER);
+		LIMITER(LimiterComponent.class, "MM-Limiter", (Component[]) null),
+		ABILITIES(AbilitiesComponent.class,"MM-Abilities", (Component[]) null),
+		BOUNTY(BountyComponent.class, "MM-Bounty", (Component[]) null),
+		SPAWNER(false, SpawnerComponent.class, "MM-Spawner", Component.LIMITER);
 		
 		private final boolean canEnable;
 		private final MMComponent instance;
@@ -162,7 +162,7 @@ public abstract class MMComponent
 					}
 					catch (Exception e)
 					{
-						c.severe("Error when enabling component");
+						c.severe("Error when enabling component " + c.getFancyName());
 						e.printStackTrace();
 					}
 				}

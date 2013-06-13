@@ -44,6 +44,14 @@ If false /mm version will only provide the current version and not
     check for a new version
 
 #######################################################################
+EnableAutoUpdater
+#######################################################################
+If true MobManager will check for new Approved Downloads from BukkitDev
+    and automatically download and install them.
+
+A restart or /reload will be required to use them. 
+
+#######################################################################
 Integration.EpicBossRecoded
 #######################################################################
 Enables integration of EpicBossRecoded to prevent EpicBosses from

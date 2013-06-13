@@ -28,6 +28,7 @@
 
 package com.forgenz.mobmanager;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -39,6 +40,8 @@ import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.integration.PluginIntegration;
 import com.forgenz.mobmanager.common.listeners.CommonMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.FileUtil;
+import com.forgenz.mobmanager.common.util.Updater;
 import com.forgenz.mobmanager.metrics.Metrics;
 
 /**
@@ -75,11 +78,17 @@ public class P extends JavaPlugin
 		return biomeSpecificMobs;
 	}
 	
-	private boolean versionCheckEnabled;
+	private boolean versionCheckEnabled, autoUpdateEnabled;
+	private Updater updater;
 	
 	public boolean isVersionCheckEnabled()
 	{
 		return versionCheckEnabled;
+	}
+	
+	public Updater getUpdater()
+	{
+		return updater;
 	}
 	
 	public String getHeaderString()
@@ -141,6 +150,9 @@ public class P extends JavaPlugin
 		versionCheckEnabled = getConfig().getBoolean("EnableVersionCheck", true);
 		AbstractConfig.set(getConfig(), "EnableVersionCheck", versionCheckEnabled);
 		
+		autoUpdateEnabled = getConfig().getBoolean("EnableAutoUpdater", false);
+		AbstractConfig.set(getConfig(), "EnableAutoUpdater", autoUpdateEnabled);
+		
 		// Copy the Config header into config.yml
 		AbstractConfig.copyHeader(getConfig(), "Config_Header.txt", "Global Config\n"
 				+ "\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList());
@@ -158,6 +170,27 @@ public class P extends JavaPlugin
 		AbstractConfig.set(getConfig(), "Version", getDescription().getVersion());
 		saveConfig();
 		
+		// Check for updates
+		if (versionCheckEnabled || autoUpdateEnabled)
+		{
+			Updater.UpdateType type;
+			
+			if (!autoUpdateEnabled)
+			{
+				type = Updater.UpdateType.NO_DOWNLOAD;
+			}
+			else
+			{
+				type = Updater.UpdateType.DEFAULT;
+			}
+			
+			updater = new Updater(this, "mobmanager", this.getFile(), type, true);
+		}
+		else
+		{
+			updater = null;
+		}
+		
 		// Start Metrics gathering
 		startMetrics();
 	}
@@ -171,8 +204,29 @@ public class P extends JavaPlugin
 		Component.disableComponents();
 		
 		p = null;
+		
+		// Backup the current files
+		if (updater != null && updater.getResult() == Updater.UpdateResult.SUCCESS)
+		{
+			File destination = new File(getDataFolder(), String.format("backups%s%s", File.separator, getDescription().getVersion()));
+			
+			for (File file : getDataFolder().listFiles())
+			{
+				if ("backups".equalsIgnoreCase("file.getName())"))
+					continue;
+				
+				try
+				{
+					FileUtil.copy(file, destination);	
+				}
+				catch (IOException e)
+				{
+					getLogger().severe("Error backing up old config files");
+					e.printStackTrace();
+				}
+			}
+		}
 	}
-	
 	
 	private void startMetrics()
 	{

@@ -28,11 +28,6 @@
 
 package com.forgenz.mobmanager.commands;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
@@ -40,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.common.util.Updater;
 
 public class MMCommandVersion extends MMCommand
 {
@@ -48,9 +44,6 @@ public class MMCommandVersion extends MMCommand
 	{
 		super(Pattern.compile("^version$", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"), 0, 0);
 	}
-	
-	private final Pattern versionStringSplit = Pattern.compile("\\|");
-	private final Pattern dotSplit = Pattern.compile("\\.");
 
 	@Override
 	public void run(final CommandSender sender, String maincmd, String[] args)
@@ -68,101 +61,36 @@ public class MMCommandVersion extends MMCommand
 		
 		sender.sendMessage(ChatColor.DARK_GREEN + P.p().getDescription().getName() + " version " + versionString);
 		
-		if (!P.p().isVersionCheckEnabled())
+		Updater updater = P.p().getUpdater();
+		
+		if (updater == null)
 		{
 			sender.sendMessage(ChatColor.DARK_GREEN + "Turn on EnableVersionCheck to allow checking for a new version");
 			return;
 		}
 		
-		P.p().getServer().getScheduler().runTaskAsynchronously(P.p(), new Runnable()
+		
+		switch (updater.getResult())
 		{
-
-			@Override
-			public void run()
-			{
-				URL url;
-				InputStream is = null;
-				DataInputStream dis;
-				byte[] chars = new byte[32];
-				int numChars;
-				
-				String update = "";
-
-				try
-				{
-				    url = new URL("http://forgenz.com/MobManager_Version.txt");
-				    is = url.openStream();
-				    dis = new DataInputStream(new BufferedInputStream(is));
-
-				    numChars = dis.read(chars);
-				    
-				    for (int i = 0; i < numChars; ++i)
-				    	update += (char) chars[i];
-				}
-				catch (Exception e)
-				{
-				}
-				finally
-				{
-					try
-					{
-						is.close();
-					}
-					catch (IOException e)
-					{
-				    }
-				}
-				
-				if (update.length() != 0)
-				{
-					String[] split = versionStringSplit.split(update);
-					
-					if (split.length != 2)
-						return;
-					
-					String[] versionL = dotSplit.split(split[0]);
-					String[] versionC = dotSplit.split(versionString);
-					
-					int majorL = Integer.valueOf(versionL[0]);
-					int majorC = Integer.valueOf(versionC[0]);
-					
-					int minorL = Integer.valueOf(versionL[1].replaceAll("[_A-Za-z]", ""));
-					int minorC = Integer.valueOf(versionC[1].replaceAll("[_A-Za-z]", ""));
-					//if (latestVersion.length != 2 || currentVersion.length != 2)
-					//	return;
-					
-					// Check if the major version is old
-					if (majorL > majorC
-							// Check if the minor version is old
-							|| (majorL == majorC && minorL > minorC)
-							//  Check if the sub version is old
-							|| (majorL == majorC && minorL == minorC && compareLetters(versionL[1], versionC[1])))
-						sender.sendMessage(ChatColor.DARK_GREEN + "There is a new version of MobManager: v" + split[0] + " for " + split[1]);
-					else
-						sender.sendMessage(ChatColor.DARK_GREEN + "MobManager is up to date");
-				}
-				else
-					sender.sendMessage(ChatColor.DARK_GREEN + "Failed to check for updates");
-			}
-			
-		});
-	}
-	
-	private boolean compareLetters(String latest, String current)
-	{
-		latest = latest.replaceAll("[0-9]", "");
-		current = current.replaceAll("[0-9]|(_dev)", "");
-		
-		if (latest.length() == 0)
-			return false;
-		
-		if (latest.length() > 0 && current.length() == 0)
-			return true;
-		
-		char l = latest.charAt(0);
-		char c = current.charAt(0);
-		
-		return l > c;
+		case FAIL_BADSLUG:
+		case FAIL_DBO:
+		case FAIL_NOVERSION:
+			sender.sendMessage(String.format("%sThe was an error when checking for an update. Please notify me. ERROR: %s", ChatColor.RED, updater.getResult()));
+			break;
+		case FAIL_DOWNLOAD:
+			sender.sendMessage("");
+			break;
+		case NO_UPDATE:
+			sender.sendMessage(String.format("%sMobManager is up to date!", ChatColor.DARK_GREEN));
+			break;
+		case SUCCESS:
+			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' has been downloaded", ChatColor.DARK_GREEN, updater.getLatestVersionString()));
+			sender.sendMessage(String.format("%sA restart or /reload is required to enable this new version", ChatColor.DARK_GREEN));
+			break;
+		case UPDATE_AVAILABLE:
+			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' is available from BukkitDev", ChatColor.DARK_GREEN, updater.getLatestVersionString()));
+			break;
+		}
 	}
 
 	@Override
