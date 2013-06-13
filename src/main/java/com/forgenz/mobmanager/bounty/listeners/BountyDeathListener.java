@@ -153,11 +153,13 @@ public class BountyDeathListener implements Listener
 		{
 			if (reward > 0.0)
 			{
-				player.sendMessage(String.format(cfg.rewardPlayerMessage, objReward, mobName));
+				if (cfg.rewardPlayerMessage.length() > 0)
+					player.sendMessage(String.format(cfg.rewardPlayerMessage, objReward, mobName));
 			}
 			else
 			{
-				player.sendMessage(String.format(cfg.finePlayerMessage, objReward, mobName));
+				if (cfg.finePlayerMessage.length() > 0)
+					player.sendMessage(String.format(cfg.finePlayerMessage, objReward, mobName));
 			}
 		}
 	}
