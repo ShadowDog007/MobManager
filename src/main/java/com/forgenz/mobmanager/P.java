@@ -208,16 +208,21 @@ public class P extends JavaPlugin
 		// Backup the current files
 		if (updater != null && updater.getResult() == Updater.UpdateResult.SUCCESS)
 		{
-			File destination = new File(getDataFolder(), String.format("backups%s%s", File.separator, getDescription().getVersion()));
+			File destination = new File(getDataFolder(), String.format("backups%sv%s", File.separator, getDescription().getVersion()));
+			
+			if (destination.exists())
+			{
+				FileUtil.deleteFile(destination);
+			}
 			
 			for (File file : getDataFolder().listFiles())
 			{
-				if ("backups".equalsIgnoreCase("file.getName())"))
+				if ("backups".equalsIgnoreCase(file.getName()))
 					continue;
 				
 				try
 				{
-					FileUtil.copy(file, destination);	
+					FileUtil.copy(file, new File(destination, file.getName()));	
 				}
 				catch (IOException e)
 				{

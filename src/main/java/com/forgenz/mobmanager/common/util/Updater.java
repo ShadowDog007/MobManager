@@ -439,16 +439,11 @@ public class Updater
             if(title.split(" v").length == 2)
             {
                 String remoteVersion = title.split(" v")[1].split(" ")[0]; // Get the newest file's version number
-                int remVer = -1,curVer=0;
-                try
-                {
-                    remVer = calVer(remoteVersion);
-                    curVer = calVer(version);
-                }
-                catch(NumberFormatException nfe)
-                {
-                    remVer=-1;
-                }
+                long remVer = -1,curVer=0; // MobManager - Changed to long
+
+                remVer = calVer(remoteVersion);
+                curVer = calVer(version);
+
                 if(hasTag(version)||version.equalsIgnoreCase(remoteVersion)||curVer>=remVer)
                 {
                     // We already have the latest version, or this build is tagged for no-update
@@ -471,23 +466,36 @@ public class Updater
     /**
      * Used to calculate the version string as an Integer
      */
-    private Integer calVer(String s) throws NumberFormatException
+    private long calVer(String s) throws NumberFormatException
     {
-        if(s.contains("."))
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i <s.length(); i++)
-            {
-                Character c = s.charAt(i);
-                if (Character.isLetterOrDigit(c))
-                {
-                    sb.append(c);
-                }
-            }
-            return Integer.parseInt(sb.toString());
-        }
-        return Integer.parseInt(s);
-    }
+    	// MobManager - Changed to allow for letters in the version string
+		long multi = 1;
+		long version = 0;
+
+		for (int i = s.length() - 1; i >= 0; --i)
+		{
+			char c = s.charAt(i);
+
+			if (Character.isLetterOrDigit(c))
+			{
+				if (Character.isDigit(c))
+				{
+					version += multi * ((int) c - 48);
+					multi *= 10;
+				}
+				else
+				{
+					version += multi * ((int) Character.toLowerCase(c) - 96);
+					multi *= 100;
+				}
+			}
+			else
+			{
+				multi *= 1000;
+			}
+		}
+		return version;
+	}
     /**
      * Evaluate whether the version number is marked showing that it should not be updated by this program
      */

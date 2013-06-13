@@ -78,7 +78,8 @@ public class MMCommandVersion extends MMCommand
 			sender.sendMessage(String.format("%sThe was an error when checking for an update. Please notify me. ERROR: %s", ChatColor.RED, updater.getResult()));
 			break;
 		case FAIL_DOWNLOAD:
-			sender.sendMessage("");
+			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' is available from BukkitDev", ChatColor.DARK_GREEN, updater.getLatestVersionString()));
+			sender.sendMessage(String.format("%sAn attempt to download this new version failed :(", ChatColor.DARK_GREEN));
 			break;
 		case NO_UPDATE:
 			sender.sendMessage(String.format("%sMobManager is up to date!", ChatColor.DARK_GREEN));
