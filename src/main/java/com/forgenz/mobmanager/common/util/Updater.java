@@ -468,6 +468,7 @@ public class Updater
      */
     private long calVer(String s) throws NumberFormatException
     {
+    	s.replace("-DEV", ".");
     	// MobManager - Changed to allow for letters in the version string
 		long multi = 1;
 		long version = 0;

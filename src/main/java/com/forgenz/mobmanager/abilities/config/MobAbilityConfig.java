@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
@@ -167,5 +168,12 @@ public class MobAbilityConfig extends AbstractConfig
 	public MobAbilityConfig(ExtendedEntityType mob, ConfigurationSection cfg)
 	{
 		this(mob, mob != null ? mob.toString() : "Unknown", cfg, false);
+	}
+
+	public void applyRates(LivingEntity entity)
+	{
+		BabyAbility.addByChance(entity, this);
+		AngryAbility.addByChance(entity, this);
+		ChargedCreeperAbility.addByChance(entity, this);
 	}
 }

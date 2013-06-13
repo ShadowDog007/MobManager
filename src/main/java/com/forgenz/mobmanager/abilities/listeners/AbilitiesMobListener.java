@@ -157,9 +157,7 @@ public class AbilitiesMobListener implements Listener
 		}
 		
 		// Apply rates to the mob
-		BabyAbility.addByChance(entity, rateMa);
-		AngryAbility.addByChance(entity, rateMa);
-		ChargedCreeperAbility.addByChance(entity, rateMa);
+		rateMa.applyRates(entity);
 		
 		if (applyNormalAbilities)
 		{

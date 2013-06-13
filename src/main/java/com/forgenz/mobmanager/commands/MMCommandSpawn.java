@@ -227,6 +227,8 @@ public class MMCommandSpawn extends MMCommand
 			if (entity instanceof LivingEntity)
 			{
 				set.addAbility((LivingEntity) entity);
+				set.getAbilityConfig().applyRates((LivingEntity) entity);
+				
 				if (set.applyNormalAbilities())
 				{
 					AbilitiesMobListener.applyNormalAbilities((LivingEntity) entity, null);
