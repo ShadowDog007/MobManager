@@ -50,6 +50,8 @@ If true MobManager will check for new Approved Downloads from BukkitDev
     and automatically download and install them.
 
 A restart or /reload will be required to use them. 
+MobManager will automatically backup your configuration files for you
+    before updating
 
 #######################################################################
 Integration.EpicBossRecoded
