@@ -40,6 +40,7 @@ import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
+import com.forgenz.mobmanager.abilities.abilities.VillagerAbility;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
@@ -51,6 +52,7 @@ public class MobAbilityConfig extends AbstractConfig
 	
 	public final float spawnRate;
 	public final float babyRate;
+	public final double villagerRate;
 	public final float angryRate;
 	public final float chargedRate;
 	
@@ -86,27 +88,41 @@ public class MobAbilityConfig extends AbstractConfig
 		/* ######## BabyRate ######## */
 		if (mob == ExtendedEntityType.UNKNOWN || BabyAbility.isValid(mob))
 		{
-			float babyRate = (float) cfg.getDouble("BabyRate", 0.0F);
+			float babyRate = (float) cfg.getDouble(AbilityType.BABY.getConfigPath(), 0.0F);
 			if (babyRate <= 0.0F)
 				babyRate = 0.0F;
 			else if (babyRate > 1.0F)
 				babyRate = 1.0F;
 			this.babyRate = babyRate;
-			set(cfg, "BabyRate", babyRate);
+			set(cfg, AbilityType.BABY.getConfigPath(), babyRate);
 		}
 		else
 		{
 			babyRate = 0.0F;
 		}
 		
+		/* ######## VillagerRate ######## */
+		if (mob == ExtendedEntityType.UNKNOWN || VillagerAbility.isValid(mob.getBukkitEntityType()))
+		{
+			float villagerRate = (float) cfg.getDouble(AbilityType.VILLAGER.getConfigPath(), 0.0F);
+			if (villagerRate <= 0.0F)
+				villagerRate = 0.0F;
+			this.villagerRate = villagerRate;
+			set(cfg, AbilityType.VILLAGER.getConfigPath(), villagerRate);
+		}
+		else
+		{
+			villagerRate = 0.0F;
+		}
+		
 		/* ######## AngryRate ######## */
 		if (mob == ExtendedEntityType.UNKNOWN || AngryAbility.isValid(mob.getBukkitEntityType()))
 		{
-			float angryRate = (float) cfg.getDouble("AngryRate", 0.0F);
+			float angryRate = (float) cfg.getDouble(AbilityType.ANGRY.getConfigPath(), 0.0F);
 			if (angryRate <= 0.0F)
 				angryRate = 0.0F;
 			this.angryRate = angryRate;
-			set(cfg, "AngryRate", angryRate);
+			set(cfg, AbilityType.ANGRY.getConfigPath(), angryRate);
 		}
 		else
 		{
@@ -116,11 +132,11 @@ public class MobAbilityConfig extends AbstractConfig
 		/* ######## ChargedRate ######## */
 		if (mob == ExtendedEntityType.UNKNOWN || ChargedCreeperAbility.isValid(mob.getBukkitEntityType()))
 		{
-			float chargedRate = (float) cfg.getDouble("ChargedRate", 0.0F);
+			float chargedRate = (float) cfg.getDouble(AbilityType.CHARGED.getConfigPath(), 0.0F);
 			if (chargedRate <= 0.0F)
 				chargedRate = 0.0F;
 			this.chargedRate = chargedRate;
-			set(cfg, "ChargedRate", chargedRate);
+			set(cfg, AbilityType.CHARGED.getConfigPath(), chargedRate);
 		}
 		else
 		{
@@ -175,6 +191,7 @@ public class MobAbilityConfig extends AbstractConfig
 	public void applyRates(LivingEntity entity)
 	{
 		BabyAbility.addByChance(entity, this);
+		VillagerAbility.addByChance(entity, this);
 		AngryAbility.addByChance(entity, this);
 		ChargedCreeperAbility.addByChance(entity, this);
 	}

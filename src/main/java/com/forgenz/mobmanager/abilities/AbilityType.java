@@ -71,9 +71,11 @@ public enum AbilityType
 	
 	BABY("BabyRate", false),
 	
-	ANGRY("Angry", false),
+	VILLAGER("VillagerRate", false),
 	
-	CHARGED("Charged", false),
+	ANGRY("AngryRate", false),
+	
+	CHARGED("ChargedRate", false),
 	
 	ABILITY_SET("ApplySets");
 	
