@@ -106,12 +106,12 @@ public abstract class AbstractSpawnAbility extends Ability
 			
 			if (abilities != null && spawnedEntity != null)
 			{
-				abilities.addAbility((LivingEntity) entity);
-				abilities.getAbilityConfig().applyRates((LivingEntity) entity);
+				abilities.addAbility(spawnedEntity);
+				abilities.getAbilityConfig().applyRates((LivingEntity) spawnedEntity);
 				
 				if (abilities.applyNormalAbilities())
 				{
-					AbilitiesMobListener.applyNormalAbilities((LivingEntity) entity, null);
+					AbilitiesMobListener.applyNormalAbilities((LivingEntity) spawnedEntity, null);
 				}
 			}
 		}

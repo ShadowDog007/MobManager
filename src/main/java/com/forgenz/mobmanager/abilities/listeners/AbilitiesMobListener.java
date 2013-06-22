@@ -47,9 +47,6 @@ import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
-import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
-import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
-import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.abilities.DeathSpawnAbility;
 import com.forgenz.mobmanager.abilities.abilities.DropsAbility;
@@ -118,8 +115,8 @@ public class AbilitiesMobListener implements Listener
 	public static void addAbilities(LivingEntity entity, SpawnReason spawnReason)
 	{
 		// Fetch the mob config for this entity
-		MobAbilityConfig ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.valueOf(entity), spawnReason);
-		MobAbilityConfig rateMa = ma;
+		MobAbilityConfig ma, rateMa;
+		rateMa = ma = AbilityConfig.i().getMobConfig(entity.getWorld().getName(), ExtendedEntityType.valueOf(entity), spawnReason);
 		
 		// If there is not config for the entity there is nothing more to do
 		if (ma == null)

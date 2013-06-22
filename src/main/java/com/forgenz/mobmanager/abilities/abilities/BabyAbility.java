@@ -71,7 +71,7 @@ public class BabyAbility extends Ability
 		if (isValid(entity) && ma.babyRate <= 1.0F && ma.babyRate != 0.0F)
 		{
 			// If the random number is higher than the baby chance we don't turn the mob into a baby
-			if ( ma.babyRate == 1.0F || LimiterConfig.rand.nextFloat() < ma.babyRate)
+			if (ma.babyRate == 1.0F || LimiterConfig.rand.nextFloat() < ma.babyRate)
 			{
 				ability.addAbility(entity);
 			}

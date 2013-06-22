@@ -426,53 +426,55 @@ public class BountyConfig extends AbstractConfig
 			ExploitsPlayerData playerData = null;
 			
 			if (useCooldown || useNearbyMobCap || useSpawnerProtection || useDepreciativeReturn)
+			{
 				playerData = getPlayerData(player);
 			
-			// If the cooldown has not expired we return 0.0
-			if (useCooldown && System.currentTimeMillis() - playerData.getLastKillTime() <= cooldownTimeout)
-			{
-				return 0.0;
-			}
-			
-			// If the players login cooldown has not expired we return 0.0
-			if (useLoginTimer)
-			{
-				Long loginTime = loginTimer.get(player.getName());
-				
-				if (loginTime != null)
+				// If the cooldown has not expired we return 0.0
+				if (useCooldown && System.currentTimeMillis() - playerData.getLastKillTime() <= cooldownTimeout)
 				{
-					if (System.currentTimeMillis() - loginTime <= loginTimeout)
+					return 0.0;
+				}
+				
+				// If the players login cooldown has not expired we return 0.0
+				if (useLoginTimer)
+				{
+					Long loginTime = loginTimer.get(player.getName());
+					
+					if (loginTime != null)
 					{
-						return 0.0;
-					}
-					else
-					{
-						loginTimer.remove(player.getName());
+						if (System.currentTimeMillis() - loginTime <= loginTimeout)
+						{
+							return 0.0;
+						}
+						else
+						{
+							loginTimer.remove(player.getName());
+						}
 					}
 				}
-			}
-			
-
-			
-			if (useSpawnerProtection)
-			{
-				if (spawnerCap < playerData.getSpawnedMobKillCount(entity))
-					reward *= spawnerCappedMulti;
-			}
-			
-			if (useNearbyMobCap)
-			{
-				if (nearbyMobCap < playerData.getNewNearbyKillCount(entity, nearbyRangeSquared))
-					reward *= nearbyCappedMulti;
-			}
-			
-			// Apply Depreciative Return
-			if (useDepreciativeReturn)
-			{
-				int count = playerData.getNewKillCount(type);
-				while (--count >= 0)
+				
+	
+				
+				if (useSpawnerProtection)
 				{
-					reward *= depreciativeReturnMulti;
+					if (spawnerCap < playerData.getSpawnedMobKillCount(entity))
+						reward *= spawnerCappedMulti;
+				}
+				
+				if (useNearbyMobCap)
+				{
+					if (nearbyMobCap < playerData.getNewNearbyKillCount(entity, nearbyRangeSquared))
+						reward *= nearbyCappedMulti;
+				}
+				
+				// Apply Depreciative Return
+				if (useDepreciativeReturn)
+				{
+					int count = playerData.getNewKillCount(type);
+					while (--count >= 0)
+					{
+						reward *= depreciativeReturnMulti;
+					}
 				}
 			}
 			
@@ -523,7 +525,7 @@ public class BountyConfig extends AbstractConfig
 			}
 		}
 		
-		if (reward <= DOUBLE_TOO_SMALL)
+		if (Math.abs(reward) <= DOUBLE_TOO_SMALL)
 			return 0.0;
 		
 		return reward;

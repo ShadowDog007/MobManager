@@ -121,7 +121,7 @@ public class BountyDeathListener implements Listener
 		{
 			return;
 		}
-		
+
 		// Attempt to fetch the mobs custom name
 		String mobName = worldCfg.getMobName(entity);
 		// Else just use the mob type
@@ -135,8 +135,7 @@ public class BountyDeathListener implements Listener
 		switch (cfg.bountyType)
 		{
 		case EXP:
-			handleExp(player, (int) reward);
-			objReward = (int) Math.abs(reward);
+			objReward = handleExp(player, reward);
 			break;
 		case ITEM:
 			int count = handleItemDrop(event.getDrops(), cfg.itemDrop, reward);
@@ -264,15 +263,20 @@ public class BountyDeathListener implements Listener
 		return amount;
 	}
 	
-	public void handleExp(Player player, double reward)
+	public int handleExp(Player player, double reward)
 	{
+		boolean give = reward > 0.0;
+		reward = Math.abs(reward);
+		
 		int exp = (int) reward;
 		
-		if (Math.random() <= reward)
+		if (Math.random() <= reward - exp)
 		{
 			++exp;
 		}
 		
-		player.giveExp(exp);
+		player.giveExp(give ? exp : -exp);
+		
+		return exp;
 	}
 }

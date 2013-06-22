@@ -89,6 +89,8 @@ public class MobAbilityConfig extends AbstractConfig
 			float babyRate = (float) cfg.getDouble("BabyRate", 0.0F);
 			if (babyRate <= 0.0F)
 				babyRate = 0.0F;
+			else if (babyRate > 1.0F)
+				babyRate = 1.0F;
 			this.babyRate = babyRate;
 			set(cfg, "BabyRate", babyRate);
 		}
