@@ -70,6 +70,19 @@ EnableAnimalDespawning
 If false MobManager will never despawn Animals
 If true MobManager will run as normal
 
+WARNING: All players animals will be despawned unless they feed them
+    every X number of days of DaysTillFarmAnimalCleanup
+    
+    If you are just installing MobManager this will be disabled while
+    the protected entities list builds up (See EnableAnimalTracking)
+
+#######################################################################    
+EnableAnimalTracking
+#######################################################################
+If true, tracks players animals regardless of EnableAnimalDespawning
+    so you can build up a list of animals which should be protected
+    before enabling animal despawning
+
 #######################################################################
 DaysTillFarmAnimalCleanup
 #######################################################################

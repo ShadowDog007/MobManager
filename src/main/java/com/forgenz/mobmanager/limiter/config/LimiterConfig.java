@@ -65,6 +65,7 @@ public class LimiterConfig extends AbstractConfig
 	public static boolean countTamedAnimals;
 	
 	public static boolean enableAnimalDespawning;
+	public static boolean enableAnimalTracking;
 	public static double daysTillFarmAnimalCleanup;
 	public static int protectedFarmAnimalSaveInterval;
 	
@@ -125,8 +126,11 @@ public class LimiterConfig extends AbstractConfig
 		set(cfg, "CountTamedAnimals", countTamedAnimals);
 		
 		/* ################ Animal Despawning Stuff ################ */
-		enableAnimalDespawning = cfg.getBoolean("EnableAnimalDespawning", true);
+		enableAnimalDespawning = cfg.getBoolean("EnableAnimalDespawning", false);
 		set(cfg, "EnableAnimalDespawning", enableAnimalDespawning);
+		
+		enableAnimalTracking = cfg.getBoolean("EnableAnimalTracking", true);
+		set(cfg, "EnableAnimalTracking", enableAnimalTracking);
 		
 		daysTillFarmAnimalCleanup = cfg.getDouble("DaysTillFarmAnimalCleanup", 30.0D);
 		set(cfg, "DaysTillFarmAnimalCleanup", daysTillFarmAnimalCleanup);

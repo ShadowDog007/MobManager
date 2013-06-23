@@ -109,7 +109,7 @@ public class MobDespawnCheck
 		if (mob == MobType.ANIMAL)
 		{
 			// If animal protection is off then despawning of animals is disabled
-			if (MMComponent.getLimiter().animalProtection == null)
+			if (!LimiterConfig.enableAnimalDespawning || MMComponent.getLimiter().animalProtection == null)
 				return false;
 			
 			// Check if the animal is tamed

@@ -124,7 +124,7 @@ public class LimiterComponent extends MMComponent
 		despawner.runTaskTimer(P.p(), 1L, LimiterConfig.ticksPerDespawnScan);
 
 		// Setup animal protection
-		if (LimiterConfig.enableAnimalDespawning)
+		if (LimiterConfig.enableAnimalDespawning || LimiterConfig.enableAnimalTracking)
 		{
 			animalProtection = new AnimalProtection();
 
