@@ -162,6 +162,11 @@ public abstract class AbstractSpawnAbility extends Ability
 		{
 			mobType = mobTypeString.equalsIgnoreCase("NONE") ? null : ExtendedEntityType.valueOf(mobTypeString);
 			
+			if (mobType == ExtendedEntityType.UNKNOWN)
+			{
+				mobType = null;
+			}
+			
 			if (!mobTypeString.equalsIgnoreCase("NONE") && mobType == null)
 			{
 				MMComponent.getAbilities().warning("No EntityType called " + mobTypeString + " for " + (type == AbilityType.BIRTH_SPAWN ? "Birth" : "Death") + " Spawn");

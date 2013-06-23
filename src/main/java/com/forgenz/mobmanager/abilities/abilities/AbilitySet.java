@@ -197,6 +197,12 @@ public class AbilitySet extends Ability
 			if (key != null)
 				entityType = ExtendedEntityType.valueOf(key);
 			
+			// Make sure the config is more specific
+			if (entityType == ExtendedEntityType.UNKNOWN)
+			{
+				entityType = null;
+			}
+			
 			if (entityType == null)
 			{
 				MMComponent.getAbilities().warning("Invalid EntityType " + key + " in AbilitySets");
