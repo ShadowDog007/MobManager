@@ -31,7 +31,6 @@ package com.forgenz.mobmanager.common.util;
 import java.util.HashMap;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
