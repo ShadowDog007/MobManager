@@ -88,6 +88,16 @@ E.G. if SpawnRate was 0.5 there would be a 50% chance that a mob
 This setting only works for Animals and Zombies
 
 ################
+VillagerRate (Rate)
+################
+A number between 0.0 and 1.0
+Represents the chance a zombie will be turned into a Villager Zombie.
+
+E.G. if SpawnRate was 0.5 there would be a 50% chance that a zombie
+    which spawns will be turned into a Villager Zombie
+This setting only works for Zombies
+
+################
 AngryRate (Rate)
 ################
 A number between 0.0 and 1.0
