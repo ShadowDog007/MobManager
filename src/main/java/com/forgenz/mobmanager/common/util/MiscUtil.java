@@ -137,8 +137,8 @@ public class MiscUtil
 		if (obj == null)
 			return def;
 		
-		if (obj instanceof Integer)
-			return (Integer) obj;
+		if (obj instanceof Number)
+			return ((Number) obj).intValue();
 		
 		try
 		{
@@ -163,11 +163,8 @@ public class MiscUtil
 		if (obj == null)
 			return def;
 		
-		if (obj instanceof Float)
-			return (Float) obj;
-		
-		if (obj instanceof Double)
-			return ((Double) obj).floatValue();
+		if (obj instanceof Number)
+			return ((Number) obj).floatValue();
 			
 		try
 		{
@@ -195,5 +192,31 @@ public class MiscUtil
 		}
 		
 		return ((Boolean) obj).booleanValue();
+	}
+
+	public static double getDouble(Object obj)
+	{
+		return getDouble(obj, 0.0);
+	}
+	
+	public static double getDouble(Object obj, double def)
+	{
+		if (obj == null)
+			return def;
+		
+		if (obj instanceof Number)
+			return ((Number) obj).doubleValue();
+			
+		try
+		{
+			if (obj instanceof String)
+				return Double.valueOf((String) obj);
+		}
+		catch (Exception e)
+		{
+			return def;
+		}
+		
+		return def;
 	}
 }

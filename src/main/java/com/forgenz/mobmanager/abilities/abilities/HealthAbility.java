@@ -47,7 +47,7 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 	
 	public final double bonus;
 
-	private HealthAbility(int bonus)
+	private HealthAbility(double bonus)
 	{
 		this.bonus = bonus;
 	}
@@ -60,7 +60,7 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 	
 	private static void setMaxHealth(Damageable entity, double bonus)
 	{
-		if (entity == null || bonus == 0)
+		if (entity == null || bonus == 0.0)
 			return;
 
 		
@@ -127,14 +127,14 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 			if (obj == null)
 				continue;
 			
-			HealthAbility ability = setup(mob, MiscUtil.getInteger(obj));
+			HealthAbility ability = setup(mob, MiscUtil.getDouble(obj));
 			
 			if (ability != null)
 				abilityChances.addChance(chance, ability);
 		}
 	}
 	
-	public static HealthAbility setup(ExtendedEntityType mob, int bonus)
+	public static HealthAbility setup(ExtendedEntityType mob, double bonus)
 	{
 		return new HealthAbility(bonus);
 	}
@@ -144,12 +144,12 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 		if (opt == null)
 			return null;
 		
-		int bonus = MiscUtil.getInteger(opt, Integer.MIN_VALUE);
+		double bonus = MiscUtil.getDouble(opt, Double.NaN);
 		
-		if (bonus == Integer.MIN_VALUE)
+		if (bonus == Double.NaN)
 		{
 			MMComponent.getAbilities().warning(String.format("Found an error in abilities config for %s-HealthBonus. The value must be a whole number", mob.toString()));
-			bonus = 0;
+			bonus = 0.0;
 		}
 		
 		return setup(mob, bonus);

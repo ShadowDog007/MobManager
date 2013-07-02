@@ -203,16 +203,16 @@ Health Bonuses are added on to the mobs normal health
 They can be negative (So they reduce the mobs normal health)
 
 Keys:
-- Bonus: The bonus HP to give to a mob (Must be a whole number)
+- Bonus: The bonus HP to give to a mob
 
 EXAMPLE:
 MobAbilities:
   ZOMBIE:
     HealthBonus:
     - Chance: 99
-      Bonus: 0
+      Bonus: 0.0
     - Chance: 1
-      Bonus: 9001
+      Bonus: 9001.0
 
 ################
 DamageMulti (ChanceList)
