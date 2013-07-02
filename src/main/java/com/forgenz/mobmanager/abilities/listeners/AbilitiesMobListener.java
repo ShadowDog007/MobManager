@@ -268,7 +268,7 @@ public class AbilitiesMobListener implements Listener
 				return;
 			
 			// Calculate the new damage
-			int newDamage = (int) (event.getDamage() * multi);
+			double newDamage = event.getDamage() * multi;
 			
 			// Set the new damage
 			event.setDamage(newDamage);

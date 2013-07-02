@@ -45,7 +45,7 @@ import com.forgenz.mobmanager.common.util.MiscUtil;
 public class HealthAbility extends Ability implements JoinableAttribute<HealthAbility>
 {
 	
-	public final int bonus;
+	public final double bonus;
 
 	private HealthAbility(int bonus)
 	{
@@ -58,21 +58,21 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 		setMaxHealth(entity, bonus);
 	}
 	
-	private static void setMaxHealth(Damageable entity, int bonus)
+	private static void setMaxHealth(Damageable entity, double bonus)
 	{
 		if (entity == null || bonus == 0)
 			return;
 
 		
 		// Fetch the entities old max/actual health (Used for HP scaling)
-		int oldHp = entity.getHealth();
-		int oldMax = entity.getMaxHealth();
+		double oldHp = entity.getHealth();
+		double oldMax = entity.getMaxHealth();
 
 		// Make sure we do not add too much HP to the entity
 		entity.resetMaxHealth();
 
 		// Calculate the new maximum value
-		int newMax = bonus + entity.getMaxHealth();
+		double newMax = bonus + entity.getMaxHealth();
 		
 		// Validate the new maximum
 		if (newMax <= 0)
@@ -88,7 +88,7 @@ public class HealthAbility extends Ability implements JoinableAttribute<HealthAb
 	@Override
 	public void joinAttributes(LivingEntity entity, HealthAbility ...attributes)
 	{
-		int bonus = this.bonus;
+		double bonus = this.bonus;
 		
 		for (HealthAbility ability : attributes)
 		{

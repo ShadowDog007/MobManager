@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.forgenz</groupId>
   <artifactId>MobManager</artifactId>
-  <version>2_6e_DEV1</version>
+  <version>2_7</version>
   
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -62,7 +62,7 @@
   	<dependency>
   		<groupId>org.bukkit</groupId>
   		<artifactId>bukkit</artifactId>
-  		<version>RELEASE</version>
+  		<version>LATEST</version>
   	</dependency>
   	<dependency>
   		<groupId>net.milkbowl.vault</groupId>
