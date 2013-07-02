@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.AbilityType;
@@ -63,7 +65,7 @@ public class ArmourAbility extends Ability
 		}
 		
 	}
-	public enum ArmourMaterials
+	public enum ArmourMaterial
 	{
 		DIAMOND(Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE, Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS),
 		IRON(Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS),
@@ -75,7 +77,7 @@ public class ArmourAbility extends Ability
 		
 		private final Material[] materials = new Material[4]; 
 		
-		ArmourMaterials(Material head, Material chest, Material legs, Material feet)
+		ArmourMaterial(Material head, Material chest, Material legs, Material feet)
 		{
 			materials[ArmourPosition.HELMET.p] = head;
 			materials[ArmourPosition.CHESTPLATE.p] = chest;
@@ -95,7 +97,7 @@ public class ArmourAbility extends Ability
 		public final float dropChance;
 		private final ItemStack itemTemplate;
 		
-		public Armour(ArmourPosition position, float dropChance, ArmourMaterials material, ArrayList<Enchantment> enchantments, ArrayList<Integer> enchantLevels)
+		public Armour(ArmourPosition position, float dropChance, ArmourMaterial material, ArrayList<Enchantment> enchantments, ArrayList<Integer> enchantLevels, Color colour)
 		{
 			this.position = position;
 			this.dropChance = dropChance < 0.0F ? 0.15F : dropChance;
@@ -113,6 +115,13 @@ public class ArmourAbility extends Ability
 			
 			// Create an Item Stack with the new material
 			itemTemplate = new ItemStack(itemMat);
+			
+			if (material == ArmourMaterial.LEATHER)
+			{
+				LeatherArmorMeta meta = (LeatherArmorMeta) itemTemplate.getItemMeta();
+				meta.setColor(colour);
+				itemTemplate.setItemMeta(meta);
+			}
 			
 			// Add enchantments to the item stack
 			if (enchantments != null && enchantLevels != null && enchantments.size() == enchantLevels.size())
@@ -296,7 +305,7 @@ public class ArmourAbility extends Ability
 			return null;
 		}
 		
-		ArmourMaterials armourMaterial = ArmourMaterials.valueOf(tmpStr.toUpperCase());
+		ArmourMaterial armourMaterial = ArmourMaterial.valueOf(tmpStr.toUpperCase());
 		
 		float dropChance = MiscUtil.getFloat(optMap.get("DROPCHANCE"), 0.15F);
 		
@@ -304,6 +313,19 @@ public class ArmourAbility extends Ability
 		
 		ArrayList<Enchantment> enchantments = null;
 		ArrayList<Integer> enchantLevels = null;
+		
+		Color colour = null;
+		if (armourMaterial == ArmourMaterial.LEATHER)
+		{
+			int red = MiscUtil.getInteger(optMap.get("COLOURRED"), -1);
+			int green = MiscUtil.getInteger(optMap.get("COLOURGREEN"), -1);
+			int blue = MiscUtil.getInteger(optMap.get("COLOURBLUE"), -1);
+			
+			if (red != -1 && green != -1 && blue != -1)
+			{
+				colour = Color.fromRGB(red, green, blue);
+			}
+		}
 		
 		if (enchantmentList != null)
 		{
@@ -352,7 +374,7 @@ public class ArmourAbility extends Ability
 			}
 		}
 		
-		return new Armour(position, dropChance, armourMaterial, enchantments, enchantLevels);
+		return new Armour(position, dropChance, armourMaterial, enchantments, enchantLevels, colour);
 	}
 	
 	public static ArmourAbility setup(ExtendedEntityType mob, Object opt)

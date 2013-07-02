@@ -271,6 +271,12 @@ Keys:
         piece of armour to drop when the mob dies
     - Enchantments: A list of enchantments to be added to the armour
         (In the format '<enchantment>:<level>')
+    - ColourRed: Number between 0 and 255.
+        Used to colour leather armour (Google RGB colours)
+    - ColourGreen: Number between 0 and 255.
+        Used to colour leather armour (Google RGB colours)
+    - ColourBlue: Number between 0 and 255.
+        Used to colour leather armour (Google RGB colours)
     
 EXAMPLE:
 MobAbilities:
