@@ -40,6 +40,7 @@ import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
+import com.forgenz.mobmanager.abilities.abilities.SunProofAbility;
 import com.forgenz.mobmanager.abilities.abilities.VillagerAbility;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
@@ -52,7 +53,8 @@ public class MobAbilityConfig extends AbstractConfig
 	
 	public final float spawnRate;
 	public final float babyRate;
-	public final double villagerRate;
+	public final float villagerRate;
+	public final float sunProofRate;
 	public final float angryRate;
 	public final float chargedRate;
 	
@@ -113,6 +115,20 @@ public class MobAbilityConfig extends AbstractConfig
 		else
 		{
 			villagerRate = 0.0F;
+		}
+		
+		/* ######## VillagerRate ######## */
+		if (mob == ExtendedEntityType.UNKNOWN || SunProofAbility.isValid(mob.getBukkitEntityType()))
+		{
+			float sunProofRate = (float) cfg.getDouble(AbilityType.SUNPROOF.getConfigPath(), 0.0F);
+			if (sunProofRate <= 0.0F)
+				sunProofRate = 0.0F;
+			this.sunProofRate = sunProofRate;
+			set(cfg, AbilityType.SUNPROOF.getConfigPath(), villagerRate);
+		}
+		else
+		{
+			sunProofRate = 0.0F;
 		}
 		
 		/* ######## AngryRate ######## */
@@ -192,6 +208,7 @@ public class MobAbilityConfig extends AbstractConfig
 	{
 		BabyAbility.addByChance(entity, this);
 		VillagerAbility.addByChance(entity, this);
+		SunProofAbility.addByChance(entity, this);
 		AngryAbility.addByChance(entity, this);
 		ChargedCreeperAbility.addByChance(entity, this);
 	}

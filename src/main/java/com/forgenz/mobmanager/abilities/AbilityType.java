@@ -73,6 +73,8 @@ public enum AbilityType
 	
 	VILLAGER("VillagerRate", false),
 	
+	SUNPROOF("SunProofRate", false),
+	
 	ANGRY("AngryRate", false),
 	
 	CHARGED("ChargedRate", false),

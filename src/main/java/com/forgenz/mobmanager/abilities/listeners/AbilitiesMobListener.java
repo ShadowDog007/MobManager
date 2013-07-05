@@ -37,6 +37,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -50,6 +51,7 @@ import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.abilities.DeathSpawnAbility;
 import com.forgenz.mobmanager.abilities.abilities.DropsAbility;
+import com.forgenz.mobmanager.abilities.abilities.SunProofAbility;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
@@ -272,6 +274,20 @@ public class AbilitiesMobListener implements Listener
 			
 			// Set the new damage
 			event.setDamage(newDamage);
+		}
+	}
+	
+	@EventHandler(ignoreCancelled = true)
+	public void onEntityCombust(EntityCombustEvent event)
+	{
+		if (event.getClass() != EntityCombustEvent.class)
+		{
+			return;
+		}
+		
+		if (event.getEntity() instanceof LivingEntity && SunProofAbility.isSunProof((LivingEntity) event.getEntity()))
+		{
+			event.setCancelled(true);
 		}
 	}
 }
