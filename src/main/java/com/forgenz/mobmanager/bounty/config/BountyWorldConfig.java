@@ -33,6 +33,7 @@ import java.util.HashMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
@@ -107,6 +108,8 @@ public class BountyWorldConfig extends AbstractConfig
 			String name = entity.getCustomName();
 			if (name != null)
 				return name;
+			if (entity instanceof Player)
+				return ((Player) entity).getName();
 		}
 		if (showAbilitySetName && MMComponent.getAbilities().isEnabled())
 		{
