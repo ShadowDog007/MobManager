@@ -29,8 +29,10 @@
 package com.forgenz.mobmanager.common.config;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -50,7 +52,25 @@ public abstract class AbstractConfig
 	
 	public static FileConfiguration getConfig(String folder, String config)
 	{
-		return YamlConfiguration.loadConfiguration(new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + config));
+		YamlConfiguration yaml = new YamlConfiguration();
+		
+		File configFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + config);
+		
+		try
+		{
+			yaml.load(configFile);
+		}
+		catch (FileNotFoundException e) {}
+		catch (Exception e)
+		{
+			File backupFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + ("Backup-" + System.currentTimeMillis() / 1000L) + config);
+			P.p().getLogger().log(Level.SEVERE, "Failed to load config: " + configFile.getPath());
+			P.p().getLogger().log(Level.SEVERE, "Creating backup: '" + backupFile.getPath(), e);
+			
+			configFile.renameTo(backupFile);
+		}
+		
+		return yaml;
 	}
 	
 	public static void saveConfig(String folder, String config, FileConfiguration cfg)
