@@ -67,15 +67,6 @@ E.G. if SpawnRate was 0.5 there would be a 50% chance that any mob
     which attempts to spawn will be allowed to spawn
 This setting can be used to reduce the number of certain mobs on your
     server. (Possibly Freeing up space for other mobs)
-    
-
-################
-EquipmentDropChance (Rate)
-################
-A number between 0.0 and 1.0
-Represents the chance a mob will drop held items upon death
-
-NOTE: This only works when using Armour or Item_Hand abilities
 
 ################
 BabyRate (Rate)
@@ -236,11 +227,14 @@ MobAbilities:
       Multi: 1.0
 
 ################
-ArmourSet (ChanceList)
+EquipmentSet (ChanceList)
 ################
-ArmourSet is a list of armour materials to be put on a mob
+EquipmentSet is a list of equipment to be put on a mob
 Armour is picked per position (Helmet/Chestplate/Leggings/Boots)
-Armour can also have enchantments added
+
+NOTE: EquipmentSet replaces the old ArmourSet node
+
+Equipment can be chosen via Materials or custom items can be created.
 
 Valid armour materials are:
 - DIAMOND
@@ -251,11 +245,15 @@ Valid armour materials are:
 - NONE
 - DEFAULT
 
+NOTE: For hand held items, each material will give the mob
+    a sword of a similar type.
+
 Valid Armour Positions are:
 - Helmet
 - Chestplate
 - Leggings
 - Boots
+- Hand
 
 The chosen armour is put on the mob when it spawns.
 NOTE: NONE means that the mob will have NO armour.
@@ -267,68 +265,50 @@ Keys:
     - Position: The position to put the armour
         (e.g. Helmet/Chestplate etc)
     - Material: The material for the armour
+        (Not used if CustomItem is used)
     - DropChance: The chance (Between 0.0 and 1.0) for the
         piece of armour to drop when the mob dies
-    - Enchantments: A list of enchantments to be added to the armour
-        (In the format '<enchantment>:<level>')
-    - ColourRed: Number between 0 and 255.
-        Used to colour leather armour (Google RGB colours)
-    - ColourGreen: Number between 0 and 255.
-        Used to colour leather armour (Google RGB colours)
-    - ColourBlue: Number between 0 and 255.
-        Used to colour leather armour (Google RGB colours)
+    - CustomItem: Defines the item placed on the mob
+        See the following link for info on item formats:
+        http://dev.bukkit.org/bukkit-plugins/mobmanager/pages/configuration/item-formatting/
+        Also see 'DropSet' below for basic format
     
 EXAMPLE:
 MobAbilities:
   ZOMBIE:
-    ArmourSet:
+    EquipmentSet:
     - Chance: 1
       Pieces:
       - Position: HELMET
-        Material: DIAMOND
-        Enchantments:
-        - PROTECTION_FIRE
+        CustomItem:
+          type: SKULL_ITEM
+          damage: 3
+          meta:
+            ==: ItemMeta
+            meta-type: SKULL
+            skull-owner: ShadowDog007
       - Position: CHESTPLATE
         Material: LEATHER
         DropChance: 1.0
       - Position: LEGGINGS
         Material: NONE
-      - Position: BOOTS
-        Material: CHAIN
-        DropChance: 0.0
-        Enchantments:
-        - PROTECTION_FALL:2
+      - Position: HAND
+        CustomItem:
+          type: DIAMOND_SPADE
+          meta:
+            ==: ItemMeta
+            meta-type: UNSPECIFIC
+            display-name: '&aShadowDog''s &bShovel'
+            enchants:
+              DURABILITY: 3
+              SILK_TOUCH: 1
+            repair-cost: 2         
+        DropChance: 1.0
         
     - Chance: 4 # This would produce no change to the mobs armour
-
-################
-Item_Hand (ChanceList)
-################
-This is a list of items mobs can start with.
-Items are given by their ID number and are placed in the mobs hand
-
-Check here for item id's: http://www.minecraftwiki.net/wiki/Data_values
-
-For no item use the ID for Air (Which is 0)
-
-To not replace the item a mob spawns with use -1
-
-Keys:
-- ID: The ID of the item to be placed in the mobs hand
-
-EXAMPLE:
-MobAbilities:
-  SKELETON-WITHER:
-    Item_Hand:
-    - Chance: 1
-      ID: 276
-    - Chance: 2
-      ID: 261
-    - Chance: 7
-      ID: -1
   
 ################
-Drops (ChanceList)
+DropSet (ChanceList)
 ################
 This is a list of chances/items that
     will be dropped upon the mobs death
@@ -342,16 +322,23 @@ Keys:
 - Drops: List of maps which define what items are dropped
     for the given chance.
     Drops has additional keys:
-    - ID: The id of the item to be dropped
-    - Data: The data to be added to the item
-    - MinCount: The minimum number of the item to be dropped
-    - MaxCount: The maximum number of the item to be dropped
-    - MinDurability: The minimum durability on the item
-    - MaxDurability: The maximum durability on the item
-    - Title: The name to be applied to the item (Supports & colour codes)
-    - Lore: List of strings to be set as the lore for the item
-        (Supports & colour codes)
-    - Enchantments: A list of enchantments to add to the item
+    - type: The id or name of the item to be dropped
+        Item names can be found here:
+        http://jd.bukkit.org/rb/apidocs/org/bukkit/Material.html
+    - damage: The amount of damage on the item
+        Also used to change the items type
+        e.g. for a STEP (Half slabs) set damage to 7
+        for a quartz slab
+    - damage-max: The max damage on the item
+        if this is used the items damage will be random between
+        damage and damage-max
+    - amount: The amount of the item to drop
+    - amount-max: The maximum amount of the item to drop
+        If this is used items amount will be random between
+        amount and amount-max
+    - meta: Used to further customise items
+        See here for more information:
+        http://dev.bukkit.org/bukkit-plugins/mobmanager/pages/configuration/item-formatting/
 
 - Replace: If true, vanilla drops are replaced with new drops
     If false, new drops are dropped with vanilla drops
@@ -361,40 +348,40 @@ Keys:
 EXAMPLE:
 MobAbilities:
   ZOMBIE:
-    Drops:
+    DropSet:
     - Chance: 1
       Replace: true
       Drops:
-      - ID: 367
-        MinCount: 1
-        MaxCount: 3
-      - ID: 267
-        MinCount: -1
-        MaxCount: 1
-        Durability: 20
-        Enchantments:
-        - DAMAGE_ALL:2
+      - type: 367
+        amount: 1
+        amount-max: 3
+      - type: IRON_SWORD
+        amount: -1
+        amount-max: 1
+        damage: 20
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            FIRE_ASPECT: 2
+          repair-cost: 2   
         
   <MobType>
-    Drops:
+    DropSet:
     - Chance: 1
       Replace: <True/False>
       Drops:
-      - ID: <Item_Id>
-        Data: <Item_Data>
-        MinCount: <Min count>
-        MaxCount: <Max Count>
-        Enchantments:
-        - <Enchantment_1>
-        - <Enchantment_2>:<Enchantment_2_Level>    
+      - type: <Item_Id or Name>
+        damage: <item data or damage>
+        amount: <Min amount>
+        amount-max: <Max amount>    
       
-NOTE: If neither MinCount or MaxCount are provided min/maxcount is
+NOTE: If neither amount or amount-max are provided amount is
     set to 1
-NOTE: If MinCount is negative this gives the item a lesser chance
+NOTE: If amount is negative this gives the item a lesser chance
     to spawn
-NOTE: If MinCount is given by MaxCount is not, MaxCount is
-    set the same as MinCount
-NOTE: Enchantments can only be added to items which support them
+NOTE: If amount is given by amount-max is not, amount-max is
+    set the same as amount
 
 
 ################

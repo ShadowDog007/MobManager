@@ -33,23 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.entity.EntityType;
-
 import com.forgenz.mobmanager.P;
 
 public class MiscUtil
-{
-	public static EntityType getEntityType(String name)
-	{
-		for (EntityType type : EntityType.values())
-		{
-			if (type.getName().equalsIgnoreCase(name))
-				return type;
-		}
-		
-		return null;
-	}
-	
+{	
 	public static Map<String, Object> getConfigMap(Object obj)
 	{
 		return getConfigMap(obj, true);
@@ -105,8 +92,13 @@ public class MiscUtil
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T> T getMapValue(Map<String, Object> map, String key, String error, Class<T> classOfT)
+	{
+		return getMapValue(map, key, error, classOfT, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T getMapValue(Map<String, Object> map, String key, String error, Class<T> classOfT, T def)
 	{
 		Object obj = map.get(key);
 		
@@ -114,7 +106,7 @@ public class MiscUtil
 		{
 			if (error != null)
 				P.p().getLogger().warning(String.format("Missing key %s for %s", key, error));
-			return null;
+			return def;
 		}
 		
 		if (classOfT.isAssignableFrom(obj.getClass()))
@@ -122,7 +114,7 @@ public class MiscUtil
 		
 		if (error != null)
 			P.p().getLogger().warning(String.format("Invalid Value for key %s for %s", key, error));
-		return null;
+		return def;
 	}
 	
 	public static String getString(Object obj)

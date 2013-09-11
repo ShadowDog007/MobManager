@@ -49,8 +49,6 @@ import com.forgenz.mobmanager.common.util.MiscUtil;
 
 public class MobAbilityConfig extends AbstractConfig
 {
-	public final float equipmentDropChance;
-	
 	public final float spawnRate;
 	public final float babyRate;
 	public final float villagerRate;
@@ -75,16 +73,10 @@ public class MobAbilityConfig extends AbstractConfig
 				spawnRate = 1.0F;
 			this.spawnRate = spawnRate;
 			set(cfg, "SpawnRate", spawnRate);
-			
-			/* ######## EquipmentDropChance ######## */
-			float equipmentDropChance = (float) cfg.getDouble("EquipmentDropChance", 0.15F);
-			this.equipmentDropChance = equipmentDropChance < 0 ? 0.0F : equipmentDropChance;
-			set(cfg, "EquipmentDropChance", this.equipmentDropChance);
 		}
 		else
 		{
 			spawnRate = 1.0F;
-			equipmentDropChance = 1.0F;
 		}
 		
 		/* ######## BabyRate ######## */

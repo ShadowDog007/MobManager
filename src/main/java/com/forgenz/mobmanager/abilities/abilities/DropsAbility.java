@@ -33,146 +33,28 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
+import com.forgenz.mobmanager.abilities.util.ItemParser;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.common.util.MiscUtil;
-import com.forgenz.mobmanager.common.util.Patterns;
-import com.forgenz.mobmanager.common.util.RandomUtil;
 
 public class DropsAbility extends Ability
-{
-	public static class DropSet
-	{
-		private final ItemStack item;
-
-		public final int range;
-		public final short durabilityRange;
-		
-		public DropSet(Material material, byte data, short minDurability, short maxDurability, int min, int max, String title, List<String> lore)
-		{
-			// Validate min/max counts
-			if (min > max)
-			{
-				min = min ^ max;
-				max = min ^ max;
-				min = min ^ max;
-			}
-			// Calculate the difference between min/max counts
-			this.range = max - min;
-			
-			// Validate min/max durability
-			if (minDurability > maxDurability)
-			{
-				minDurability = (short) (minDurability ^ maxDurability);
-				maxDurability = (short) (minDurability ^ maxDurability);
-				minDurability = (short) (minDurability ^ maxDurability);
-			}
-			// Calculate the difference between min/max durabilities
-			this.durabilityRange = (short) (maxDurability - minDurability);
-			
-			// Create our ItemStack template
-			item = new ItemStack(material, min, minDurability);
-			
-			// If data is not 0 add the data
-			if (data != 0)
-			{
-				item.setData(item.getType().getNewData(data));
-			}
-			
-			// Setup Title/Lore
-			if (title != null || lore != null)
-			{
-				// Fetch an ItemMeta object
-				ItemMeta meta = item.getItemMeta();
-				
-				// Add the title to ItemMeta
-				if (title != null)
-				{
-					meta.setDisplayName(title);
-				}
-				
-				// Add the lore to ItemMeta
-				if (lore != null)
-				{
-					meta.setLore(lore);
-				}
-				
-				item.setItemMeta(meta);
-			}
-		}
-		
-		public boolean hasValidCountRange()
-		{
-			return item.getAmount() + range > 0;
-		}
-		
-		public boolean addEnchantment(Enchantment e, int level)
-		{
-			if (e == null)
-				return false;
-			
-			if (level < 0)
-				level = 0;
-			
-			if (item.containsEnchantment(e))
-				return false;
-			
-			item.addUnsafeEnchantment(e, level);
-			return true;
-		}
-		
-		public List<ItemStack> getItem()
-		{
-			// Drop air? I think not.
-			if (item.getType() == Material.AIR)
-				return null;
-			
-			// Calculate the number of items to create
-			int count = range > 0 ? RandomUtil.i.nextInt(range + 1) + item.getAmount() : item.getAmount();
-			
-			// Make sure count is more than 0
-			if (count <= 0)
-				return null;
-			
-			// Create a list of the perfect size :)
-			List<ItemStack> itemz = new ArrayList<ItemStack>(count / item.getType().getMaxStackSize() + 1);
-			
-			// Create the item stack/stacks
-			while (count > 0)
-			{
-				// Clone our template
-				ItemStack clone = item.clone();
-				// Set an appropriate amount for the item stack
-				clone.setAmount(count > item.getType().getMaxStackSize() ? item.getType().getMaxStackSize() : count);
-				
-				itemz.add(clone);
-				count -= item.getType().getMaxStackSize();
-			}
-			
-			// Return the item in question
-			return itemz;
-		}
-	}
-	
+{	
 	public static final String metaStorageKey = "MOBMANAGER_DROPS";
 	public static final DropsAbility emptyDrops = new DropsAbility(null, false);
 	
-	private final ArrayList<DropSet> drops;
+	private final ArrayList<ItemParser> drops;
 	private final boolean replaceDrops;
 	
-	private DropsAbility(ArrayList<DropSet> drops, boolean replaceDrops)
+	private DropsAbility(ArrayList<ItemParser> drops, boolean replaceDrops)
 	{
 		this.drops = drops;
 		this.replaceDrops = replaceDrops;
@@ -207,19 +89,14 @@ public class DropsAbility extends Ability
 		if (drops != null)
 		{
 			// Iterate through each dropset
-			for (DropSet drop : drops)
+			for (ItemParser drop : drops)
 			{
 				// Get a list of itemstacks from the dropset
-				List<ItemStack> itemz = drop.getItem();
+				List<ItemStack> itemz = drop.getItems();
 				
 				// If the dropset provided a list add them to the main list
 				if (itemz != null)
-				{
-					for (ItemStack item : itemz)
-					{
-						items.add(item);
-					}
-				}
+					items.addAll(itemz);
 			}
 		}
 		
@@ -281,140 +158,50 @@ public class DropsAbility extends Ability
 	public static DropsAbility setup(ExtendedEntityType mob, Map<String, Object> optMap)
 	{
 		List<Object> drops = MiscUtil.getList(optMap.get("DROPS"));
-		ArrayList<DropSet> dropSets = null;
+		ArrayList<ItemParser> dropSets = null;
 		
 		// If drops is provided we fetch each set of drops
 		if (drops != null)
 		{
 			// Create a list for the drops to be stored
-			dropSets = new ArrayList<DropSet>();
+			dropSets = new ArrayList<ItemParser>();
 			// Iterate through each object and look for drops
 			for (Object obj : drops)
 			{
 				// Fetch the map containing drop settings
-				Map<String, Object> dropMap = MiscUtil.getConfigMap(obj);
+				Map<String, Object> dropMap = MiscUtil.getConfigMap(obj, false);
 				
 				// If no map was found continue
 				if (dropMap == null)
 					continue;
 				
-				// Fetch the ID  for the drop
-				int id = MiscUtil.getInteger(dropMap.get("ID"), -1);
-				
-				// Fetch the material for the drop
-				Material material = Material.getMaterial(id);
-				
-				// If the material is invalid, check next drop
-				if (material == null)
+				// Create a new Drop and store it in the list
+				ItemParser drop;
+				try
 				{
-					MMComponent.getAbilities().warning("No such Item ID " + id + " for " + mob);
+					 drop = new ItemParser(dropMap);
+				}
+				catch (Exception e)
+				{
+					MMComponent.getAbilities().warning("Invalid item data in DropSet for " + mob);
 					continue;
 				}
 				
-				// Fetch the data for the drop
-				byte data = (byte) MiscUtil.getInteger(dropMap.get("DATA"), 0);
-				
-				// Fetch the min and max counts for the drop
-				int minCount = MiscUtil.getInteger(dropMap.get("MINCOUNT"), 1);
-				int maxCount = MiscUtil.getInteger(dropMap.get("MAXCOUNT"), minCount);
-				
-				// Fetch the min and max durabilities
-				short minDurability = (short) MiscUtil.getInteger(dropMap.get("MINDURABILITY"), 0);
-				short maxDurability = (short) MiscUtil.getInteger(dropMap.get("MAXDURABILITY"), minDurability);
-				
-				// Fetch the title of the drop
-				String title = MiscUtil.getString(dropMap.get("TITLE"));
-				if (title != null)
-					title = ChatColor.translateAlternateColorCodes('&', title);
-				
-				// Fetch and validate the lore of the drop
-				List<Object> lore = MiscUtil.getList(dropMap.get("LORE"));
-				List<String> colouredLore = null;
-				if (lore != null)
-				{
-					colouredLore = new ArrayList<String>();
-					// Colour the lore and add it to the list
-					for (Object loreLine : lore)
-					{
-						if (loreLine instanceof String)
-							colouredLore.add(ChatColor.translateAlternateColorCodes('&', (String) loreLine));
-					}
-					// If there is no lore? What are we doing?
-					if (colouredLore.isEmpty())
-						colouredLore = null;
-				}
-				
-				// Create a new DropSet and store it in the list
-				DropSet drop = new DropSet(material, data, minDurability, maxDurability, minCount, maxCount, title, colouredLore);
-				
 				if (!drop.hasValidCountRange())
 				{
-					MMComponent.getAbilities().warning("DropSet made from " + id + "-" + material + " for " + mob + " will never drop any items.");
+					ItemStack template = drop.getItem();
+					MMComponent.getAbilities().warning("Drop made from " + template.getType() + " for " + mob + " will never drop any items.");
 					continue;
 				}
 				
 				dropSets.add(drop);
-				
-				// Fetch enchantments and add them to the DropSet
-				List<Object> enchantments = MiscUtil.getList(dropMap.get("ENCHANTMENTS"));
-				
-				// Ignore enchantments if key does not match
-				if (enchantments == null)
-					continue;
-				
-				// Find enchantments from the list
-				for (Object enchObj : enchantments)
-				{
-					// Fetch the string representing the enchantment
-					String ench = MiscUtil.getString(enchObj);
-					
-					// If no string was found check next object
-					if (ench == null)
-						continue;
-					
-					// Split the enchantment and the level
-					String[] split = Patterns.colonSplit.split(ench);
-					
-					// If WTF ignore the enchantment
-					if (split.length < 1)
-						continue;
-					
-					// Fetch the enchantment object
-					Enchantment enchantment = Enchantment.getByName(split[0].toUpperCase());
-					
-					if (enchantment == null)
-					{
-						MMComponent.getAbilities().warning("Invalid enchantment given: " + split[0].toUpperCase());
-						continue;
-					}
-					
-					// Make sure you can enchant the given material with the found enchantment
-					if (!enchantment.canEnchantItem(new ItemStack(material)))
-					{
-						MMComponent.getAbilities().warning("Can not enchant " + material.toString() + " with the enchantment: " + enchantment.toString());
-						continue;
-					}
-					
-					// Get the level of the enchantment
-					int level = split.length == 2 && Patterns.numberCheck.matcher(split[1]).matches() ? Integer.valueOf(split[1]) : enchantment.getStartLevel();
-					
-					// Validate the enchantment level
-					if (level > enchantment.getMaxLevel())
-						level = enchantment.getMaxLevel();
-					
-					if (level < enchantment.getStartLevel())
-						level = enchantment.getStartLevel();
-					
-					// Add the enchantment to the DropSet
-					drop.addEnchantment(enchantment, level);
-				}
 			}
 		}
 		
-		Boolean replaceDrops = MiscUtil.getMapValue(optMap, "REPLACE", null, Boolean.class);
+		boolean replaceDrops = MiscUtil.getMapValue(optMap, "REPLACE", null, Boolean.class, false).booleanValue();
 		
 		// Finally create the drops ability and return it
-		return drops.size() > 0 ? new DropsAbility(dropSets, replaceDrops != null ? replaceDrops : false) : DropsAbility.emptyDrops;
+		return dropSets != null && !dropSets.isEmpty() ? new DropsAbility(dropSets, replaceDrops) : DropsAbility.emptyDrops;
 	}
 
 	public static DropsAbility setup(ExtendedEntityType mob, Object opt)

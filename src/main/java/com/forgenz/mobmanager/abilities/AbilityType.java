@@ -34,13 +34,12 @@ import com.forgenz.mobmanager.abilities.abilities.Ability;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.abilities.abilities.AbstractSpawnAbility;
 import com.forgenz.mobmanager.abilities.abilities.AngryAbility;
-import com.forgenz.mobmanager.abilities.abilities.ArmourAbility;
+import com.forgenz.mobmanager.abilities.abilities.EquipmentAbility;
 import com.forgenz.mobmanager.abilities.abilities.BabyAbility;
 import com.forgenz.mobmanager.abilities.abilities.ChargedCreeperAbility;
 import com.forgenz.mobmanager.abilities.abilities.DamageAbility;
 import com.forgenz.mobmanager.abilities.abilities.DropsAbility;
 import com.forgenz.mobmanager.abilities.abilities.HealthAbility;
-import com.forgenz.mobmanager.abilities.abilities.ItemAbility;
 import com.forgenz.mobmanager.abilities.abilities.NameAbility;
 import com.forgenz.mobmanager.abilities.abilities.NullAbility;
 import com.forgenz.mobmanager.abilities.abilities.PotionAbility;
@@ -63,11 +62,9 @@ public enum AbilityType
 	
 	DAMAGE_MULTI("DamageMulti"),
 	
-	ARMOURSET("ArmourSet"),
+	EQUIPMENT_SET("EquipmentSet"),
 	
-	ITEM_HAND("Item_Hand"),
-	
-	DROPS("Drops"),
+	DROPS("DropSet"),
 	
 	BABY("BabyRate", false),
 	
@@ -123,17 +120,14 @@ public enum AbilityType
 		case ABILITY_SET:
 			AbilitySet.setup(mob, abilityChances, optList);
 			break;
-		case ARMOURSET:
-			ArmourAbility.setup(mob, abilityChances, optList);
+		case EQUIPMENT_SET:
+			EquipmentAbility.setup(mob, abilityChances, optList);
 			break;
 		case DAMAGE_MULTI:
 			DamageAbility.setup(mob, abilityChances, optList);
 			break;
 		case HEALTH_BONUS:
 			HealthAbility.setup(mob, abilityChances, optList);
-			break;
-		case ITEM_HAND:
-			ItemAbility.setup(mob, abilityChances, optList);
 			break;
 		case DROPS:
 			DropsAbility.setup(mob, abilityChances, optList);
@@ -164,8 +158,8 @@ public enum AbilityType
 	{
 		switch (this)
 		{
-		case ARMOURSET:
-			return ArmourAbility.setup(mob, opt);
+		case EQUIPMENT_SET:
+			return EquipmentAbility.setup(mob, opt);
 		case BABY:
 			return BabyAbility.ability;
 		case ANGRY:
@@ -176,8 +170,6 @@ public enum AbilityType
 			return DamageAbility.setup(mob, opt);
 		case HEALTH_BONUS:
 			return HealthAbility.setup(mob, opt);
-		case ITEM_HAND:
-			return ItemAbility.setup(mob, opt);
 		case DROPS:
 			return DropsAbility.setup(mob, opt);
 		case NONE:
