@@ -63,7 +63,7 @@ public abstract class AbstractConfig
 		catch (FileNotFoundException e) {}
 		catch (Exception e)
 		{
-			File backupFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + ("Backup-" + System.currentTimeMillis() / 1000L) + config);
+			File backupFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + ("Backup-" + System.currentTimeMillis() / 1000L + "-") + config);
 			P.p().getLogger().log(Level.SEVERE, "Failed to load config: " + configFile.getPath());
 			P.p().getLogger().log(Level.SEVERE, "Creating backup: '" + backupFile.getPath(), e);
 			
