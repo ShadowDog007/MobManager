@@ -52,6 +52,11 @@ public class MiscUtil
 	
 	public static Map<String, Object> getConfigMap(Object obj)
 	{
+		return getConfigMap(obj, true);
+	}
+	
+	public static Map<String, Object> getConfigMap(Object obj, boolean uppercase)
+	{
 		if (obj == null || obj instanceof Map == false)
 			return null;
 		
@@ -64,7 +69,11 @@ public class MiscUtil
 			if (obj2 instanceof String == false)
 				continue;
 			
-			stringMap.put(((String) obj2).toUpperCase(), map.get(obj2));
+			String key = (String) obj2;
+			
+			key = uppercase ? key.toUpperCase() : key.toLowerCase();
+			
+			stringMap.put(key, map.get(obj2));
 		}
 		
 		return stringMap;
