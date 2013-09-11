@@ -1,6 +1,6 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 2.7b
+version: 2.8
 website: http://dev.bukkit.org/server-mods/mobmanager/
 author: Michael McKnight (ShadowDog007)
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
