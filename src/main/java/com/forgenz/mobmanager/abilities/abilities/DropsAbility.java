@@ -49,7 +49,7 @@ import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.common.util.MiscUtil;
 import com.forgenz.mobmanager.common.util.Patterns;
-import com.forgenz.mobmanager.limiter.config.LimiterConfig;
+import com.forgenz.mobmanager.common.util.RandomUtil;
 
 public class DropsAbility extends Ability
 {
@@ -140,7 +140,7 @@ public class DropsAbility extends Ability
 				return null;
 			
 			// Calculate the number of items to create
-			int count = range > 0 ? LimiterConfig.rand.nextInt(range + 1) + item.getAmount() : item.getAmount();
+			int count = range > 0 ? RandomUtil.i.nextInt(range + 1) + item.getAmount() : item.getAmount();
 			
 			// Make sure count is more than 0
 			if (count <= 0)

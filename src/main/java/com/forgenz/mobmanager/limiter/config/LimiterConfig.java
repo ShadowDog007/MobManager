@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -52,8 +51,6 @@ import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class LimiterConfig extends AbstractConfig
 {
-	public final static Random rand = new Random();
-	
 	public final static Pattern layerPattern = Pattern.compile("^\\d+/{1}\\d+$");
 	public final static Pattern layerSplitPattern = Pattern.compile("/{1}");
 	

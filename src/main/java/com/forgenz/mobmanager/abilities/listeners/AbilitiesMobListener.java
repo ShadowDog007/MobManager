@@ -57,7 +57,7 @@ import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.integration.MobManagerProtector;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
-import com.forgenz.mobmanager.limiter.config.LimiterConfig;
+import com.forgenz.mobmanager.common.util.RandomUtil;
 
 public class AbilitiesMobListener implements Listener
 {
@@ -89,7 +89,7 @@ public class AbilitiesMobListener implements Listener
 				return;
 			}
 			// If the random number is higher than the spawn chance we disallow the spawn
-			if (LimiterConfig.rand.nextFloat() >= ma.spawnRate)
+			if (RandomUtil.i.nextFloat() >= ma.spawnRate)
 			{
 				event.setCancelled(true);
 				return;

@@ -30,7 +30,7 @@ package com.forgenz.mobmanager.abilities.util;
 
 import java.util.ArrayList;
 
-import com.forgenz.mobmanager.limiter.config.LimiterConfig;
+import com.forgenz.mobmanager.common.util.RandomUtil;
 
 public class ValueChance<T extends Object>
 {
@@ -68,7 +68,7 @@ public class ValueChance<T extends Object>
 		if (chances.size() == 0)
 			return null;
 		
-		int chance = LimiterConfig.rand.nextInt(totalChance);
+		int chance = RandomUtil.i.nextInt(totalChance);
 		
 		for (Chance c : chances)
 		{

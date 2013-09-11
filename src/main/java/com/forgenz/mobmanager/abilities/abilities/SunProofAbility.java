@@ -36,7 +36,7 @@ import org.bukkit.metadata.MetadataValue;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.abilities.AbilityType;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
-import com.forgenz.mobmanager.limiter.config.LimiterConfig;
+import com.forgenz.mobmanager.common.util.RandomUtil;
 
 public class SunProofAbility extends Ability
 {
@@ -63,7 +63,7 @@ public class SunProofAbility extends Ability
 		if (ma.sunProofRate <= 1.0 && ma.sunProofRate != 0.0)
 		{
 			// If the random number is lower than the sunproof rate we make the entity sun proof :D
-			if (ma.sunProofRate == 1.0F || LimiterConfig.rand.nextFloat() < ma.sunProofRate)
+			if (ma.sunProofRate == 1.0F || RandomUtil.i.nextFloat() < ma.sunProofRate)
 			{
 				ability.addAbility(entity);
 			}

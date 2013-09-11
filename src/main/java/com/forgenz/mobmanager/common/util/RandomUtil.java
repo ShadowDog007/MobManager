@@ -26,69 +26,14 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.abilities.abilities;
 
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Zombie;
+package com.forgenz.mobmanager.common.util;
 
-import com.forgenz.mobmanager.abilities.AbilityType;
-import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
-import com.forgenz.mobmanager.common.util.RandomUtil;
+import java.util.Random;
 
-public class VillagerAbility extends Ability
+public class RandomUtil
 {
-
-	public static Ability ability = new VillagerAbility();
+	public static final Random i = new Random();
 	
-	private VillagerAbility()
-	{
-		
-	}
-	
-	@Override
-	public void addAbility(LivingEntity entity)
-	{
-		if (entity instanceof Zombie == false)
-			return;
-		
-		Zombie zombie = (Zombie) entity;
-		
-		zombie.setVillager(true);
-	}
-	
-	public static void addByChance(LivingEntity entity, MobAbilityConfig ma)
-	{
-		if (ma == null || !isValid(entity))
-			return;
-		
-		if (ma.villagerRate <= 1.0 && ma.villagerRate != 0.0)
-		{
-			// If the random number is lower than the villager rate we turn it into a villager
-			if (ma.villagerRate == 1.0F || RandomUtil.i.nextFloat() < ma.villagerRate)
-			{
-				ability.addAbility(entity);
-			}
-		}
-	}
-	
-	public static boolean isValid(LivingEntity entity)
-	{
-		return entity instanceof Zombie;
-	}
-	
-	public static boolean isValid(EntityType entity)
-	{
-		if (entity == null || entity.getEntityClass() == null)
-			return false;
-		
-		return Zombie.class.isAssignableFrom(entity.getEntityClass());
-	}
-
-	@Override
-	public AbilityType getAbilityType()
-	{
-		return AbilityType.VILLAGER;
-	}
-
+	private RandomUtil() {}
 }
