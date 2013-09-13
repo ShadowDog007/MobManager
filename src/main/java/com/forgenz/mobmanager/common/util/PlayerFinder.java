@@ -26,7 +26,10 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.limiter.util;
+package com.forgenz.mobmanager.common.util;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -43,6 +46,93 @@ import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class PlayerFinder
 {
+	private PlayerFinder() {}
+
+	public enum FinderMode
+	{
+		/** Checks distance between two locations */
+		SPHERE
+		{
+			@Override
+			public boolean withinRange(Location l1, Location l2, int radiusSquared, int height)
+			{
+				return l1.distanceSquared(l2) < radiusSquared;
+			}
+		},
+		
+		/** Checks the horizontal and vertical distance between two locations */
+		CYLINDER
+		{
+			@Override
+			public boolean withinRange(Location l1, Location l2, int radiusSquared, int height)
+			{
+				// Check height is within range
+				if (Math.abs(l1.getBlockY() - l2.getBlockY()) <= height)
+				{
+					// Check horizontal distance is within range
+					final double first = Math.pow(l1.getX() - l2.getX(), 2);
+					
+					// If the first one is greater the two combined won't be less...
+					if (first > radiusSquared)
+						return false;
+					
+					return first + Math.pow(l1.getZ() - l2.getZ(), 2) <= radiusSquared;
+				}
+				return false;
+			}
+		};
+		
+		public abstract boolean withinRange(Location l1, Location l2, int radiusSquared, int height);
+	}
+	
+	/**
+	 * Fetches all nearby players and adds them to the player collection
+	 * @param loc The center of the search
+	 * @param mode The mode in which to search for players
+	 * @param radiusSquared The radius squared in which we are checking for players
+	 * @param height The height difference between the center and the player (Only for CYLINDER FinderMode)
+	 * @param players A collection which will have players added to it
+	 */
+	public static Collection<Player> findNearbyPlayers(Location loc, FinderMode mode, int radiusSquared, int height, Collection<Player> players)
+	{
+		// Fetch a location object for ploc
+		Location pLoc = LocationCache.getCachedLocation();
+		
+		// Iterate through each player to check if there is a player nearby
+		for (Player player : P.p().getServer().getOnlinePlayers())
+		{
+			// Skip the player if they are in creative mode (And we should be skipping them)
+			if (LimiterConfig.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
+				continue;
+			
+			// If the worlds differ the player is not nearby
+			if (player.getWorld() != loc.getWorld())
+				continue;
+			
+			// Copy the players location into pLoc
+			player.getLocation(pLoc);
+			
+			// Check the location and the player is within range
+			if (mode.withinRange(loc, pLoc, radiusSquared, height))
+			{
+				players.add(player);
+			}
+		}
+		return players;
+	}
+	
+	/**
+	 * Fetches all nearby players
+	 * 
+	 * @See {@link #findNearbyPlayers(Location, FinderMode, int, int, Collection<Player>)}
+	 * 
+	 * @return A list of all nearby players
+	 */
+	public static ArrayList<Player> findNearbyPlayers(Location loc, FinderMode mode, int radiusSquared, int height)
+	{
+		return (ArrayList<Player>) findNearbyPlayers(loc, mode, radiusSquared, height, new ArrayList<Player>());
+	}
+	
 	public static boolean mobFlys(Entity entity)
 	{
 		if (entity instanceof Flying || entity instanceof Bat)
@@ -88,8 +178,7 @@ public class PlayerFinder
 			// Check the if the distance between the entity and the player is less than the search distance
 			// Then check the if the height difference is small enough
 			// Return true as soon as we find a player which matches these requirements
-			if (Math.pow(pLoc.getX() - eLoc.getX(), 2) + Math.pow(pLoc.getZ() - eLoc.getZ(), 2) <= searchDist
-					&& Math.abs(eLoc.getBlockY() - pLoc.getBlockY()) <= searchY)
+			if (FinderMode.CYLINDER.withinRange(eLoc, pLoc, searchDist, searchY))
 				return true;
 		}
 		

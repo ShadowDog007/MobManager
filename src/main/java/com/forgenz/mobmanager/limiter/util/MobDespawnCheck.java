@@ -37,6 +37,7 @@ import org.bukkit.inventory.EntityEquipment;
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.PlayerFinder;
 import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
