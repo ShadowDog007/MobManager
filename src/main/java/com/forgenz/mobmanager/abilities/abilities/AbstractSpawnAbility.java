@@ -42,12 +42,12 @@ import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.LocationCache;
 import com.forgenz.mobmanager.common.util.MiscUtil;
 import com.forgenz.mobmanager.common.util.RandomLocationGen;
 
 public abstract class AbstractSpawnAbility extends Ability
 {
-	protected final static Location loc = new Location(null, 0, 0, 0);
 	private static boolean spawning = false;
 	
 	private final ExtendedEntityType type;
@@ -84,7 +84,7 @@ public abstract class AbstractSpawnAbility extends Ability
 			return;
 		
 		// Copy the entities location into the cache
-		entity.getLocation(loc);
+		Location loc = entity.getLocation(LocationCache.getCachedLocation());
 		
 		// Spawn each mob
 		for (int i = 0; i < count; ++i)

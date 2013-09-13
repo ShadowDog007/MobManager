@@ -53,13 +53,12 @@ import com.forgenz.mobmanager.bounty.config.multipliers.TimeMultiplier;
 import com.forgenz.mobmanager.bounty.config.util.ExploitsPlayerData;
 import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.LocationCache;
 
 public class BountyConfig extends AbstractConfig
 {
 	private static final String BOUNTY_CONFIG_NAME = "bounty.yml";
 	private static final double DOUBLE_TOO_SMALL = 0.0001;
-	
-	private final Location cacheLoc = new Location(null, 0.0, 0.0, 0.0);
 	
 	public final BountyType bountyType;
 	public final Material itemDrop;
@@ -506,8 +505,8 @@ public class BountyConfig extends AbstractConfig
 		// Apply Biome multiplier
 		if (usingBiomeMulti)
 		{
-			entity.getLocation(cacheLoc);
-			Biome biome = entity.getWorld().getBiome(cacheLoc.getBlockX(), cacheLoc.getBlockZ());
+			Location loc = entity.getLocation(LocationCache.getCachedLocation());
+			Biome biome = entity.getWorld().getBiome(loc.getBlockX(), loc.getBlockZ());
 			
 			reward *= biomeMultipliers[biome.ordinal()];
 		}

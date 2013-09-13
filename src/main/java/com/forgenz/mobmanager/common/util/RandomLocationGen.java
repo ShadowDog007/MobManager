@@ -30,7 +30,6 @@ package com.forgenz.mobmanager.common.util;
 
 import java.util.Random;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -41,7 +40,6 @@ import com.forgenz.mobmanager.P;
 public class RandomLocationGen
 {
 	private static Random rand = new Random();
-	private static Location loc = new Location(null, 0.0, 0.0, 0.0);
 	
 	/**
 	 * Stop instances of the class from being created
@@ -56,8 +54,7 @@ public class RandomLocationGen
 	 */
 	public static Location getLocation(boolean circle, Location center, int range, int minRange, int heightRange)
 	{
-		Location loc = Bukkit.isPrimaryThread() ? RandomLocationGen.loc : new Location(null, 0.0, 0.0, 0.0);
-		return getLocation(circle, center, range, minRange, heightRange, loc);
+		return getLocation(circle, center, range, minRange, heightRange, LocationCache.getCachedLocation());
 	}
 	
 	/**

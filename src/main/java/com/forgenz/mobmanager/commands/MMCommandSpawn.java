@@ -44,6 +44,7 @@ import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.listeners.AbilitiesMobListener;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.LocationCache;
 import com.forgenz.mobmanager.common.util.RandomLocationGen;
 
 public class MMCommandSpawn extends MMCommand
@@ -104,7 +105,7 @@ public class MMCommandSpawn extends MMCommand
 				return null;
 			}
 			
-			return new Location(world, Integer.valueOf(args[4]), Integer.valueOf(args[5]), Integer.valueOf(args[6]));
+			return LocationCache.getCachedLocation(world, Integer.valueOf(args[4]), Integer.valueOf(args[5]), Integer.valueOf(args[6]));
 		}
 		else if (args.length == 3)
 		{

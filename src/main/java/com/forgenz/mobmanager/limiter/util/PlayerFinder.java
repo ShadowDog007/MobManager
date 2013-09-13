@@ -28,7 +28,6 @@
 
 package com.forgenz.mobmanager.limiter.util;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Bat;
@@ -38,14 +37,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.common.util.LocationCache;
 import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 
 public class PlayerFinder
 {
-	private static Location eLoc = new Location(null, 0.0, 0.0, 0.0);
-	private static Location pLoc = new Location(null, 0.0, 0.0, 0.0);
-	
 	public static boolean mobFlys(Entity entity)
 	{
 		if (entity instanceof Flying || entity instanceof Bat)
@@ -65,11 +62,9 @@ public class PlayerFinder
 	 */
 	public static boolean playerNear(MMWorld world, LivingEntity entity, boolean flying)
 	{		
-		// Fetch the entities location and sets the pLoc object to use
-		// If the function is run in the primary thread we use a cached object else we make new ones
-		boolean pThread = Bukkit.isPrimaryThread();
-		Location eLoc = pThread ? entity.getLocation(PlayerFinder.eLoc) : entity.getLocation();
-		Location pLoc = pThread ? PlayerFinder.pLoc : new Location(null, 0.0, 0.0, 0.0);
+		// Fetch the entities location and a location object for ploc
+		Location eLoc = entity.getLocation(LocationCache.getCachedLocation());
+		Location pLoc = LocationCache.getCachedLocation();
 		
 		// Fetch the worlds search distance at the given entities height
 		int searchDist = world.getSearchDistance((short) eLoc.getBlockY());

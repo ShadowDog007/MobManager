@@ -28,7 +28,6 @@
 
 package com.forgenz.mobmanager.limiter.listeners;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -40,6 +39,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
+import com.forgenz.mobmanager.common.util.LocationCache;
 import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.util.MobType;
 import com.forgenz.mobmanager.limiter.util.PlayerFinder;
@@ -55,9 +55,6 @@ import com.forgenz.mobmanager.limiter.world.MMWorld;
 public class MobListener implements Listener
 {	
 	// Event listener methods
-	
-	/** Pre-made location object for speedz */
-	private final Location loc = new Location(null, 0, 0, 0);
 	
 	/**
 	 * Checks mob limits to determine if the mob can spawn </br>
@@ -113,7 +110,7 @@ public class MobListener implements Listener
 					// If the limit is 0 there is no point counting the mobs
 					if (world.worldConf.breedingLimit != 0)
 					{
-						for (Entity entity : event.getEntity().getLocation(loc).getChunk().getEntities())
+						for (Entity entity : LocationCache.getCachedLocation(event.getEntity()).getChunk().getEntities())
 						{
 							if (MobType.ANIMAL.belongs(entity))
 								++animalCount;
