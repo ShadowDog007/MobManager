@@ -69,6 +69,8 @@ public class AbilitySet extends Ability
 	
 	public static AbilitySet getAbilitySet(String name)
 	{
+		if (name.equalsIgnoreCase("none"))
+			return null;
 		return abilitySets.get(name.toLowerCase());
 	}
 	
@@ -103,6 +105,7 @@ public class AbilitySet extends Ability
 			if (protectFromDespawner)
 			{
 				MobManagerProtector.getInstance().addProtectedEntity(entity);
+				entity.setRemoveWhenFarAway(false);
 			}
 			
 			// Add each ability to the entity

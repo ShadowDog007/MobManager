@@ -29,7 +29,7 @@
 package com.forgenz.mobmanager.common.integration;
 
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 
 import org.bukkit.entity.LivingEntity;
 
@@ -38,7 +38,7 @@ import com.forgenz.mobmanager.P;
 public class MobManagerProtector implements Protector
 {
 	private static MobManagerProtector i;
-	private final ConcurrentHashMap<UUID, UUID> protectedEntities = new ConcurrentHashMap<UUID, UUID>();
+	private final WeakHashMap<LivingEntity, UUID> protectedEntities = new WeakHashMap<LivingEntity, UUID>();
 
 	protected MobManagerProtector()
 	{
@@ -53,7 +53,7 @@ public class MobManagerProtector implements Protector
 	}
 	
 	@Override
-	public boolean canDespawn(LivingEntity entity)
+	public synchronized boolean canDespawn(LivingEntity entity)
 	{
 		if (entity == null)
 		{
@@ -75,7 +75,7 @@ public class MobManagerProtector implements Protector
 		return true;
 	}
 	
-	public void addProtectedEntity(LivingEntity entity)
+	public synchronized void addProtectedEntity(LivingEntity entity)
 	{
 		if (entity == null)
 		{
@@ -83,16 +83,6 @@ public class MobManagerProtector implements Protector
 		}
 
 		UUID id = entity.getUniqueId();
-		protectedEntities.put(id, id);
-	}
-	
-	public void remoteProtectedEntity(LivingEntity entity)
-	{
-		if (entity == null)
-		{
-			return;
-		}
-		
-		protectedEntities.remove(entity.getUniqueId());
+		protectedEntities.put(entity, id);
 	}
 }

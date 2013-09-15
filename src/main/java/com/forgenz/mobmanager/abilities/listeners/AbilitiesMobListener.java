@@ -55,7 +55,6 @@ import com.forgenz.mobmanager.abilities.abilities.SunProofAbility;
 import com.forgenz.mobmanager.abilities.config.AbilityConfig;
 import com.forgenz.mobmanager.abilities.config.MobAbilityConfig;
 import com.forgenz.mobmanager.abilities.util.ValueChance;
-import com.forgenz.mobmanager.common.integration.MobManagerProtector;
 import com.forgenz.mobmanager.common.util.ExtendedEntityType;
 import com.forgenz.mobmanager.common.util.RandomUtil;
 
@@ -228,9 +227,6 @@ public class AbilitiesMobListener implements Listener
 				event.getDrops().add(item);
 			}
 		}
-		
-		// Make sure protected entities are removed from the protection map
-		MobManagerProtector.getInstance().remoteProtectedEntity(event.getEntity());
 	}
 	
 	/**
