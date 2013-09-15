@@ -149,9 +149,6 @@ public class AbilitiesMobListener implements Listener
 			
 			// Make sure rates which are applied are the AbilitySets ones
 			rateMa = abilitySet.getAbilityConfig();
-			
-			// Add the ability and return to prevent other abilities being applied
-			abilitySet.addAbility(entity);
 		}
 		
 		// Apply rates to the mob
@@ -160,6 +157,12 @@ public class AbilitiesMobListener implements Listener
 		if (applyNormalAbilities)
 		{
 			applyNormalAbilities(entity, rateMa);
+		}
+		
+		if (abilitySet != null)
+		{
+			// Add the ability and return to prevent other abilities being applied
+			abilitySet.addAbility(entity);
 		}
 	}
 	
