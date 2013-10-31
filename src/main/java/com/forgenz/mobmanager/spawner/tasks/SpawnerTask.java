@@ -28,20 +28,60 @@
 
 package com.forgenz.mobmanager.spawner.tasks;
 
-import org.bukkit.scheduler.BukkitRunnable;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SpawnerTask extends BukkitRunnable
+import org.bukkit.Bukkit;
+
+import com.forgenz.mobmanager.MMComponent;
+import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.spawner.util.MobSpawner;
+
+/**
+ * Handles queuing and execution of {@link MobSpawner} objects
+ */
+public class SpawnerTask implements Runnable
 {
+	private final AtomicBoolean isRunning = new AtomicBoolean(false);
+
+	private final Queue<MobSpawner> spawners = new LinkedList<MobSpawner>();
 	
-	public SpawnerTask()
+	public synchronized void addSpawner(MobSpawner spawner)
 	{
+		spawners.add(spawner);
+		schedule();
+	}
+	
+	private synchronized MobSpawner getSpawner()
+	{
+		return spawners.poll();
+	}
+	
+	private synchronized boolean isEmpty()
+	{
+		return spawners.isEmpty();
+	}
+	
+	private void schedule()
+	{
+		if (MMComponent.getAbilities().isEnabled() && isRunning.compareAndSet(false, true))
+			Bukkit.getScheduler().runTask(P.p(), this);
 	}
 
 	@Override
 	public void run()
 	{
-		// TODO Auto-generated method stub
+		MobSpawner spawner;
+		// Spawn all the mobs!
+		while ((spawner = getSpawner()) != null)
+			spawner.spawn();
 		
+		// Allow the spawner task to run again
+		isRunning.set(false);
+		
+		// Make sure we don't have any spawns left to do
+		if (!isEmpty())
+			schedule();
 	}
-
 }

@@ -26,60 +26,59 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.commands;
+package com.forgenz.mobmanager.spawner.listener;
 
-import java.util.ArrayList;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import com.forgenz.mobmanager.MMComponent;
 
-public class MMCommandListener implements CommandExecutor
+/**
+ * Handles clearing of mobs from a players mob limit
+ */
+public class PlayerListener implements Listener
 {
-	private static ArrayList<MMCommand> commands = null;
-	
-	static void registerCommand(MMCommand command)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerQuit(PlayerQuitEvent event)
 	{
-		commands.add(command);
+		remove(event.getPlayer());
 	}
 	
-	public MMCommandListener()
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerKick(PlayerKickEvent event)
 	{
-		commands = new ArrayList<MMCommand>();
-		
-		// Create Command objects
-		new MMCommandHelp(commands);
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-		new MMCommandSpawn();
-		new MMCommandPSpawn();
-		new MMCommandAbilitySetList();
-		new MMCommandMobTypes();
-		new MMCommandSaveItem();
-		new MMCommandSpawnCheck();
-		new MMCommandVersion();
-		new MMCommandDebug();
+		remove(event.getPlayer());
 	}
 	
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerTeleport(PlayerTeleportEvent event)
 	{
-		if (args.length >= 1)
+		checkClear(event.getPlayer(), event.getFrom(), event.getTo());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerPortal(PlayerPortalEvent event)
+	{
+		checkClear(event.getPlayer(), event.getFrom(), event.getTo());
+	}
+	
+	private void remove(Player player)
+	{
+		MMComponent.getSpawner().getSpawnFinder().removeMobs(player);
+	}
+	
+	private void checkClear(Player player, Location f, Location t)
+	{
+		if (t.getWorld() != f.getWorld() || f.distanceSquared(t) > 1000)
 		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0].trim()))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
+			remove(player);
 		}
-		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
-		return true;
 	}
-
 }

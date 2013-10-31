@@ -28,7 +28,9 @@
 
 package com.forgenz.mobmanager.common.util;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,18 +51,31 @@ public class MiscUtil
 		
 		Map<?, ?> map = (Map<?, ?>) obj;
 		
-		Map<String, Object> stringMap = new HashMap<String, Object>();
+		Map<String, Object> stringMap = new LinkedHashMap<String, Object>();
 		
-		for (Object obj2 : map.keySet())
+		for (Entry<?, ?> e : map.entrySet())
 		{
-			if (obj2 instanceof String == false)
-				continue;
-			
-			String key = (String) obj2;
-			
+			String key = e.getKey().toString();
 			key = uppercase ? key.toUpperCase() : key.toLowerCase();
 			
-			stringMap.put(key, map.get(obj2));
+			stringMap.put(key, e.getValue());
+		}
+		
+		return stringMap;
+	}
+	
+	public static Map<String, Object> copyConfigMap(Object obj)
+	{
+		if (obj == null || obj instanceof Map == false)
+			return null;
+		
+		Map<?, ?> map = (Map<?, ?>) obj;
+		
+		Map<String, Object> stringMap = new LinkedHashMap<String, Object>();
+		
+		for (Entry<?, ?> e : map.entrySet())
+		{
+			stringMap.put(e.getKey().toString(), e.getValue());
 		}
 		
 		return stringMap;
@@ -76,6 +91,23 @@ public class MiscUtil
 			return (List<Object>) obj;
 		
 		return null;
+	}
+	
+	public static List<String> getStringList(Object obj)
+	{
+		List<Object> list = getList(obj);
+		
+		if (list != null && list.size() > 0)
+		{
+			List<String> strList = new ArrayList<String>(list.size());
+			
+			for (Object o : list)
+				if (o != null)
+					strList.add(o.toString());
+			
+			return strList;
+		}
+		return Collections.emptyList();
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -26,60 +26,86 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.commands;
+package com.forgenz.mobmanager.common.util;
 
-import java.util.ArrayList;
+import java.util.WeakHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-
-public class MMCommandListener implements CommandExecutor
+public class ThreadCache<T>
 {
-	private static ArrayList<MMCommand> commands = null;
+	private final WeakHashMap<Thread, T> map;
+	private final ReentrantReadWriteLock rwLock;
+	private Class<T> clazz;
 	
-	static void registerCommand(MMCommand command)
+	public ThreadCache()
 	{
-		commands.add(command);
+		this(null);
 	}
 	
-	public MMCommandListener()
+	public ThreadCache(Class<T> clazz)
 	{
-		commands = new ArrayList<MMCommand>();
+		this.map = new WeakHashMap<Thread, T>();
+		rwLock = new ReentrantReadWriteLock();
+		this.clazz = clazz;
+	}
+	
+	public T get()
+	{
+		ReadLock lock = rwLock.readLock();
+		lock.lock();
 		
-		// Create Command objects
-		new MMCommandHelp(commands);
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-		new MMCommandSpawn();
-		new MMCommandPSpawn();
-		new MMCommandAbilitySetList();
-		new MMCommandMobTypes();
-		new MMCommandSaveItem();
-		new MMCommandSpawnCheck();
-		new MMCommandVersion();
-		new MMCommandDebug();
-	}
-	
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-	{
-		if (args.length >= 1)
+		T t = null;
+		try
 		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0].trim()))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
+			t = map.get(Thread.currentThread());
+		}
+		finally
+		{
+			lock.unlock();
 		}
 		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
-		return true;
+		if (t == null && clazz != null)
+		{
+			try
+			{
+				t = clazz.getConstructor().newInstance();
+				set(t);
+			}
+			catch (Exception e)
+			{
+				clazz = null;
+			}
+		}
+		return t;
 	}
-
+	
+	public void set(T t)
+	{
+		WriteLock lock = rwLock.writeLock();
+		lock.lock();
+		try
+		{
+			map.put(Thread.currentThread(), t);
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
+	public void clear()
+	{
+		WriteLock lock = rwLock.writeLock();
+		lock.lock();
+		try
+		{
+			map.clear();
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
 }

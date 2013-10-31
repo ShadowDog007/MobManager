@@ -38,6 +38,32 @@ MobMananger's Bounty allows you to provide players with rewards
 Rewards can be Money, Items or Experience
 
 #######################################################################
+EnableSpawner
+#######################################################################
+Enables the Spawner component of MobManager (Requires Limiter)
+
+MobMananger's Spawner allows you to have much more control over spawns
+
+You can use it to provide a more consistent experience for players
+    by having a fixed number of mobs spawn around each player
+    periodically. This means that groups of players will meet larger
+    amounts of mobs.
+
+The Spawner hooks into both MobManager's Limiter and Abilities
+    components.
+    For limiter, it bypasses the normal spawn checks and completes
+    them itself in a slightly more efficient manner.
+    For abilities, it allows you to directly spawn mobs with chosen
+    ability sets.
+
+The Spawner also uses Regions which allows even more power by allowing
+    different mobs to spawn in different defined regions.
+
+The Spawner can also allow mobs to spawn in locations they normally
+    wouldn't. Such as zombies in daylight, or have naturally spawning
+    Giants
+
+#######################################################################
 EnableVersionCheck
 #######################################################################
 If false /mm version will only provide the current version and not

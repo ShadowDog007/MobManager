@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,6 +49,53 @@ import com.forgenz.mobmanager.P;
  */
 public abstract class AbstractConfig
 {
+	private ConfigurationSection cfg;
+	private Map<String, Object> mapCfg;
+	
+	protected void setCfg(ConfigurationSection cfg)
+	{
+		this.cfg = cfg;
+	}
+	
+	protected void setMapCfg(Map<String, Object> cfg)
+	{
+		this.mapCfg = cfg;
+	}
+	
+	protected ConfigurationSection getCfg()
+	{
+		return cfg;
+	}
+	
+	protected Map<String, Object> getMapCfg()
+	{
+		return mapCfg;
+	}
+	
+	protected void clearCfg()
+	{
+		cfg = null;
+		mapCfg = null;
+	}
+	
+	public ConfigurationSection getConfigurationSection(String path)
+	{
+		return getConfigurationSection(cfg, path);
+	}
+	
+	public void set(String path, Object obj)
+	{
+		if (cfg != null)
+			set(cfg, path, obj);
+		else
+			set(mapCfg, path, obj);
+	}
+	
+	public <T> T getAndSet(String path, T def)
+	{
+		return cfg != null ? getAndSet(cfg, path, def) : getAndSet(mapCfg, path, def);
+	}
+	
 	public final static String WORLDS_FOLDER = "worlds";
 	public final static String LIMITER_CONFIG_NAME = "limiter.yml";
 	
@@ -146,5 +195,38 @@ public abstract class AbstractConfig
 	{
 		cfg.set(path, null);
 		cfg.set(path, obj);
+	}
+	
+	public static <T> T getAndSet(ConfigurationSection cfg, String path, T def)
+	{
+		Object o = cfg.get(path);
+		
+		@SuppressWarnings("unchecked")
+		T ret = (T) (o != null && def.getClass().isAssignableFrom(o.getClass()) ? o : def);
+		
+		set(cfg, path, ret);
+		return ret;
+	}
+
+	public static Map<String, Object> getConfigurationSection(Map<String, Object> cfg, String path)
+	{
+		return getAndSet(cfg, path, new LinkedHashMap<String, Object>());
+	}
+	
+	public static void set(Map<String, Object> cfg, String path, Object obj)
+	{
+		cfg.remove(path);
+		cfg.put(path, obj);
+	}
+	
+	public static <T> T getAndSet(Map<String, Object> cfg, String path, T def)
+	{
+		Object o = cfg.get(path);
+		
+		@SuppressWarnings("unchecked")
+		T ret = (T) (o != null && def.getClass().isAssignableFrom(o.getClass()) ? o : def);
+		
+		set(cfg, path, ret);
+		return ret;
 	}
 }

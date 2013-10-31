@@ -210,7 +210,7 @@ public class ExtendedEntityType
 	
 	public LivingEntity spawnMob(Location loc)
 	{
-		if (loc == null || loc.getWorld() == null)
+		if (eType.getEntityClass() == null || loc == null || loc.getWorld() == null)
 			return null;
 		
 		LivingEntity entity = (LivingEntity) loc.getWorld().spawnEntity(loc, eType);

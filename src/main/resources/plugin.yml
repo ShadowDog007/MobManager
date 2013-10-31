@@ -1,6 +1,6 @@
 main: com.forgenz.mobmanager.P
 name: MobManager
-version: 2.8
+version: 3.0
 website: http://dev.bukkit.org/server-mods/mobmanager/
 author: Michael McKnight (ShadowDog007)
 description: MobManager made for ForgeNZ to give the illusion of having more mobs while having less
@@ -20,6 +20,7 @@ permissions:
       mobmanager.pspawn: true
       mobmanager.abilitysetlist: true
       mobmanager.mobtypes: true
+      mobmanager.checkmobs: true
       mobmanager.debug: true
       mobmanager.version: true
     
@@ -39,6 +40,8 @@ permissions:
     description: Gives access to the /mm mobtypes command
   mobmanager.version:
     description: Gives access to the /mm version command
+  mobmanager.checkmobs:
+    description: Gives access to the /mm checkmobs command
   mobmanager.debug:
     description: Gives access to the /mm debug command
   # Bounty Permissions

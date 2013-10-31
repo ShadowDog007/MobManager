@@ -66,7 +66,7 @@ public class LimiterConfig extends AbstractConfig
 	public static double daysTillFarmAnimalCleanup;
 	public static int protectedFarmAnimalSaveInterval;
 	
-	public static short despawnSearchDistance;
+	public static short despawnSearchDistance, despawnSearchDistanceSquared;
 	public static short despawnSearchHeight;
 	public static short flyingMobAditionalBlockDepth;
 	public static int ticksPerRecount;
@@ -184,7 +184,8 @@ public class LimiterConfig extends AbstractConfig
 		
 		/* ################ DespawnSearchDistance ################ */
 		short despawnSearchDistance = (short) Math.abs(cfg.getInt("DespawnSearchDistance", 72));
-		LimiterConfig.despawnSearchDistance = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
+		LimiterConfig.despawnSearchDistance = despawnSearchDistance;
+		LimiterConfig.despawnSearchDistanceSquared = despawnSearchDistance <= 0 ? 1 : (short) (despawnSearchDistance * despawnSearchDistance);
 		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
 		/* ################ DespawnSearchHeight ################ */

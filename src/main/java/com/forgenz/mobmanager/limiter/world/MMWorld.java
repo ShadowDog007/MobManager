@@ -30,6 +30,7 @@ package com.forgenz.mobmanager.limiter.world;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Tameable;
@@ -115,6 +116,16 @@ public class MMWorld
 		MMComponent.getLimiter().info(String.format("[%s] Limits M:%d, A:%d, W:%d, Am:%d, V:%d", world.getName(), maxMonsters, maxAnimals, maxWater, maxAmbient, maxVillagers));
 	}
 	
+	public short getSearchDistanceSquared(short y)
+	{
+		return y <= worldConf.groundHeight ? worldConf.undergroundSearchDistanceSquared : getSearchDistanceSquared();
+	}
+	
+	public short getSearchDistanceSquared()
+	{
+		return worldConf.despawnSearchDistanceSquared > 0 ? worldConf.despawnSearchDistanceSquared : LimiterConfig.despawnSearchDistanceSquared;
+	}
+	
 	public short getSearchDistance(short y)
 	{
 		return y <= worldConf.groundHeight ? worldConf.undergroundSearchDistance : getSearchDistance();
@@ -155,7 +166,7 @@ public class MMWorld
 	 */
 	public boolean updateMobCounts(List<LivingEntity> entities)
 	{
-		if (needsUpdate)
+		if (Bukkit.isPrimaryThread() && needsUpdate)
 		{
 			resetMobCounts();
 			

@@ -74,50 +74,55 @@ public abstract class AbstractSpawnAbility extends Ability
 		// Make sure the bonus mobs don't recursively spawn more bonus mobs
 		spawning = true;
 		
-		// Get the ability set being assigned to the mob
-		AbilitySet abilities = abilitySet != null ? AbilitySet.getAbilitySet(abilitySet) : null;
-		// Get the entity type the mob will be
-		ExtendedEntityType type = this.type != null ? this.type : (abilitySet != null ? abilities.type : null);
-		
-		// If there is no entity type return
-		if (type == null)
-			return;
-		
-		// Copy the entities location into the cache
-		Location loc = entity.getLocation(LocationCache.getCachedLocation());
-		
-		// Spawn each mob
-		for (int i = 0; i < count; ++i)
+		try
 		{
-			// If the mob has an ability set we do not add any abilities
-			if (abilities != null)
-				P.p().abilitiesIgnoreNextSpawn(true);
+			// Get the ability set being assigned to the mob
+			AbilitySet abilities = abilitySet != null ? AbilitySet.getAbilitySet(abilitySet) : null;
+			// Get the entity type the mob will be
+			ExtendedEntityType type = this.type != null ? this.type : (abilitySet != null ? abilities.type : null);
 			
-			if (!AbilityConfig.i().limitBonusSpawns)
-				P.p().limiterIgnoreNextSpawn(true);
+			// If there is no entity type return
+			if (type == null)
+				return;
 			
-			Location spawnLoc;
-			if (AbilityConfig.i().radiusBonusSpawn)
-				spawnLoc = RandomLocationGen.getLocation(AbilityConfig.i().useCircleLocationGeneration, loc, range, 1, heightRange);
-			else
-				spawnLoc = loc;
-			// Spawn the entity
-			LivingEntity spawnedEntity = type.spawnMob(spawnLoc);
+			// Copy the entities location into the cache
+			Location loc = entity.getLocation(LocationCache.getCachedLocation());
 			
-			if (abilities != null && spawnedEntity != null)
+			// Spawn each mob
+			for (int i = 0; i < count; ++i)
 			{
-				abilities.addAbility(spawnedEntity);
-				abilities.getAbilityConfig().applyRates((LivingEntity) spawnedEntity);
+				// If the mob has an ability set we do not add any abilities
+				if (abilities != null)
+					P.p().abilitiesIgnoreNextSpawn(true);
 				
-				if (abilities.applyNormalAbilities())
+				if (!AbilityConfig.i().limitBonusSpawns)
+					P.p().limiterIgnoreNextSpawn(true);
+				
+				Location spawnLoc;
+				if (AbilityConfig.i().radiusBonusSpawn)
+					spawnLoc = RandomLocationGen.getLocation(AbilityConfig.i().useCircleLocationGeneration, loc, range, 1, heightRange);
+				else
+					spawnLoc = loc;
+				// Spawn the entity
+				LivingEntity spawnedEntity = type.spawnMob(spawnLoc);
+				
+				if (abilities != null && spawnedEntity != null)
 				{
-					AbilitiesMobListener.applyNormalAbilities((LivingEntity) spawnedEntity, null);
+					abilities.addAbility(spawnedEntity);
+					abilities.getAbilityConfig().applyRates((LivingEntity) spawnedEntity);
+					
+					if (abilities.applyNormalAbilities())
+					{
+						AbilitiesMobListener.applyNormalAbilities((LivingEntity) spawnedEntity, null);
+					}
 				}
 			}
 		}
-		
-		// Make sure we can spawn more mobs later :)
-		spawning = false;
+		finally
+		{
+			// Make sure we can spawn more mobs later :)
+			spawning = false;
+		}
 	}
 
 	public static void setup(AbilityType type, ExtendedEntityType mob, ValueChance<Ability> abilityChances, List<Object> optList)

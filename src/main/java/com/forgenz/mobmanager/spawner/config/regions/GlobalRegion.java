@@ -26,60 +26,28 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.commands;
+package com.forgenz.mobmanager.spawner.config.regions;
 
-import java.util.ArrayList;
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import com.forgenz.mobmanager.spawner.config.Region;
 
-public class MMCommandListener implements CommandExecutor
+public class GlobalRegion extends Region
 {
-	private static ArrayList<MMCommand> commands = null;
-	
-	static void registerCommand(MMCommand command)
+	public GlobalRegion(ConfigurationSection cfg)
 	{
-		commands.add(command);
+		super(cfg, RegionType.GLOBAL);
 	}
-	
-	public MMCommandListener()
-	{
-		commands = new ArrayList<MMCommand>();
-		
-		// Create Command objects
-		new MMCommandHelp(commands);
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-		new MMCommandSpawn();
-		new MMCommandPSpawn();
-		new MMCommandAbilitySetList();
-		new MMCommandMobTypes();
-		new MMCommandSaveItem();
-		new MMCommandSpawnCheck();
-		new MMCommandVersion();
-		new MMCommandDebug();
-	}
-	
+
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	public void initialise()
 	{
-		if (args.length >= 1)
-		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0].trim()))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
-		}
-		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
+	}
+
+	@Override
+	public boolean withinRegion(Location location)
+	{
 		return true;
 	}
-
 }

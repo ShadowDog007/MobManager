@@ -30,9 +30,11 @@ package com.forgenz.mobmanager.common.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Flying;
@@ -40,6 +42,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.P;
+import com.forgenz.mobmanager.common.config.AbstractConfig;
 import com.forgenz.mobmanager.common.util.LocationCache;
 import com.forgenz.mobmanager.limiter.config.LimiterConfig;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
@@ -83,6 +86,16 @@ public class PlayerFinder
 		};
 		
 		public abstract boolean withinRange(Location l1, Location l2, int radiusSquared, int height);
+		
+		public static FinderMode getMode(String string, FinderMode def)
+		{
+			for (FinderMode mode : values())
+			{
+				if (mode.toString().equalsIgnoreCase(string))
+					return mode;
+			}
+			return def;
+		}
 	}
 	
 	/**
@@ -92,8 +105,10 @@ public class PlayerFinder
 	 * @param radiusSquared The radius squared in which we are checking for players
 	 * @param height The height difference between the center and the player (Only for CYLINDER FinderMode)
 	 * @param players A collection which will have players added to it
+	 * 
+	 * @return The players argument
 	 */
-	public static Collection<Player> findNearbyPlayers(Location loc, FinderMode mode, int radiusSquared, int height, Collection<Player> players)
+	public static <T extends Collection<Player>> T findNearbyPlayers(Location loc, FinderMode mode, int radiusSquared, int height, T players)
 	{
 		// Fetch a location object for ploc
 		Location pLoc = LocationCache.getCachedLocation();
@@ -130,7 +145,36 @@ public class PlayerFinder
 	 */
 	public static ArrayList<Player> findNearbyPlayers(Location loc, FinderMode mode, int radiusSquared, int height)
 	{
-		return (ArrayList<Player>) findNearbyPlayers(loc, mode, radiusSquared, height, new ArrayList<Player>());
+		return findNearbyPlayers(loc, mode, radiusSquared, height, new ArrayList<Player>());
+	}
+	
+	/**
+	 * Fetches all nearby players
+	 * 
+	 * @See {@link #findNearbyPlayers(Location, FinderMode, int, int, Collection<Player>)}
+	 * 
+	 * @param cfg The configuration to use to find the players
+	 * @param players A collection which will have players added to it
+	 * 
+	 * @return The players argument
+	 */
+	public static <T extends Collection<Player>> T findNearbyPlayers(Location loc, FinderModeConfig cfg, T players)
+	{
+		return findNearbyPlayers(loc, cfg.mode, cfg.radiusSquared, cfg.height, players);
+	}
+	
+	/**
+	 * Fetches all nearby players
+	 * 
+	 * @See {@link #findNearbyPlayers(Location, FinderMode, int, int, Collection<Player>)}
+	 * 
+	 * @param cfg The configuration to use to find the players
+	 * 
+	 * @return A list of all nearby players
+	 */
+	public static ArrayList<Player> findNearbyPlayers(Location loc, FinderModeConfig cfg)
+	{
+		return findNearbyPlayers(loc, cfg.mode, cfg.radiusSquared, cfg.height);
 	}
 	
 	public static boolean mobFlys(Entity entity)
@@ -154,13 +198,31 @@ public class PlayerFinder
 	{		
 		// Fetch the entities location and a location object for ploc
 		Location eLoc = entity.getLocation(LocationCache.getCachedLocation());
-		Location pLoc = LocationCache.getCachedLocation();
 		
 		// Fetch the worlds search distance at the given entities height
-		int searchDist = world.getSearchDistance((short) eLoc.getBlockY());
+		int searchDist = world.getSearchDistanceSquared((short) eLoc.getBlockY());
 		// Fetch the worlds search height
 		int searchY = world.getSearchHeight() + (flying ? LimiterConfig.flyingMobAditionalBlockDepth : 0);
 		
+		// Find nearby players
+		return playerNear(eLoc, searchDist, searchY);
+	}
+	
+	/**
+	 * Scans nearby chunks for players on layers which cross a given height
+	 * 
+	 * @param location The location to check for players around
+	 * @param searchDist The distance around the location to look for players
+	 * @param searchY The vertical distance to look for players
+	 * 
+	 * @return True if there is a player within range location and in
+	 *         a layer which overlaps the height 'y'
+	 */
+	public static boolean playerNear(Location location, int searchDist, int searchY)
+	{		
+		// Fetch the entities location and a location object for ploc
+		Location pLoc = LocationCache.getCachedLocation();
+
 		// Iterate through each player to check if there is a player nearby
 		for (Player player : P.p().getServer().getOnlinePlayers())
 		{
@@ -169,7 +231,7 @@ public class PlayerFinder
 				continue;
 			
 			// If the worlds differ the player is not nearby
-			if (player.getWorld() != eLoc.getWorld())
+			if (player.getWorld() != location.getWorld())
 				continue;
 			
 			// Copy the players location into pLoc
@@ -178,11 +240,83 @@ public class PlayerFinder
 			// Check the if the distance between the entity and the player is less than the search distance
 			// Then check the if the height difference is small enough
 			// Return true as soon as we find a player which matches these requirements
-			if (FinderMode.CYLINDER.withinRange(eLoc, pLoc, searchDist, searchY))
+			if (FinderMode.CYLINDER.withinRange(location, pLoc, searchDist, searchY))
 				return true;
 		}
 		
 		// Return false if no nearby player was found
 		return false;
+	}
+	
+	public static class FinderModeConfig extends AbstractConfig
+	{
+		public final FinderMode mode;
+		public final int radiusSquared;
+		public final int height;
+		
+		public FinderModeConfig(ConfigurationSection cfg)
+		{
+			this(cfg.getValues(true));
+		}
+		
+		public FinderModeConfig(Map<String, Object> cfg)
+		{
+			super.setMapCfg(cfg);
+			
+			mode = FinderMode.getMode(getAndSet("FinderMode", FinderMode.CYLINDER.toString()), FinderMode.CYLINDER);
+			radiusSquared = (int) Math.pow(getAndSet("Radius", 0), 2);
+			height = Math.abs(getAndSet("Height", 0));
+			
+			super.clearCfg();
+		}
+		
+		public boolean validRange()
+		{
+			switch (mode)
+			{
+			case CYLINDER:
+				if (height == 0)
+					return false;					
+			case SPHERE:
+				return radiusSquared > 0;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode()
+		{
+			int hash = mode == null ? 0 : mode == FinderMode.CYLINDER ? 8 : 1024;
+			
+			switch (mode)
+			{
+			case CYLINDER:
+				hash ^= height;
+			case SPHERE:
+				hash ^= radiusSquared;
+			default:
+				return hash;
+			}
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			FinderModeConfig other = (FinderModeConfig) obj;
+			if (mode != other.mode)
+				return false;
+			if (radiusSquared != other.radiusSquared)
+				return false;
+			if (mode == FinderMode.CYLINDER && height != other.height)
+				return false;
+			return true;
+		}
 	}
 }

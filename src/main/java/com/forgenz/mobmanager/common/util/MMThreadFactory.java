@@ -26,60 +26,27 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.commands;
+package com.forgenz.mobmanager.common.util;
 
-import java.util.ArrayList;
+import java.util.concurrent.ThreadFactory;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import com.forgenz.mobmanager.MMComponent;
 
-public class MMCommandListener implements CommandExecutor
+public class MMThreadFactory implements ThreadFactory
 {
-	private static ArrayList<MMCommand> commands = null;
+	private volatile int nextId = 1;
+	private final String groupName;
 	
-	static void registerCommand(MMCommand command)
+	public MMThreadFactory(MMComponent.Component component, String groupName)
 	{
-		commands.add(command);
-	}
-	
-	public MMCommandListener()
-	{
-		commands = new ArrayList<MMCommand>();
-		
-		// Create Command objects
-		new MMCommandHelp(commands);
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-		new MMCommandSpawn();
-		new MMCommandPSpawn();
-		new MMCommandAbilitySetList();
-		new MMCommandMobTypes();
-		new MMCommandSaveItem();
-		new MMCommandSpawnCheck();
-		new MMCommandVersion();
-		new MMCommandDebug();
+		this.groupName = String.format("MobManager-%s-%s: ", component, groupName);
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	public Thread newThread(Runnable task)
 	{
-		if (args.length >= 1)
-		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0].trim()))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
-		}
-		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
-		return true;
+		Thread thread = new Thread(task);
+		thread.setName(groupName + nextId++);
+		return thread;
 	}
-
 }

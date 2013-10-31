@@ -147,13 +147,20 @@ public class BountyComponent extends MMComponent
 	
 	private boolean setupEconomy()
 	{
-		RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-		
-		if (economyProvider != null)
+		try
 		{
-			economy = economyProvider.getProvider();
+			RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+
+			if (economyProvider != null)
+			{
+				economy = economyProvider.getProvider();
+			}
+
+			return (economy != null);
 		}
-		
-		return (economy != null);
+		catch (NoClassDefFoundError e)
+		{
+			return false;
+		}
 	}
 }

@@ -169,6 +169,12 @@ public class AbilitySet extends Ability
 		return null;
 	}
 	
+	@Override
+	public String toString()
+	{
+		return getName();
+	}
+	
 	public static void createAbilitySet(ConfigurationSection cfg)
 	{
 		// If there are no options return

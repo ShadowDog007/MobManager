@@ -55,8 +55,8 @@ public class WorldConfig extends AbstractConfig
 	public final short breedingLimit;
 	public final short numAnimalsForFarm;
 	
-	public final short despawnSearchDistance;
-	public final short undergroundSearchDistance;
+	public final short despawnSearchDistance, despawnSearchDistanceSquared;
+	public final short undergroundSearchDistance, undergroundSearchDistanceSquared;
 	public final short despawnSearchHeight;
 	
 	public final int groundHeight;
@@ -103,13 +103,14 @@ public class WorldConfig extends AbstractConfig
 		
 		/* ################ DespawnSearchDistance ################ */
 		short despawnSearchDistance = (short) cfg.getInt("DespawnSearchDistance", -1);
-		this.despawnSearchDistance = despawnSearchDistance <= 0 ? -1 : (short) (despawnSearchDistance * despawnSearchDistance);
+		this.despawnSearchDistance = despawnSearchDistance <= 0 ? -1 : despawnSearchDistance;
+		this.despawnSearchDistanceSquared = despawnSearchDistance <= 0 ? -1 : (short) (despawnSearchDistance * despawnSearchDistance);
 		set(cfg, "DespawnSearchDistance", despawnSearchDistance);
 		
 
 		/* ################ UndergroundSearchDistance ################ */
-		short undergroundSearchDistance = (short) cfg.getInt("UndergroundSearchDistance", 32);
-		this.undergroundSearchDistance = (short) (undergroundSearchDistance * undergroundSearchDistance);
+		this.undergroundSearchDistance = (short) cfg.getInt("UndergroundSearchDistance", 32);
+		this.undergroundSearchDistanceSquared = (short) (undergroundSearchDistance * undergroundSearchDistance);
 		set(cfg, "UndergroundSearchDistance", undergroundSearchDistance);
 		
 		/* ################ DespawnSearchHeight ################ */

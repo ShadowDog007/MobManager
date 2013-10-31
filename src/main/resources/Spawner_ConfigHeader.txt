@@ -1,0 +1,47 @@
+#######################################################################
+SpawnFinderThreads
+#######################################################################
+The number of threads to use for asynchronous portions of the spawner
+
+Value of 1 should be fine for most servers.
+
+The number of threads should have a large effect on servers with lots
+    of players. Also if you have very large sets of Regions or Mobs.
+
+#######################################################################
+TicksPerSpawn
+#######################################################################
+How many ticks between sets of spawns.
+
+Spawns run every second tick, finding spawns for mobs
+    around each player. This value can only take even numbers.
+
+#######################################################################
+SpawnGenerateAttempts
+#######################################################################
+This value effects how many attempts are made to generate a safe
+    location for a mob spawn.
+
+Once a spawn attempt has been started a location around the player
+    is generated. If the location does not have free air,
+    or is too close to another player, the location is marked unsafe
+    and is not used. 'SpawnGenerateAttempts' attempts will be made
+    to find a 'safe' location for each mob.
+
+This does not have much effect when players are on the surface.
+
+Higher values mean higher chances of mobs spawning in closed off areas
+    (Such as caves)
+
+Inside a vanilla cave system, a 'SpawnGenerateAttempts' of...
+    - 5 gives about a 60% chance of allowing the mob to spawn.
+    - 2 gives about a 40% chance of allowing the mob to spawn.
+
+This is recommended to be as small as possible due to the amount
+    of CPU time required to check if a location is 'safe'
+
+#######################################################################
+MobDistanceForLimitRemoval
+#######################################################################
+The distance between the mob and player before the mob is removed
+    from the players mob limit.

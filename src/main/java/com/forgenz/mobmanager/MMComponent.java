@@ -29,6 +29,7 @@
 package com.forgenz.mobmanager;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.forgenz.mobmanager.abilities.AbilitiesComponent;
@@ -46,7 +47,7 @@ public abstract class MMComponent
 		LIMITER(LimiterComponent.class, "MM-Limiter", (Component[]) null),
 		ABILITIES(AbilitiesComponent.class,"MM-Abilities", (Component[]) null),
 		BOUNTY(BountyComponent.class, "MM-Bounty", (Component[]) null),
-		SPAWNER(false, SpawnerComponent.class, "MM-Spawner", Component.LIMITER);
+		SPAWNER(SpawnerComponent.class, "MM-Spawner", Component.LIMITER);
 		
 		private final boolean canEnable;
 		private final MMComponent instance;
@@ -137,14 +138,39 @@ public abstract class MMComponent
 			log.info(info);
 		}
 		
+		public void info(String info, Object ...args)
+		{
+			info(String.format(info, args));
+		}
+		
 		public void warning(String warning)
 		{
 			log.warning(warning);
+		}
+
+		public void warning(String warning, Object ...args)
+		{
+			warning(String.format(warning, args));
 		}
 		
 		public void severe(String error)
 		{
 			log.severe(error);
+		}
+		
+		public void severe(String error, Object ...args)
+		{
+			severe(String.format(error, args));
+		}
+		
+		public void severe(String error, Throwable e)
+		{
+			log.log(Level.SEVERE, error, e);
+		}
+		
+		public void severe(String error, Throwable e, Object ...args)
+		{
+			severe(String.format(error, args), e);
 		}
 		
 		public static void enableComponents()
@@ -160,7 +186,7 @@ public abstract class MMComponent
 					{
 						c.i().enable(false);
 					}
-					catch (Exception e)
+					catch (Throwable e)
 					{
 						c.severe("Error when enabling component " + c.getFancyName());
 						e.printStackTrace();
@@ -216,14 +242,39 @@ public abstract class MMComponent
 		getComponent().info(info);
 	}
 	
+	public void info(String info, Object ...args)
+	{
+		info(String.format(info, args));
+	}
+	
 	public void warning(String warning)
 	{
 		getComponent().warning(warning);
+	}
+
+	public void warning(String warning, Object ...args)
+	{
+		warning(String.format(warning, args));
 	}
 	
 	public void severe(String error)
 	{
 		getComponent().severe(error);
+	}
+	
+	public void severe(String error, Object ...args)
+	{
+		severe(String.format(error, args));
+	}
+	
+	public void severe(String error, Throwable e)
+	{
+		getComponent().severe(error, e);
+	}
+	
+	public void severe(String error, Throwable e, Object ...args)
+	{
+		severe(String.format(error, args), e);
 	}
 
 	/**

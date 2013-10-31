@@ -28,26 +28,26 @@
 
 package com.forgenz.mobmanager.common.util;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 
 import com.forgenz.mobmanager.P;
 
 public class RandomLocationGen
 {
-	private static Random rand = new Random();
+	private static List<Integer> cacheList;
 	
 	/**
 	 * Stop instances of the class from being created
 	 */
-	private RandomLocationGen()
-	{
-		
-	}
+	private RandomLocationGen() {}
 
 	/**
 	 * Generates a random location around the center location
@@ -61,6 +61,22 @@ public class RandomLocationGen
 	 * Generates a random location around the center location
 	 */
 	public static Location getLocation(boolean circle, Location center, int range, int minRange, int heightRange, Location cacheLoc)
+	{
+		return getLocation(circle, false, center, range, minRange, heightRange, cacheLoc);
+	}
+	
+	/**
+	 * Generates a random location around the center location
+	 */
+	public static Location getLocation(boolean circle, boolean checkPlayers, Location center, int range, int minRange, int heightRange, Location cacheLoc)
+	{
+		return getLocation(circle, false, 5, center, range, minRange, heightRange, cacheLoc);
+	}
+	
+	/**
+	 * Generates a random location around the center location
+	 */
+	public static Location getLocation(boolean circle, boolean checkPlayers, int spawnAttempts, Location center, int range, int minRange, int heightRange, Location cacheLoc)
 	{
 		// Make sure the centers world is valid
 		if (center.getWorld() == null)
@@ -91,8 +107,8 @@ public class RandomLocationGen
 		// Copy the world
 		cacheLoc.setWorld(center.getWorld());
 		
-		// Make 10 attempts to find a safe spawning location
-		for (int i = 0; i < 10; ++i)
+		// Make X attempts to find a safe spawning location
+		for (int i = 0; i < spawnAttempts; ++i)
 		{
 			// Generate the appropriate type of location
 			if (circle)
@@ -105,86 +121,159 @@ public class RandomLocationGen
 			}
 			
 			// Generate coordinates for Y
-			cacheLoc.setY(rand.nextInt(heightRange2) - heightRange + center.getBlockY() + 0.5);
+			cacheLoc.setY(RandomUtil.i.nextInt(heightRange2) - heightRange + center.getBlockY() + 0.5);
 				
 			// If the location is safe we can return the location
-			if (isLocationSafe(cacheLoc, center.getBlockY(), heightRange))
+			if ((!checkPlayers || !PlayerFinder.playerNear(cacheLoc, minRange, heightRange)) && findSafeY(cacheLoc, center.getBlockY(), heightRange))
 			{
 				// Generate a random Yaw/Pitch
-				cacheLoc.setYaw(rand.nextFloat() * 360.0F);
+				cacheLoc.setYaw(RandomUtil.i.nextFloat() * 360.0F);
+				cacheLoc.setPitch(80.0F + RandomUtil.i.nextFloat() * 20.0F);
 				return cacheLoc;
 			}
 		}
 		
-		// If no safe location was found in a reasonable timeframe just return the center
+		// If no safe location was found in a reasonable time frame just return the center
 		return center;
 	}
 	
 	/**
-	 * Makes sure the given location is safe to spawn something there
-	 * @return true if the location is safe
+	 * Finds a safe Y location at the given x/z location
+	 * @return true if a safe location was found
 	 */
-	private static boolean isLocationSafe(Location location, int centerY, int heightRange)
+	public static boolean findSafeY(Location location, int centerY, int heightRange)
 	{
-		// Check the location is safe
-		Block block = location.getBlock();
+		List<Integer> list = Bukkit.isPrimaryThread() ? cacheList : new ArrayList<Integer>();
+		if (list == null)
+			cacheList = list = new ArrayList<Integer>();
+		return findSafeY(location, centerY, heightRange, list);
+	}
+	
+	/**
+	 * Finds a safe Y location at the given x/z location
+	 * @return true if a safe location was found
+	 */
+	public static boolean findSafeY(Location location, int centerY, int heightRange, List<Integer> cacheList)
+	{
+		int foundAir = 0;
 		
-		// If the location is not safe we try again			
-		if (!(isSafeBlock(block) && isSafeBlock(block.getRelative(BlockFace.UP))))
-		{
+		// Fetch max and min Y locations
+		int startY = centerY + heightRange;
+		int endY = centerY - heightRange;
+		
+		// Validate max and min Y locations
+		if (startY > 256)
+			startY = 256;
+		if (endY < 0)
+			endY = 0;
+		
+		World world = location.getWorld();
+		
+		if (!world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4))
 			return false;
-		}
 		
-		// Calculate the height diff
-		int heightDiff = Math.abs(location.getBlockY() - centerY);
-		
-		boolean onGround = false;
-		// Move the position down as close to the ground as we can
-		while (heightDiff < heightRange)
+		// Find sets of Y's which are safe
+		for (; startY > endY; --startY)
 		{
-			block = block.getRelative(BlockFace.DOWN);
-			
-			// If the below block is empty we shift the location down
-			if (isSafeBlock(block))
+			Block b = world.getBlockAt(location.getBlockX(), startY, location.getBlockZ());
+			if (isSafeMaterial(b.getType()))
 			{
-				location.setY(location.getY() - 1.0D);
-				++heightDiff;
+				++foundAir;
 			}
-			// If it isn't the mob is on the ground
 			else
 			{
-				onGround = true;
-				break;
+				 if (foundAir >= 2)
+					 cacheList.add(startY + 1);
+				foundAir = 0;
 			}
 		}
-
-		// If the location is on or near the ground the location is good
-		if (onGround || !isSafeBlock(block.getRelative(BlockFace.DOWN)) || !isSafeBlock(block.getRelative(BlockFace.DOWN, 2)))
+		
+		// If there are no safe locations we return false :(
+		if (cacheList.isEmpty())
+			return false;
+		
+		// Fetch a random location
+		location.setY(cacheList.get(RandomUtil.i.nextInt(cacheList.size())));		
+		cacheList.clear();
+		
+		return true;	
+	}
+	
+	/**
+	 * Finds a safe Y location at the given x/z location
+	 * Uses a chunk snapshot for speed
+	 * @return true if a safe location was found
+	 */
+	@SuppressWarnings("deprecation")
+	public static boolean findSafeY(ChunkSnapshot chunk, Location location, int centerY, int heightRange, List<Integer> cacheList)
+	{
+		int foundAir = 0;
+		
+		// Fetch max and min Y locations
+		int startY = centerY + heightRange;
+		int endY = centerY - heightRange;
+		
+		// Validate max and min Y locations
+		if (startY > 256)
+			startY = 256;
+		if (endY < 0)
+			endY = 0;
+		
+		int x = location.getBlockX() % 16, z = location.getBlockZ() % 16;
+		if (x < 0)
+			x += 16;
+		if (z < 0)
+			z += 16;
+		
+		// Find sets of Y's which are safe
+		for (; startY > endY; --startY)
 		{
-			return true;
+			if (isSafeMaterial(Material.getMaterial(chunk.getBlockTypeId(x, startY, z))))
+			{
+				++foundAir;
+			}
+			else
+			{
+				 if (foundAir >= 2)
+					 cacheList.add(startY + 1);
+				foundAir = 0;
+			}
 		}
 		
-		return false;
+		// If there are no safe locations we return false :(
+		if (cacheList.isEmpty())
+			return false;
+		
+		// Fetch a random location
+		location.setY(cacheList.get(RandomUtil.i.nextInt(cacheList.size())));		
+		cacheList.clear();
+		
+		return true;	
 	}
 	
 	/**
 	 * Generates a random location which is circular around the center
 	 */
-	private static Location getCircularLocation(Location center, int range, int minRange, Location cacheLoc)
+	public static Location getCircularLocation(Location center, int range, int minRange, Location cacheLoc)
+	{
+		return getCircularLocation(center.getBlockX(), center.getBlockZ(), range, minRange, cacheLoc);
+	}
+	
+	public static Location getCircularLocation(int centerX, int centerZ, double range, double minRange, Location cacheLoc)
 	{
 		// Calculate the difference between the max and min range
-		int rangeDiff = range - minRange;
+		double rangeDiff = range - minRange;
 		// Calculate a random direction for the X/Z values
-		double theta = 2 * Math.PI * rand.nextDouble();
+		double theta = 2 * Math.PI * RandomUtil.i.nextDouble();
 		
 		// Generate a random radius
-		double radius = rand.nextDouble() * rangeDiff + minRange;
+		double radius = RandomUtil.i.nextDouble() * rangeDiff + minRange;
 		
 		// Set the X/Z coordinates
 		double trig = Math.cos(theta);
-		cacheLoc.setX(Location.locToBlock(radius * trig) + center.getBlockX() + 0.5);
+		cacheLoc.setX(Location.locToBlock(radius * trig) + centerX + 0.5);
 		trig = Math.sin(theta);
-		cacheLoc.setZ(Location.locToBlock(radius * trig) + center.getBlockZ() + 0.5);
+		cacheLoc.setZ(Location.locToBlock(radius * trig) + centerZ + 0.5);
 		
 		return cacheLoc;
 	}
@@ -192,12 +281,17 @@ public class RandomLocationGen
 	/**
 	 * Generates a random location which is square around the center
 	 */
-	private static Location getSquareLocation(Location center, int range, int minRange, Location cacheLoc)
+	public static Location getSquareLocation(Location center, int range, int minRange, Location cacheLoc)
+	{
+		return getSquareLocation(center.getBlockX(), center.getBlockZ(), range, minRange, cacheLoc);
+	}
+	
+	public static Location getSquareLocation(int centerX, int centerZ, int range, int minRange, Location cacheLoc)
 	{
 		// Calculate the sum of all the block deviations from the center between minRange and range
 		int totalBlockCount = (range * (++range) - minRange * (minRange + 1)) >> 1;
 		// Fetch a random number of blocks
-		int blockCount = totalBlockCount - rand.nextInt(totalBlockCount);
+		int blockCount = totalBlockCount - RandomUtil.i.nextInt(totalBlockCount);
 		
 		// While the block deviation from the center for the given range is
 		// less than the number of blocks left we remove a layer of blocks
@@ -205,31 +299,31 @@ public class RandomLocationGen
 			blockCount -= --range;
 		
 		// Pick a random location on the range line
-		int lineLoc = rand.nextInt(range << 1);
+		int lineLoc = RandomUtil.i.nextInt(range << 1);
 		// Choose a line (North/East/West/South lines)
 		// Then set the X/Z coordinates
-		switch (rand.nextInt(4))
+		switch (RandomUtil.i.nextInt(4))
 		{
 		// East Line going North
 		case 0:
-			cacheLoc.setX(center.getBlockX() + range + 0.5D);
-			cacheLoc.setZ(center.getBlockZ() + range - lineLoc + 0.5D);
+			cacheLoc.setX(centerX + range + 0.5D);
+			cacheLoc.setZ(centerZ + range - lineLoc + 0.5D);
 			break;
 		// South Line going East
 		case 1:
-			cacheLoc.setX(center.getBlockX() - range + lineLoc + 0.5D);
-			cacheLoc.setZ(center.getBlockZ() + range + 0.5D);
+			cacheLoc.setX(centerX - range + lineLoc + 0.5D);
+			cacheLoc.setZ(centerZ + range + 0.5D);
 			break;
 		// West Line going South
 		case 2:
-			cacheLoc.setX(center.getBlockX() - range + 0.5D);
-			cacheLoc.setZ(center.getBlockZ() - range + lineLoc + 0.5D);
+			cacheLoc.setX(centerX - range + 0.5D);
+			cacheLoc.setZ(centerZ - range + lineLoc + 0.5D);
 			break;
 		// North Line going west
 		case 3:
 		default:
-			cacheLoc.setX(center.getBlockX() + range - lineLoc + 0.5D);
-			cacheLoc.setZ(center.getBlockZ() - range + 0.5D);
+			cacheLoc.setX(centerX + range - lineLoc + 0.5D);
+			cacheLoc.setZ(centerZ - range + 0.5D);
 		}
 		
 		return cacheLoc;
@@ -239,10 +333,13 @@ public class RandomLocationGen
 	 * Checks if the block is of a type which is safe for spawning inside of
 	 * @return true if the block type is safe
 	 */
-	private static boolean isSafeBlock(Block block)
+	public static boolean isSafeBlock(Block block)
 	{
-		Material mat = block.getType();
-		
+		return isSafeMaterial(block.getType());
+	}
+	
+	public static boolean isSafeMaterial(Material mat)
+	{
 		switch (mat)
 		{
 		case AIR:

@@ -1,0 +1,292 @@
+
+#######################################################################
+SpawnMobs
+#######################################################################
+If true mobs will be allowed to spawn in this world.
+
+Only present in world configs.
+
+#######################################################################
+Regions
+#######################################################################
+Used to define different regions each which have their own set of
+    mobs which spawn within them.
+
+Present in both the Global and World configs.
+
+Currently there are four types of regions:
+=> GlobalConfig only
+- GLOBAL Represents every location
+=> WorldConfig only
+- POINT_CIRCLE Defines a region which covers a
+    radius around a point
+- POINT_SQUARE Defines a region which covers a
+    X/Z distance from a point
+
+
+Avalible region types are automatically generated into the config.
+
+Regions:
+  POINT_CIRCLE: {}
+  POINT_SQUARE: {}
+
+To create a custom region you can start off by simply setting the name
+    of the region.
+
+Regions:
+  POINT_CIRCLE:
+    TestRegion: {}
+  POINT_SQUARE: {}
+
+Reload MobManager and the required information will be generated
+    into the config for you.
+
+Regions:
+  POINT_CIRCLE:
+    TestRegion:
+      Priority: 1
+      SpawnAttempts: 1
+      SpawnAttemptChance: 100.0
+      MaxBlockRange: 56
+      MinBlockRange: 24
+      MinY: 0
+      MaxY: 256
+      X: 0
+      Z: 0
+      Radius: 0
+      Mobs: []
+  POINT_SQUARE: {}
+
+  
+After this is done, fill in the required information and reload MM
+
+
+There are a set of region settings which are present in all
+    region types.
+
+Nodes: Priority, SpawnAttempts, SpawnAttemptChance, MinBlockRange and Mobs.
+
+################
+Priority
+################
+This represents the priority given to the region.
+
+This is used when two regions overlap at a point.
+
+When a region is fetched at a point where two overlap,
+    the region with the higher value for priority has
+    a higher chance of being picked.
+
+################
+SpawnAttempts
+################
+This is the number of spawn attempts to make for each player
+    every time the spawner runs.
+
+Spawn attempts can fail if mobs attempt to spawn in unsafe locations
+     or if they attempt to spawn in locations with no regions
+     or if the region selected contains no mobs which meet
+     their requirements.
+
+################
+SpawnAttemptChance
+################
+This is a percent chance out of 100% in which a spawn attempt
+    will be executed. If this chance fails the spawn attempt
+    will not be executed.
+
+You can make use of this to have more random numbers of spawn attempts
+    per player.
+
+################
+MaxBlockRange
+################
+This is the maximum range in blocks which a mob is allowed
+    to spawn afar from the player.
+
+This will be forced lower if the limiters spawn range
+    is lower
+
+################
+MinBlockRange
+################
+This is the minimum range in blocks which a mob is allowed
+    to spawn nearby to a player.
+
+Spawn locations are not generated between the player up
+    till this distance.
+
+This distance can cause spawn generation to fail if another
+    player is within range of the generated spawn.
+
+################
+MaxPlayerMobs
+################
+Defines the limit to how many mobs a player can have spawned around
+    them before mobs are prevented from spawning.
+
+The players limit is based on the number of mobs specifically
+     spawned around them (Doesn't coun't for mobs spawned for
+     other nearby players)
+
+The limit is reset after teleporting between worlds or 100 blocks.
+The limit is also reduced after the mob dies.
+
+################
+MobPlayerLimitTimeoutTicks
+################
+The time in ticks after a mob is removed from a players max mobs limit
+
+################
+MaxRegionMobs
+################
+Defines the maximum number of mobs which can be alive which
+    were spawned by this region
+
+################
+RegionMobCooldown
+################
+Defines how long in seconds before a mob which is counted towards
+    this regions 'MaxRegionMobs' is removed from the limit
+
+################
+EnforceAllCooldownConditions
+################
+If true, a mob will not be removed from the max alive
+    limit unless it is both dead and the cooldown has passed  
+
+################
+Mobs
+################
+Every region has a list of mobs which spawn within the region along
+    with a set of requirements which must be met for the mob to spawn.
+
+Mobs:
+- SpawnChance: 1
+  MaxAlive: 0
+  MobCooldown: 60
+  EnforceAllCooldownConditions: false
+  MobType: ZOMBIE
+  AbilitySet: none
+  Requirements:
+    MinLight: 0
+    MaxLight: 15
+    MinY: 0
+    MaxY: 256
+    BlockList: []
+    BlockWhitelist: false
+    BiomeList: []
+    EnvironmentList: []
+    BiomeWhitelist: false
+  Action:
+    MessageSettings:
+      FinderMode: CYLINDER
+      Radius: 0
+      Height: 0
+    RandomMessage: false
+    Messages: []
+    CommandSettings:
+      FinderMode: CYLINDER
+      Radius: 0
+      Height: 0
+    Commands: []
+
+
+Nodes:
+- SpawnChance =>
+    The chance of the mob to spawn relative to other
+    mobs which met the requirements of the spawn
+
+- MaxAlive =>
+    The maximum number of this mob which can be alive
+    at any one time.
+
+- MobCooldown =>
+    The time in seconds after which a mob is not counted
+    towards the max alive limit
+
+- EnforceAllCooldownConditions =>
+    If true, a mob will not be removed from the max alive
+    limit unless it is both dead and the cooldown has passed  
+
+- HeightOffset =>
+    The height in blocks which this mob will be spawned above
+    normal. Could be helpful with flying mobs which spawn far above
+    normal mobs.
+
+- BypassMobManagerLimit =>
+    If true this mob will bypass the check to see if the Limiter
+    component will allow it to spawn.
+
+- BypassRegionMobLimit =>
+    If true this mob will not count towards the regions mob limit.
+    This could be useful with boss mobs which you still want to spawn
+    even if there are many other mobs around
+
+- DelayRequirementsCheck =>
+    Mob spawn chances are based on the mobs which can spawn in the
+    random location chosen, if this is true, it is assumed the
+    mob can spawn, and this is checked afterwards when the mob
+    has been chosen. If requirements fail at this point no
+    mob is spawned.
+
+- MobType =>
+    The type of mob which this 'Mob' will spawn
+
+- AbilitySet =>
+    The name of the ability set you wish to apply
+    to the mob (Must have the AbilityComponent enabled)
+
+    Note: MobType is not required if the AbilitySet
+    has a default MobType assigned.
+
+- Requirements =>
+    Requirements which the spawn location has to satisfy
+    else the mob will not get a chance to spawn.
+    
+    Requirement Nodes:
+    - SlimeLikeSpawnSeed: The seed to use to determine
+        which chunks this mob can spawn in. Set to 0
+        to disable.
+    - MinLight: The minimum amount of light at the spawn
+    - MaxLight: The maximum amount of light at the spawn
+    - MinY: The minimum Y location of the spawn
+    - MaxY: The maximum Y location of the spawn
+    - <Type>List: List of <Type> which the spawn
+        (must|must not) have at least one of.
+    - <Type>Whitelist: If true the <Type> at the spawn
+        must be within the <Type>List
+        Else it must not be within the <Type>List
+    
+    Types:
+    - Block: Use block names from this link
+        http://jd.bukkit.org/dev/apidocs/org/bukkit/Material.html
+    - Biome: Use biome names from this link
+        http://jd.bukkit.org/dev/apidocs/org/bukkit/block/Biome.html
+    - Environment: Use environments names from this link
+        http://jd.bukkit.org/dev/apidocs/org/bukkit/World.Environment.html
+
+- Action =>
+    Defines an action to perform upon the spawn of the mob.
+    
+    Action Nodes:
+    - RandomMessage: If true, a single message is chosen from the list
+        and sent to nearby players. Else all messages are sent to
+        nearby players in order
+    - Messages: A list of messages to send to nearby players.
+        Can contain '{player}' which is replaced with the players name.
+        Can also contain & colour codes.
+    - Commands: A list of commands to run.
+        Can contain '{player}'. If this is done the command is run
+        once for every player within range. Else it is executed once.
+    - <Action>Settings:
+        -> FinderMode: CYLINDER or SPHERE. CYLINDER is slightly
+            more efficient.
+        -> Radius: Used for the radius of the sphere or
+            circle (If CYLINDER is used)
+        -> Height: Only used for CYLINDER. Determines the
+            height of the cylinder search for players.
+
+
+
+#######################################################################

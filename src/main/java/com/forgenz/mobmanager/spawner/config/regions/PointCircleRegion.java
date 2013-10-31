@@ -26,60 +26,35 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.commands;
+package com.forgenz.mobmanager.spawner.config.regions;
 
-import java.util.ArrayList;
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-
-public class MMCommandListener implements CommandExecutor
+public class PointCircleRegion extends PointRegion
 {
-	private static ArrayList<MMCommand> commands = null;
-	
-	static void registerCommand(MMCommand command)
+	public PointCircleRegion(ConfigurationSection cfg)
 	{
-		commands.add(command);
-	}
-	
-	public MMCommandListener()
-	{
-		commands = new ArrayList<MMCommand>();
-		
-		// Create Command objects
-		new MMCommandHelp(commands);
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-		new MMCommandSpawn();
-		new MMCommandPSpawn();
-		new MMCommandAbilitySetList();
-		new MMCommandMobTypes();
-		new MMCommandSaveItem();
-		new MMCommandSpawnCheck();
-		new MMCommandVersion();
-		new MMCommandDebug();
+		super(cfg, RegionType.POINT_CIRCLE);
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+	public void initialise()
 	{
-		if (args.length >= 1)
-		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0].trim()))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
-		}
-		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
-		return true;
+		super.initialise();
+		radius *= radius;
 	}
 
+	@Override
+	public boolean withinRadius(Location location)
+	{
+		// Check horizontal distance is within range
+		final double first = Math.pow(location.getBlockX() - x, 2);
+
+		// If the first one is greater the two combined won't be less...
+		if (first > radius)
+			return false;
+
+		return first + Math.pow(location.getBlockZ() - z, 2) <= radius;
+	}
 }

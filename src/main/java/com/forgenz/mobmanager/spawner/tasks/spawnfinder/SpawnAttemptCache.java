@@ -26,60 +26,34 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.forgenz.mobmanager.commands;
+package com.forgenz.mobmanager.spawner.tasks.spawnfinder;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.Location;
 
-public class MMCommandListener implements CommandExecutor
+import com.forgenz.mobmanager.common.util.LocationCache;
+
+/**
+ * Contains a set of items which are required to complete a full spawn attempt
+ * 
+ * TODO: Test performance increase due to the cache
+ */
+public class SpawnAttemptCache
 {
-	private static ArrayList<MMCommand> commands = null;
+	public final Location playerLoc, cacheLoc;
+	public final List<Integer> cacheList;
 	
-	static void registerCommand(MMCommand command)
+	public SpawnAttemptCache()
 	{
-		commands.add(command);
+		this(LocationCache.getCachedLocation(), LocationCache.getCachedLocation(), new ArrayList<Integer>());
 	}
 	
-	public MMCommandListener()
+	public SpawnAttemptCache(Location playerLoc, Location cacheLoc, List<Integer> cacheList)
 	{
-		commands = new ArrayList<MMCommand>();
-		
-		// Create Command objects
-		new MMCommandHelp(commands);
-		new MMCommandCount();
-		new MMCommandReload();
-		new MMCommandButcher();
-		new MMCommandSpawn();
-		new MMCommandPSpawn();
-		new MMCommandAbilitySetList();
-		new MMCommandMobTypes();
-		new MMCommandSaveItem();
-		new MMCommandSpawnCheck();
-		new MMCommandVersion();
-		new MMCommandDebug();
+		this.playerLoc = playerLoc;
+		this.cacheLoc = cacheLoc;
+		this.cacheList = cacheList;
 	}
-	
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-	{
-		if (args.length >= 1)
-		{
-			for (MMCommand mmcommand : commands)
-			{
-				if (mmcommand.isCommand(args[0].trim()))
-				{
-					mmcommand.run(sender, label, args);
-					return true;
-				}
-			}
-		}
-		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
-		return true;
-	}
-
 }
