@@ -70,7 +70,7 @@ public class MobCounter
 			{
 				// Check if we need to wait for the cooldown as well
 				if (enforceAllRemovalConditions && !r.cooldownExpired())
-						continue;
+					continue;
 				// Remove this mob from the limit
 				it.remove();
 			}
