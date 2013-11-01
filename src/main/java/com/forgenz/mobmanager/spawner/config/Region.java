@@ -89,7 +89,7 @@ public abstract class Region extends AbstractConfig
 		mobLimitTimeout = getAndSet("MobPlayerLimitTimeoutTicks", 6000);
 		
 		int maxRegionMobs = getAndSet("MaxRegionMobs", 0);
-		int regionMobCooldown = getAndSet("RegionMobCooldown", 60);
+		int regionMobCooldown = getAndSet("RegionMobCooldown", 60) * 1000;
 		boolean enforceAllRemovalConditions = getAndSet("EnforceAllCooldownConditions", false);
 		if (maxRegionMobs > 0)
 			maxAliveLimiter = new MobCounter(maxRegionMobs, regionMobCooldown, enforceAllRemovalConditions);
