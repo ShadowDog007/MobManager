@@ -89,6 +89,7 @@ public class SpawnAttempt implements Runnable
 	private final SpawnAttemptExecutor saExecutor;
 	private final Player player;
 	private final int maxRange, minRange, heightRange;
+	private boolean outsideSpawnLimits;
 	
 	private AttemptState currentState = AttemptState.INITIALISE;
 	
@@ -101,7 +102,7 @@ public class SpawnAttempt implements Runnable
 	private Material materialBelow;
 	private Environment environment;
 	
-	public SpawnAttempt(SpawnAttemptExecutor saExecutor, Player player, int maxRange, int minRange, int heightRange)
+	public SpawnAttempt(SpawnAttemptExecutor saExecutor, Player player, int maxRange, int minRange, int heightRange, boolean outsideSpawnLimits)
 	{
 		this.saExecutor = saExecutor;
 		this.player = player;
@@ -109,6 +110,7 @@ public class SpawnAttempt implements Runnable
 		this.maxRange = maxRange;
 		this.minRange = minRange;
 		this.heightRange = heightRange;
+		this.outsideSpawnLimits = outsideSpawnLimits;
 	}
 	
 	@Override
@@ -213,8 +215,17 @@ public class SpawnAttempt implements Runnable
 	private void stateMethodGetRegion()
 	{
 		spawnRegion = MMComponent.getSpawner().getConfig().getRegion(spawnLocation);
+		
+		// Check if we actually got a region
+		if (finish(spawnRegion == null))
+			return;
 
-		finish(spawnRegion == null || (!spawnRegion.hasRegionLimitBypass && !spawnRegion.withinAliveLimit()));
+		// If we are not outside player limits check if we are outside region limits
+		if (!outsideSpawnLimits)
+			outsideSpawnLimits = !spawnRegion.withinAliveLimit();
+		
+		// If we are outside spawn limits and can't ignore them we are finished
+		finish(outsideSpawnLimits && !spawnRegion.ignoreMobLimits());
 	}
 	
 	/**
@@ -236,6 +247,6 @@ public class SpawnAttempt implements Runnable
 	 */
 	private void stateMethodPrepareMob()
 	{
-		spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, lightLevel, biome, materialBelow, environment);	
+		spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);	
 	}
 }

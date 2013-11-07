@@ -218,17 +218,21 @@ Nodes:
     If true this mob will bypass the check to see if the Limiter
     component will allow it to spawn.
 
-- BypassRegionMobLimit =>
-    If true this mob will not count towards the regions mob limit.
+- BypassPlayerAndRegionMobLimit =>
+    If true this mob will not count towards the players or
+    regions mob limit.
     This could be useful with boss mobs which you still want to spawn
-    even if there are many other mobs around
+    even if there are many other mobs around such as bosses.
+    When enabling this, you should have MaxAlive set or a very low chance
+    to ensure spawning of this mob does not get out of hand.
 
 - DelayRequirementsCheck =>
     Mob spawn chances are based on the mobs which can spawn in the
     random location chosen, if this is true, it is assumed the
     mob can spawn, and this is checked afterwards when the mob
     has been chosen. If requirements fail at this point no
-    mob is spawned.
+    mob is spawned. Can be useful if you want to make it
+    clearer on the chances of spawning given mobs.
 
 - MobType =>
     The type of mob which this 'Mob' will spawn

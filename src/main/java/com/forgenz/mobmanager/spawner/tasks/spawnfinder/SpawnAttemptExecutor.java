@@ -94,7 +94,7 @@ public class SpawnAttemptExecutor implements Runnable
 			// Fetch the max number of threads
 			currentThreads = cfg.spawnFinderThreads;
 			
-			// Find a resonable number of threads to run the main task in
+			// Find a reasonable number of threads to run the main task in
 			for (; currentThreads > 1 && playerQueue.size() / currentThreads <= 2; --currentThreads);
 			
 			// Execute the main tasks
@@ -134,9 +134,13 @@ public class SpawnAttemptExecutor implements Runnable
 			// Check if we can spawn in this region
 			if (playerRegion == null || playerRegion.spawnAttempts <= 0)
 				continue;
-
+			
 			// Check if the player already has too many mobs spawned around them
-			if (playerRegion.maxPlayerMobs > 0 && spawnFinder.getMobCount(player, playerRegion.mobLimitTimeout) >= playerRegion.maxPlayerMobs)
+			boolean outsideSpawnLimits = playerRegion.maxPlayerMobs > 0 && spawnFinder.getMobCount(player, playerRegion.mobLimitTimeout) >= playerRegion.maxPlayerMobs;
+
+			// If we are outside of spawn limits continue
+			// Unless the region has mobs which can ignore the spawn limits
+			if (outsideSpawnLimits && !playerRegion.ignoreMobLimits())
 				continue;
 			
 			// Find the max spawn range for the world
@@ -149,7 +153,7 @@ public class SpawnAttemptExecutor implements Runnable
 			
 			// Attempt 'X' spawns
 			for (int i = 0; i < playerRegion.spawnAttempts; ++i)
-				executor.execute(new SpawnAttempt(this, player, maxRange, minRange, heightRange));
+				executor.execute(new SpawnAttempt(this, player, maxRange, minRange, heightRange, outsideSpawnLimits));
 		}
 	}
 	

@@ -115,7 +115,7 @@ public abstract class Region extends AbstractConfig
 			if (mob != null)
 				mobs.add(mob);
 			
-			if (mob.bypassRegionLimit)
+			if (mob.bypassSpawnLimits)
 				hasRegionLimitBypass = true;
 		}
 		set("Mobs", mobConfigs);
@@ -130,6 +130,27 @@ public abstract class Region extends AbstractConfig
 	public abstract void initialise();
 
 	public abstract boolean withinRegion(Location location);
+	
+	/**
+	 * Checks if the region has mobs which can ignore spawn limits
+	 * 
+	 * @return true if the region has at least one mob which can ignore region spawn limits
+	 */
+	public boolean ignoreMobLimits()
+	{
+		if (!hasRegionLimitBypass)
+			return false;
+		
+		for (Mob mob : mobs)
+		{
+			// Check if the mob can bypass region spawn limits and also is within its own spawn limit
+			if (mob.bypassSpawnLimits && mob.withinAliveLimit())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Returns the list of mobs
@@ -175,13 +196,14 @@ public abstract class Region extends AbstractConfig
 	 * @param biome The biome type at the given spawn location
 	 * @param materialBelow The material of the block below the given spawn location
 	 * @param environment The environment of the world the given location is in
+	 * @param outsideSpawnLimits True if either player or region spawn limits have been met
 	 * 
 	 * @return True if a mob was spawned
 	 */
-	public boolean spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment)
+	public boolean spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Fetch all the mobs which we can spawn in this location 
-		ArrayList<Mob> spawnableMobs = getSpawnableMobs(spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment);
+		ArrayList<Mob> spawnableMobs = getSpawnableMobs(spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
 		
 		// If no mobs can spawn here return false :'(
 		if (spawnableMobs.isEmpty())
@@ -196,10 +218,6 @@ public abstract class Region extends AbstractConfig
 		
 		// If this mobs requirements check was delayed check it now
 		if (mob.delayRequirementsCheck && mob.requirementsMet(spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment))
-			return false;
-		
-		// If the alive limit is not met and the chosen mob can't bypass it we do nothing
-		if (!mob.bypassRegionLimit && !withinAliveLimit())
 			return false;
 		
 		// Add the height offset
@@ -220,16 +238,21 @@ public abstract class Region extends AbstractConfig
 	 * @param biome The Biome type at the spawn location
 	 * @param materialBelow The Material of the block below the spawn location
 	 * @param environment The environment in the world the spawn location is in
+	 * @param outsideSpawnLimits True if player or region limits have been met
 	 * 
 	 * @return A list of spawnable mobs
 	 */
-	private ArrayList<Mob> getSpawnableMobs(World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment)
+	private ArrayList<Mob> getSpawnableMobs(World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Initialise the list
 		ArrayList<Mob> spawnableMobs = MMComponent.getSpawner().getConfig().getCachedList();
 		
 		for (Mob mob : mobs)
 		{
+			// If we are operating outside spawn limits the mob must be able to bypass those limits
+			if (outsideSpawnLimits && !mob.bypassSpawnLimits)
+				continue;
+			
 			// Check if the mobs requirements are met
 			if (mob.requirementsMet(world, sLoc, lightLevel, biome, materialBelow, environment))
 				spawnableMobs.add(mob);

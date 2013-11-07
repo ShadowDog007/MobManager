@@ -65,7 +65,7 @@ public class Mob extends AbstractConfig
 
 	public final int heightOffset;
 	public final boolean bypassMobManagerLimit;
-	public final boolean bypassRegionLimit;
+	public final boolean bypassSpawnLimits;
 	public final boolean delayRequirementsCheck;
 	
 	private Mob(Map<String, Object> cfg)
@@ -82,7 +82,7 @@ public class Mob extends AbstractConfig
 		
 		heightOffset = getAndSet("HeightOffset", 0);
 		bypassMobManagerLimit = getAndSet("BypassMobManagerLimit", false);
-		bypassRegionLimit = getAndSet("BypassRegionMobLimit", false);
+		bypassSpawnLimits = getAndSet("BypassPlayerAndRegionMobLimit", false);
 		delayRequirementsCheck = getAndSet("DelayRequirementsCheck", false);
 		
 		mobType = ExtendedEntityType.valueOf(getAndSet("MobType", "UNKNOWN"));
