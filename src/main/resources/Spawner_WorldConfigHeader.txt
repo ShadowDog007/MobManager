@@ -25,7 +25,7 @@ Currently there are four types of regions:
     X/Z distance from a point
 
 
-Avalible region types are automatically generated into the config.
+Available region types are automatically generated into the config.
 
 Regions:
   POINT_CIRCLE: {}
