@@ -210,7 +210,7 @@ public abstract class Region extends AbstractConfig
 			return false;
 		
 		// Fetch a random mob from the list of spawnable mobs
-		Mob mob = getMob(mobs, getTotalChance(mobs));
+		Mob mob = getMob(spawnableMobs, getTotalChance(spawnableMobs));
 		
 		// If the mob is null, or the entity type is invalid return false :'(
 		if (mob == null || mob.getMobType().getBukkitEntityType() == null)
@@ -301,7 +301,7 @@ public abstract class Region extends AbstractConfig
 				return mob;
 		}
 		
-		// Waht¿
+		// Waht
 		MMComponent.getSpawner().warning("Mob chances failed (That should never happen)");
 		return null;
 	}
