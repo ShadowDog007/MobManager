@@ -164,6 +164,9 @@ public class Mob extends AbstractConfig
 	 */
 	public boolean requirementsMet(boolean delayed, World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment)
 	{
+		if (!delayed && delayRequirementsCheck)
+			return true;
+		
 		// If the mobs alive limit is reached we can't spawn any more of this mob
 		if (!withinAliveLimit())
 			return false;
@@ -180,7 +183,7 @@ public class Mob extends AbstractConfig
 		}
 		
 		// Check if we have more requirements and that they are met
-		return requirements == null || delayRequirementsCheck && !delayed
+		return requirements == null
 				|| requirements.met(sLoc.getBlockX() >> 4, sLoc.getBlockZ() >> 4, sLoc.getBlockY(), lightLevel, biome, materialBelow, environment);
 	}
 	
