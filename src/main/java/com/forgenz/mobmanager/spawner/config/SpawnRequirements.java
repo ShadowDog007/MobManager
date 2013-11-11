@@ -198,6 +198,9 @@ public class SpawnRequirements extends AbstractConfig
 	
 	public boolean meetsSlimeLikeSpawnRequirements(int chunkX, int chunkZ)
 	{
+		if (slimeLikeSpawnSeed == 0)
+			return true;
+		
 		Random rnd = new Random(slimeLikeSpawnSeed +
 				(long) (chunkX * chunkX * 0x4c1906) +
 				(long) (chunkX * 0x5ac0db) +
