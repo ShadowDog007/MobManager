@@ -173,6 +173,8 @@ Mobs:
     MaxLight: 15
     MinY: 0
     MaxY: 256
+    SlimeLikeSpawnSeed: 0
+    RequireOpaqueBlock: true
     BlockList: []
     BlockWhitelist: false
     BiomeList: []
@@ -256,6 +258,13 @@ Nodes:
     - MaxLight: The maximum amount of light at the spawn
     - MinY: The minimum Y location of the spawn
     - MaxY: The maximum Y location of the spawn
+    - SlimeLikeSpawnSeed: Only lets the mob spawn in certain
+        chunks dependant on the seed given. 1/10 chunks will
+        be spawnable. Works exactly the same as vanilla
+        Slime spawning. Seed must be a number.
+        If seed is 0 it is disabled.
+    - RequireOpaqueBlock: Requires that the block the mob
+        spawns on is solid. (i.e. not water/lava)
     - <Type>List: List of <Type> which the spawn
         (must|must not) have at least one of.
     - <Type>Whitelist: If true the <Type> at the spawn
