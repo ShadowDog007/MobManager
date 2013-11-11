@@ -153,6 +153,7 @@ public class Mob extends AbstractConfig
 	/**
 	 * Checks if requirements are met at the given location to spawn this entity
 	 * 
+	 * @param delayed True if this check has already been delayed
 	 * @param world The world which the mob is being spawned in
 	 * @param y The Y Location where the mob is being spawned
 	 * @param lightLevel The light level at the given location
@@ -161,21 +162,25 @@ public class Mob extends AbstractConfig
 	 * @param environment The environment of the world
 	 * @return True if all the mobs requirements are met
 	 */
-	public boolean requirementsMet(World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment)
+	public boolean requirementsMet(boolean delayed, World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment)
 	{
 		// If the mobs alive limit is reached we can't spawn any more of this mob
-		if (!bypassMobManagerLimit && !withinAliveLimit())
+		if (!withinAliveLimit())
 			return false;
 		
-		// Fetch the Limiter world
-		MMWorld mmWorld = MMComponent.getLimiter().getWorld(world);
-		
-		// If the world exists and has met the mob limit for the given mob we can't spawn this mob
-		if (mmWorld != null && !mmWorld.withinMobLimit(getMobType(), null))
-			return false;
+		// Do we need to check limiter spawn limits?
+		if (!bypassMobManagerLimit)
+		{
+			// Fetch the Limiter world
+			MMWorld mmWorld = MMComponent.getLimiter().getWorld(world);
+			
+			// If the world exists and has met the mob limit for the given mob we can't spawn this mob
+			if (mmWorld != null && !mmWorld.withinMobLimit(getMobType(), null))
+				return false;
+		}
 		
 		// Check if we have more requirements and that they are met
-		return requirements == null || delayRequirementsCheck
+		return requirements == null || delayRequirementsCheck && !delayed
 				|| requirements.met(sLoc.getBlockX() >> 4, sLoc.getBlockZ() >> 4, sLoc.getBlockY(), lightLevel, biome, materialBelow, environment);
 	}
 	

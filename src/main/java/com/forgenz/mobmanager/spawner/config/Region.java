@@ -217,7 +217,7 @@ public abstract class Region extends AbstractConfig
 			return false;
 		
 		// If this mobs requirements check was delayed check it now
-		if (mob.delayRequirementsCheck && mob.requirementsMet(spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment))
+		if (mob.delayRequirementsCheck && !mob.requirementsMet(true, spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment))
 			return false;
 		
 		// Add the height offset
@@ -254,7 +254,7 @@ public abstract class Region extends AbstractConfig
 				continue;
 			
 			// Check if the mobs requirements are met
-			if (mob.requirementsMet(world, sLoc, lightLevel, biome, materialBelow, environment))
+			if (mob.requirementsMet(false, world, sLoc, lightLevel, biome, materialBelow, environment))
 				spawnableMobs.add(mob);
 		}
 		
