@@ -65,8 +65,8 @@ public class SpawnFinder extends BukkitRunnable
 		// Fetch spawner config
 		cfg = MMComponent.getSpawner().getConfig();
 		
-		playerMobs = new ConcurrentHashMap<String, PlayerMobCounter>(cfg.spawnFinderThreads);
-		groupedPlayerMobs = new ConcurrentHashMap<String, HashMap<String, PlayerMobCounter>>(cfg.spawnFinderThreads);
+		playerMobs = new ConcurrentHashMap<String, PlayerMobCounter>(cfg.spawnFinderThreads + 1);
+		groupedPlayerMobs = new ConcurrentHashMap<String, HashMap<String, PlayerMobCounter>>(cfg.spawnFinderThreads + 1);
 		
 		this.ticksLeft = cfg.ticksPerSpawn;
 		
