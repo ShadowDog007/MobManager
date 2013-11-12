@@ -30,6 +30,7 @@ package com.forgenz.mobmanager.spawner.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +40,6 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.MMComponent;
@@ -50,6 +50,7 @@ import com.forgenz.mobmanager.spawner.config.regions.GlobalRegion;
 import com.forgenz.mobmanager.spawner.config.regions.PointCircleRegion;
 import com.forgenz.mobmanager.spawner.config.regions.PointSquareRegion;
 import com.forgenz.mobmanager.spawner.util.MobCounter;
+import com.forgenz.mobmanager.spawner.util.MobReference;
 import com.forgenz.mobmanager.spawner.util.MobSpawner;
 
 /**
@@ -64,9 +65,12 @@ public abstract class Region extends AbstractConfig
 	public final float spawnAttemptChance;
 	public final int maxBlockRange, minBlockRange;
 	public final int maxPlayerMobs;
-	public final int mobLimitTimeout;
+	public final int playerMobCooldown;
 	
-	public MobCounter maxAliveLimiter;
+	private MobCounter maxAliveLimiter;
+	private HashMap<String, MobCounter> groupedMaxAliveLimiters;
+	private HashMap<String, Integer> groupedPlayerMobLimits;
+	
 	
 	private final List<Mob> mobs;
 	
@@ -85,14 +89,44 @@ public abstract class Region extends AbstractConfig
 		spawnAttemptChance = getAndSet("SpawnAttemptChance", 100.0F) / 100.0F;
 		maxBlockRange = getAndSet("MaxBlockRange", 56);
 		minBlockRange = getAndSet("MinBlockRange", 24);
-		maxPlayerMobs = getAndSet("MaxPlayerMobs", 15);		
-		mobLimitTimeout = getAndSet("MobPlayerLimitTimeoutTicks", 6000);
+		maxPlayerMobs = getAndSet("MaxPlayerMobs", 15);
+		ConfigurationSection limitCfg = getConfigurationSection("MaxPlayerMobGroups");
+		for (String key : limitCfg.getKeys(false))
+		{
+			int limit = limitCfg.getInt(key);
+			
+			// Limits above 0 are valid
+			if (limit > 0)
+			{
+				if (groupedPlayerMobLimits == null)
+					groupedPlayerMobLimits = new HashMap<String, Integer>();
+				groupedPlayerMobLimits.put(key.toLowerCase(), limit);
+			}
+		}
+		
+		playerMobCooldown = getAndSet("PlayerMobCooldown", 60) * 1000;
 		
 		int maxRegionMobs = getAndSet("MaxRegionMobs", 0);
+		
+		limitCfg = getConfigurationSection("RegionMaxMobGroups");
+		
 		int regionMobCooldown = getAndSet("RegionMobCooldown", 60) * 1000;
 		boolean enforceAllRemovalConditions = getAndSet("EnforceAllCooldownConditions", false);
 		if (maxRegionMobs > 0)
 			maxAliveLimiter = new MobCounter(maxRegionMobs, regionMobCooldown, enforceAllRemovalConditions);
+		
+		for (String key : limitCfg.getKeys(false))
+		{
+			int limit = limitCfg.getInt(key);
+			
+			// Limits above 0 are valid
+			if (limit > 0)
+			{
+				if (groupedMaxAliveLimiters == null)
+					groupedMaxAliveLimiters = new HashMap<String, MobCounter>();
+				groupedMaxAliveLimiters.put(key.toLowerCase(), new MobCounter(maxRegionMobs, regionMobCooldown, enforceAllRemovalConditions));
+			}
+		}
 		
 		initialise();
 		
@@ -152,6 +186,16 @@ public abstract class Region extends AbstractConfig
 		return false;
 	}
 	
+	public int getPlayerGroupMobLimit(String playerLimitGroup)
+	{
+		if (groupedPlayerMobLimits == null)
+			return 0;
+		
+		Integer limit = groupedPlayerMobLimits.get(playerLimitGroup);
+		
+		return limit != null ? limit : 0;
+	}
+	
 	/**
 	 * Returns the list of mobs
 	 */
@@ -175,14 +219,28 @@ public abstract class Region extends AbstractConfig
 	}
 
 	/**
-	 * Adds the entity to this mobs MaxAlive limit
+	 * Adds the placeholder to spawn limits to prepare for spawning a mob
 	 * 
-	 * @param e The entity to add
+	 * @param mob The mob settings which were used to spawn this entity
+	 * @param mobRef The entity which was spawned
+	 * 
+	 * @return True if the mob is allowed to spawn
 	 */
-	public void spawned(LivingEntity e)
+	public boolean addSpawnedMob(Mob mob, MobReference mobRef)
 	{
-		if (maxAliveLimiter != null)
-			maxAliveLimiter.spawned(e);
+		// Add the mob to the regions limit
+		if (maxAliveLimiter != null && !maxAliveLimiter.add(mobRef))
+			return false;
+		
+		// Add the mob to its grouped limit
+		if (groupedMaxAliveLimiters != null && mob.regionLimitGroup.length() > 0)
+		{
+			MobCounter limiter = groupedMaxAliveLimiters.get(mob.regionLimitGroup);
+			
+			if (limiter != null && !limiter.add(mobRef))
+				return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -198,35 +256,30 @@ public abstract class Region extends AbstractConfig
 	 * @param environment The environment of the world the given location is in
 	 * @param outsideSpawnLimits True if either player or region spawn limits have been met
 	 * 
-	 * @return True if a mob was spawned
+	 * @return A mob spawner if a mob should be spawned
 	 */
-	public boolean spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
+	public MobSpawner spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Fetch all the mobs which we can spawn in this location 
-		ArrayList<Mob> spawnableMobs = getSpawnableMobs(spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
+		ArrayList<Mob> spawnableMobs = getSpawnableMobs(player, spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
 		
 		// If no mobs can spawn here return false :'(
 		if (spawnableMobs.isEmpty())
-			return false;
+			return null;
 		
 		// Fetch a random mob from the list of spawnable mobs
 		Mob mob = getMob(spawnableMobs, getTotalChance(spawnableMobs));
 		
 		// If the mob is null, or the entity type is invalid return false :'(
 		if (mob == null || mob.getMobType().getBukkitEntityType() == null)
-			return false;
+			return null;
 		
 		// If this mobs requirements check was delayed check it now
 		if (mob.delayRequirementsCheck && !mob.requirementsMet(true, spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment))
-			return false;
+			return null;
 		
-		// Add the height offset
-		if (!mob.addHeightOffset(spawnLoc, playerY, heightRange))
-			return false;
-		
-		// Add a task to spawn the mob in the main thread
-		MMComponent.getSpawner().getSpawnerTask().addSpawner(new MobSpawner(this, player, spawnLoc, mob, playerY, heightRange));
-		return true;
+		// Return the mob spawner
+		return new MobSpawner(this, player, spawnLoc, mob, playerY, heightRange);
 	}
 	
 	/**
@@ -242,7 +295,7 @@ public abstract class Region extends AbstractConfig
 	 * 
 	 * @return A list of spawnable mobs
 	 */
-	private ArrayList<Mob> getSpawnableMobs(World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
+	private ArrayList<Mob> getSpawnableMobs(Player player, World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Initialise the list
 		ArrayList<Mob> spawnableMobs = MMComponent.getSpawner().getConfig().getCachedList();
@@ -253,9 +306,25 @@ public abstract class Region extends AbstractConfig
 			if (outsideSpawnLimits && !mob.bypassSpawnLimits)
 				continue;
 			
-			// Check if the mobs requirements are met
-			if (mob.requirementsMet(false, world, sLoc, lightLevel, biome, materialBelow, environment))
-				spawnableMobs.add(mob);
+			// Check if the requirements are met
+			if (!mob.requirementsMet(false, world, sLoc, lightLevel, biome, materialBelow, environment))
+				continue;
+			
+			// Check if the mob is assigned to a player spawn limit
+			if (!MMComponent.getSpawner().getSpawnFinder().withinGroupedLimit(player, this, mob))
+				continue;
+			
+			// Check if the mob is assigned to another region spawn limit
+			if (mob.regionLimitGroup.length() > 0)
+			{
+				// Fetch the limiter for the given group
+				MobCounter limiter = groupedMaxAliveLimiters.get(mob.regionLimitGroup);
+				
+				// Check if the group limit has not been reached
+				if (limiter != null && !limiter.withinLimit())
+					continue;
+			}
+			spawnableMobs.add(mob);
 		}
 		
 		return spawnableMobs;

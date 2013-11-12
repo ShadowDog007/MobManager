@@ -40,6 +40,7 @@ import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.common.util.LocationCache;
 import com.forgenz.mobmanager.common.util.RandomLocationGen;
 import com.forgenz.mobmanager.spawner.config.Region;
+import com.forgenz.mobmanager.spawner.util.MobSpawner;
 
 /**
  * Handles each step of a SpawnAttempt
@@ -58,6 +59,8 @@ public class SpawnAttempt implements Runnable
 		GET_LOCATION_INFO(true),
 		/** Picks a mob and spawns it */
 		PREPARE_MOB,
+		/** Spawns the mob */
+		SPAWN(true),
 		/** Done :3 */
 		FINISH;
 		
@@ -102,6 +105,8 @@ public class SpawnAttempt implements Runnable
 	private Material materialBelow;
 	private Environment environment;
 	
+	private MobSpawner spawner;
+	
 	public SpawnAttempt(SpawnAttemptExecutor saExecutor, Player player, int maxRange, int minRange, int heightRange, boolean outsideSpawnLimits)
 	{
 		this.saExecutor = saExecutor;
@@ -139,6 +144,9 @@ public class SpawnAttempt implements Runnable
 			case PREPARE_MOB:
 				stateMethodPrepareMob();
 				break;
+			case SPAWN:
+				stateMethodSpawn();
+				break;
 			case FINISH:
 				return;
 			}
@@ -157,16 +165,16 @@ public class SpawnAttempt implements Runnable
 		if (nextState != AttemptState.FINISH)
 		{
 			// Check if the next state can be executed now
-			boolean runNow = nextState.sync == currentState.sync;
+//			boolean runNow = nextState.sync == currentState.sync;
 			// Update the current state
 			currentState = nextState;
 			
 			// Execute the task
 			// If the next state can be run in the same thread we execute it right away
-			if (runNow)
-				run();
-			else
-				saExecutor.addTask(this, currentState.sync);
+//			if (runNow)
+//				run();
+//			else
+			saExecutor.addTask(this, currentState.sync);
 		}
 	}
 	
@@ -247,6 +255,23 @@ public class SpawnAttempt implements Runnable
 	 */
 	private void stateMethodPrepareMob()
 	{
-		spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);	
+		// Fetch the mob spawner
+		spawner = spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
+		// If we didn't get one we are finished
+		finish(spawner == null);
+	}
+	
+	/**
+	 * Executes the mob spawner
+	 */
+	private void stateMethodSpawn()
+	{
+		spawner.spawn();
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return currentState.ordinal();
 	}
 }

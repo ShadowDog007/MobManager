@@ -36,7 +36,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
-import org.bukkit.entity.LivingEntity;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
@@ -46,6 +45,7 @@ import com.forgenz.mobmanager.common.util.MiscUtil;
 import com.forgenz.mobmanager.common.util.RandomLocationGen;
 import com.forgenz.mobmanager.limiter.world.MMWorld;
 import com.forgenz.mobmanager.spawner.util.MobCounter;
+import com.forgenz.mobmanager.spawner.util.MobReference;
 
 /**
  * Represents a mob which can be spawned and the chance of it being spawned</br>
@@ -63,6 +63,7 @@ public class Mob extends AbstractConfig
 	
 	private MobCounter maxAliveLimiter;
 
+	public final String playerLimitGroup, regionLimitGroup;
 	public final int heightOffset;
 	public final boolean bypassMobManagerLimit;
 	public final boolean bypassSpawnLimits;
@@ -80,6 +81,8 @@ public class Mob extends AbstractConfig
 		if (maxAlive > 0)
 			maxAliveLimiter = new MobCounter(maxAlive, mobCooldown, enforceAllRemovalConditions);
 		
+		playerLimitGroup = getAndSet("PlayerLimitGroup", "").toLowerCase();
+		regionLimitGroup = getAndSet("RegionLimitGroup", "").toLowerCase();
 		heightOffset = getAndSet("HeightOffset", 0);
 		bypassMobManagerLimit = getAndSet("BypassMobManagerLimit", false);
 		bypassSpawnLimits = getAndSet("BypassPlayerAndRegionMobLimit", false);
@@ -115,17 +118,6 @@ public class Mob extends AbstractConfig
 	public boolean withinAliveLimit()
 	{
 		return maxAliveLimiter == null || maxAliveLimiter.withinLimit();
-	}
-
-	/**
-	 * Adds the entity to this mobs MaxAlive limit
-	 * 
-	 * @param e The entity to add
-	 */
-	public void spawned(LivingEntity e)
-	{
-		if (maxAliveLimiter != null)
-			maxAliveLimiter.spawned(e);
 	}
 	
 	public ExtendedEntityType getMobType()
@@ -185,6 +177,11 @@ public class Mob extends AbstractConfig
 		// Check if we have more requirements and that they are met
 		return requirements == null
 				|| requirements.met(sLoc.getBlockX() >> 4, sLoc.getBlockZ() >> 4, sLoc.getBlockY(), lightLevel, biome, materialBelow, environment);
+	}
+	
+	public boolean addSpawnedMob(MobReference mobRef)
+	{
+		return maxAliveLimiter == null || maxAliveLimiter.add(mobRef);
 	}
 	
 	/**

@@ -71,10 +71,7 @@ public class SpawnerConfig extends AbstractConfig
 		super.setCfg(cfg);
 		
 		spawnFinderThreads = getAndSet("SpawnFinderThreads", 1);
-		int ticksPerSpawn = getAndSet("TicksPerSpawn", 100);
-		ticksPerSpawn = (ticksPerSpawn + ticksPerSpawn % 2);
-		set("TicksPerSpawn", ticksPerSpawn);
-		this.ticksPerSpawn = ticksPerSpawn / 2;
+		ticksPerSpawn = getAndSet("TicksPerSpawn", 100);
 		
 		spawnGenerationAttempts = getAndSet("SpawnGenerateAttempts", 3);
 		mobDistanceForLimitRemoval = (int) Math.pow(getAndSet("MobDistanceForLimitRemoval", 64), 2);

@@ -134,9 +134,25 @@ The limit is reset after teleporting between worlds or 100 blocks.
 The limit is also reduced after the mob dies.
 
 ################
-MobPlayerLimitTimeoutTicks
+MaxPlayerMobGroups
 ################
-The time in ticks after a mob is removed from a players max mobs limit
+Similar to MaxPlayerMobs but allows finer control on groups of mobs.
+A mob can be put into one mob player group which allows a
+    separate limit for players for mobs in that given group.
+
+For regions without a given group, the region will be assumed
+    to have no limits for that group.
+
+e.g.
+
+MaxPlayerMobGroups:
+  GroupOneLimit: 5
+  GroupTwoLimit: 10
+
+################
+PlayerMobCooldown
+################
+The time in seconds after a mob is removed from a players max mobs limit
 
 ################
 MaxRegionMobs

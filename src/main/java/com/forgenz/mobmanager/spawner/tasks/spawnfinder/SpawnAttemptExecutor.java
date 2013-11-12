@@ -28,8 +28,9 @@
 
 package com.forgenz.mobmanager.spawner.tasks.spawnfinder;
 
+import java.util.Comparator;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -60,10 +61,10 @@ public class SpawnAttemptExecutor implements Runnable
 	
 	private int currentThreads;
 	
-	private final LinkedBlockingQueue<Runnable> workerQueue = new LinkedBlockingQueue<Runnable>();
+	private final PriorityBlockingQueue<Runnable> syncWorkerQueue;
 	
 	private int ticksLeft;
-	
+
 	public SpawnAttemptExecutor(SpawnFinder spawnFinder, Queue<Player> playerQueue)
 	{
 		this.spawnFinder = spawnFinder;
@@ -74,7 +75,17 @@ public class SpawnAttemptExecutor implements Runnable
 		this.threadCache = new ThreadCache<SpawnAttemptCache>(SpawnAttemptCache.class);
 		
 		int c = cfg.spawnFinderThreads;
-		this.executor = new ThreadPoolExecutor(c, c, 0L, TimeUnit.NANOSECONDS, new LinkedBlockingQueue<Runnable>(), threadFactory);
+		Comparator<Object> taskComparator = new Comparator<Object>()
+		{
+			@Override
+			public int compare(Object arg0, Object arg1)
+			{
+				return arg0.hashCode() > arg1.hashCode() ? -1 : 1;
+			}
+			
+		};
+		this.syncWorkerQueue =  new PriorityBlockingQueue<Runnable>(20, taskComparator);
+		this.executor = new ThreadPoolExecutor(c, c, 0L, TimeUnit.NANOSECONDS, new PriorityBlockingQueue<Runnable>(20, taskComparator), threadFactory);
 	}
 	
 	/**
@@ -106,7 +117,7 @@ public class SpawnAttemptExecutor implements Runnable
 		
 		// Run any tasks in the worker queue (Probably full)
 		Runnable task;
-		while ((task = workerQueue.poll()) != null)
+		while ((task = syncWorkerQueue.poll()) != null)
 		{
 			task.run();
 		}
@@ -136,7 +147,7 @@ public class SpawnAttemptExecutor implements Runnable
 				continue;
 			
 			// Check if the player already has too many mobs spawned around them
-			boolean outsideSpawnLimits = playerRegion.maxPlayerMobs > 0 && spawnFinder.getMobCount(player, playerRegion.mobLimitTimeout) >= playerRegion.maxPlayerMobs;
+			boolean outsideSpawnLimits = playerRegion.maxPlayerMobs > 0 && spawnFinder.getMobCount(player, playerRegion.playerMobCooldown) >= playerRegion.maxPlayerMobs;
 
 			// If we are outside of spawn limits continue
 			// Unless the region has mobs which can ignore the spawn limits
@@ -160,7 +171,7 @@ public class SpawnAttemptExecutor implements Runnable
 	protected void addTask(Runnable task, boolean sync)
 	{
 		if (sync)
-			workerQueue.add(task);
+			syncWorkerQueue.add(task);
 		else
 			executor.execute(task);
 	}

@@ -9,7 +9,6 @@ import com.forgenz.mobmanager.spawner.config.Action;
 import com.forgenz.mobmanager.spawner.config.SpawnRequirements;
 import com.forgenz.mobmanager.spawner.config.SpawnerConfig;
 import com.forgenz.mobmanager.spawner.listener.PlayerListener;
-import com.forgenz.mobmanager.spawner.tasks.SpawnerTask;
 import com.forgenz.mobmanager.spawner.tasks.spawnfinder.SpawnFinder;
 
 public class SpawnerComponent extends MMComponent
@@ -19,7 +18,6 @@ public class SpawnerComponent extends MMComponent
 	private SpawnerConfig config;
 	private boolean enabled = false;
 	
-	private SpawnerTask spawnerTask;
 	private SpawnFinder spawnFinder;
 	
 	public SpawnerComponent(Component c)
@@ -89,8 +87,6 @@ public class SpawnerComponent extends MMComponent
 		// Load the config
 		config = new SpawnerConfig();
 		
-		// Create the spawner task
-		spawnerTask = new SpawnerTask();
 		// Create the spawn finder
 		spawnFinder = new SpawnFinder();
 		
@@ -109,8 +105,6 @@ public class SpawnerComponent extends MMComponent
 		
 		config = null;
 		
-		spawnerTask = null;
-		
 		spawnFinder.cancel();
 		spawnFinder = null;
 		
@@ -127,11 +121,6 @@ public class SpawnerComponent extends MMComponent
 		}
 		
 		return config;
-	}
-	
-	public SpawnerTask getSpawnerTask()
-	{
-		return spawnerTask;
 	}
 	
 	public SpawnFinder getSpawnFinder()

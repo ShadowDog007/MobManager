@@ -28,7 +28,6 @@
 
 package com.forgenz.mobmanager.spawner.util;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -38,8 +37,8 @@ public class MobCounter
 {
 	private ArrayList<MobReference> aliveMobs;
 	
-	private final int maxAliveMobs;
-	private final int mobCooldown;
+	protected  int maxAliveMobs;
+	protected int mobCooldown;
 	private final boolean enforceAllRemovalConditions;
 	
 	public MobCounter(int maxAliveMobs, int mobCooldown, boolean enforceAllRemovalConditions)
@@ -49,15 +48,20 @@ public class MobCounter
 		this.enforceAllRemovalConditions = enforceAllRemovalConditions;
 	}
 	
-	public synchronized boolean withinLimit()
+	public boolean withinLimit()
 	{
 		// If the mob limit is disabled
 		if (maxAliveMobs <= 0)
 			return true;
 		
+		return getMobCount() < maxAliveMobs;
+	}
+	
+	public synchronized int getMobCount()
+	{
 		// If there are no alive mobs
 		if (aliveMobs == null)
-			return true;
+			return 0;
 		
 		// Iterate through each one and remove old mobs
 		Iterator<MobReference> it = aliveMobs.iterator();
@@ -65,21 +69,37 @@ public class MobCounter
 		{
 			MobReference r = it.next();
 			
+			// If the reference is invalid ignore it
+			if (!r.isValid())
+			{
+				it.remove();
+				continue;
+			}
+			
+			LivingEntity entity = r.getEntity();
+			
 			// Check if the mob is dead
-			if (r.getEntity() == null)
+			if (entity == null)
 			{
 				// Check if we need to wait for the cooldown as well
-				if (enforceAllRemovalConditions && !r.cooldownExpired())
+				if (enforceAllRemovalConditions && !r.cooldownExpired(mobCooldown))
 					continue;
 				// Remove this mob from the limit
 				it.remove();
 			}
 			// If we don't need both conditions and the cooldown has expired remove the mob from the limit
-			else if (!enforceAllRemovalConditions && r.cooldownExpired())
+			else if (!enforceAllRemovalConditions && r.cooldownExpired(mobCooldown))
+				it.remove();
+			else if (remove(entity))
 				it.remove();
 		}
 		
-		return aliveMobs.size() < maxAliveMobs;
+		return aliveMobs.size();
+	}
+	
+	protected boolean remove(LivingEntity entity)
+	{
+		return false;
 	}
 
 	/**
@@ -87,68 +107,22 @@ public class MobCounter
 	 * 
 	 * @param e The entity to add
 	 */
-	public synchronized void spawned(LivingEntity e)
+	public synchronized boolean add(MobReference mobRef)
 	{
 		// If maxAlive is disabled do nothing
 		if (maxAliveMobs <= 0)
-			return;
+			return true;
+		
+		// If we are outside of our limit return false
+		if (!withinLimit())
+			return false;
 		
 		// If the aliveMobs list doesn't exist, then create it
 		if (aliveMobs == null)
 			aliveMobs = new ArrayList<MobReference>();
 		
 		// Add the mob to the list
-		aliveMobs.add(new MobReference(e));
-	}
-	
-	/**
-	 * Keeps a reference to the a mob and its spawn time.
-	 */
-	private class MobReference
-	{
-		private WeakReference<LivingEntity> e;
-		private long spawnTime;
-		
-		public MobReference(LivingEntity e)
-		{
-			this.e = new WeakReference<LivingEntity>(e);
-			spawnTime = System.currentTimeMillis();
-		}
-		
-		/**
-		 * Fetches the entity if it is still valid
-		 * 
-		 * @return The entity object if it is still valid
-		 */
-		public LivingEntity getEntity()
-		{
-			// If the weak reference is null the entity is invalid
-			if (e == null)
-				return null;
-			
-			// Fetch the entity
-			LivingEntity entity = e.get();
-			// If the entity is null it has been removed by GB
-			// If the entity is invalid it is gone
-			if (entity == null || !entity.isValid())
-			{
-				// Remove the weak reference and return null
-				e = null;
-				return null;
-			}
-			
-			// Fetch the entity and return
-			return e.get();
-		}
-		
-		/**
-		 * Checks if the spawn cooldown has expired
-		 * 
-		 * @return Returns true if the spawn cooldown has expired
-		 */
-		public boolean cooldownExpired()
-		{
-			return mobCooldown > 0 && (System.currentTimeMillis() - spawnTime) > mobCooldown;
-		}
+		aliveMobs.add(mobRef);
+		return true;
 	}
 }

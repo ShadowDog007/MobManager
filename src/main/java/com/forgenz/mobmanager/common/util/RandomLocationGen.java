@@ -128,7 +128,8 @@ public class RandomLocationGen
 			{
 				// Generate a random Yaw/Pitch
 				cacheLoc.setYaw(RandomUtil.i.nextFloat() * 360.0F);
-				cacheLoc.setPitch(80.0F + RandomUtil.i.nextFloat() * 20.0F);
+//				cacheLoc.setPitch(-10.0F + RandomUtil.i.nextFloat() * 20.0F);
+				cacheLoc.setPitch(90.0F);
 				return cacheLoc;
 			}
 		}

@@ -28,25 +28,22 @@
 
 package com.forgenz.mobmanager.spawner.tasks.spawnfinder;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.common.util.LocationCache;
-import com.forgenz.mobmanager.common.util.PlayerFinder.FinderMode;
+import com.forgenz.mobmanager.spawner.config.Mob;
+import com.forgenz.mobmanager.spawner.config.Region;
 import com.forgenz.mobmanager.spawner.config.SpawnerConfig;
+import com.forgenz.mobmanager.spawner.util.MobReference;
+import com.forgenz.mobmanager.spawner.util.PlayerMobCounter;
 
 /**
  * Initiates the finding of spawns for mobs
@@ -60,14 +57,16 @@ public class SpawnFinder extends BukkitRunnable
 	
 	private final SpawnAttemptExecutor spawnAttemptExecutor = new SpawnAttemptExecutor(this, playerQueue);
 	
-	private final ConcurrentHashMap<String, List<WeakReference<LivingEntity>>> playerMobs; 
+	private final ConcurrentHashMap<String, PlayerMobCounter> playerMobs; 
+	private final ConcurrentHashMap<String, HashMap<String, PlayerMobCounter>> groupedPlayerMobs;
 	
 	public SpawnFinder()
 	{
 		// Fetch spawner config
 		cfg = MMComponent.getSpawner().getConfig();
 		
-		playerMobs = new ConcurrentHashMap<String, List<WeakReference<LivingEntity>>>(cfg.spawnFinderThreads);
+		playerMobs = new ConcurrentHashMap<String, PlayerMobCounter>(cfg.spawnFinderThreads);
+		groupedPlayerMobs = new ConcurrentHashMap<String, HashMap<String, PlayerMobCounter>>(cfg.spawnFinderThreads);
 		
 		this.ticksLeft = cfg.ticksPerSpawn;
 		
@@ -105,58 +104,31 @@ public class SpawnFinder extends BukkitRunnable
 	 */
 	public int getMobCount(Player player, int mobLimitTimeout)
 	{
-		synchronized (player)
-		{
-			// Fetch the list of mobs
-			List<WeakReference<LivingEntity>> playersList = playerMobs.get(player.getName());
-			
-			// If the list doesn't exist the mob count is
-			if (playersList != null)
-			{
-				// Fetch the iterator for the list
-				Iterator<WeakReference<LivingEntity>> it = playersList.iterator();
-				while (it.hasNext())
-				{
-					// Fetch the entity
-					LivingEntity e = it.next().get();
-					
-					// If the entity is invalid or the timeout has passed remove them from the list
-					if (e == null || !e.isValid() || (mobLimitTimeout > 0 && e.getTicksLived() > mobLimitTimeout) || playerOutOfRange(player, e))
-						it.remove();
-				}
-				
-				// Return the new size of the list
-				return playersList.size();
-			}
-			// List doesn't exist so mobcount is 0
-			return 0;
-		}
+		PlayerMobCounter limiter = playerMobs.get(player.getName());
+		
+		return limiter != null ? limiter.getMobCount() : 0;
 	}
 	
-	/**
-	 * Checks if the player is out of range of the given entity
-	 * 
-	 * @param player The player
-	 * @param entity The entity
-	 * 
-	 * @return True if the player and entity are too far away from each other to count towards the player mob limit
-	 */
-	private boolean playerOutOfRange(Player player, LivingEntity entity)
+	public boolean withinGroupedLimit(Player player, Region region, Mob mob)
 	{
-		// If the automatic removal is disabled we do nothing
-		if (cfg.mobDistanceForLimitRemoval <= 0)
-			return false;
-		
-		// If the entity and player are in different worlds they are too far away
-		if (player.getWorld() != entity.getWorld())
+		if (mob.playerLimitGroup.length() <= 0)
 			return true;
 		
-		// Fetch player and mob locations
-		Location playerLoc = LocationCache.getCachedLocation(player);
-		Location mobLoc = LocationCache.getCachedLocation(entity);
+		int limit = region.getPlayerGroupMobLimit(mob.playerLimitGroup);
 		
-		// Check if the locations are out of range
-		return !FinderMode.CYLINDER.withinRange(playerLoc, mobLoc, cfg.mobDistanceForLimitRemoval, 32);
+		if (limit <= 0)
+			return true;
+		
+		HashMap<String, PlayerMobCounter> playerLimiters = groupedPlayerMobs.get(player.getName());
+		
+		if (playerLimiters == null)
+			return true;
+		
+		synchronized (playerLimiters)
+		{
+			PlayerMobCounter limiter = playerLimiters.get(mob.playerLimitGroup);
+			return limiter != null ? limiter.withinLimit(limit, region.playerMobCooldown) : true;
+		}
 	}
 	
 	/**
@@ -166,34 +138,50 @@ public class SpawnFinder extends BukkitRunnable
 	 */
 	public void removeMobs(Player player)
 	{
-		synchronized (player)
-		{
-			playerMobs.remove(player.getName());
-		}
+		playerMobs.remove(player.getName());
+		groupedPlayerMobs.remove(player.getName());
 	}
 
 	/**
-	 * Add a mob to the given players mob count
+	 * Adds the placeholder to spawn limits to prepare for spawning a mob
 	 * 
 	 * @param player The player involved
-	 * @param entity The entity to add
+	 * @param mob The mob config used to create the entity
+	 * @param mobRef The entity to add
+	 * @return True if the mob is allowed to spawn
 	 */
-	public void addMob(Player player, LivingEntity entity)
+	public boolean addSpawnedMob(Player player, Mob mob, MobReference mobRef)
 	{
-		synchronized (player)
+		// Fetch the players mob list
+		PlayerMobCounter limiter = playerMobs.get(player.getName());
+			
+		// If the limiter doesn't exist create it
+		if (limiter == null)
+			playerMobs.put(player.getName(), limiter = new PlayerMobCounter(player));
+		
+		// Track the entity
+		if (!limiter.add(mobRef))
+			return false;
+		
+		// Check for grouped limiters
+		if (mob.playerLimitGroup.length() > 0)
 		{
-			// Fetch the players mob list
-			List<WeakReference<LivingEntity>> playersList = playerMobs.get(player.getName());
+			HashMap<String, PlayerMobCounter> playerLimiters = groupedPlayerMobs.get(player.getName());
 			
-			// If the list doesn't exist create it
-			if (playersList == null)
+			if (playerLimiters == null)
+				groupedPlayerMobs.put(player.getName(), playerLimiters = new HashMap<String, PlayerMobCounter>());
+			
+			synchronized (playerLimiters)
 			{
-				playersList = new ArrayList<WeakReference<LivingEntity>>();
-				playerMobs.put(player.getName(), playersList);
+				PlayerMobCounter groupedLimiter = playerLimiters.get(mob.playerLimitGroup);
+				
+				if (groupedLimiter == null)
+					playerLimiters.put(mob.playerLimitGroup, groupedLimiter = new PlayerMobCounter(player));
+				
+				if (!groupedLimiter.add(mobRef))
+					return false;
 			}
-			
-			// Add a reference to the mob
-			playersList.add(new WeakReference<LivingEntity>(entity));
 		}
+		return true;
 	}
 }

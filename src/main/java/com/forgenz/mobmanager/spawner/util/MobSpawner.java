@@ -78,14 +78,16 @@ public class MobSpawner
 		if (entity == null)
 			return false;
 		
-		// Add this entity to the mob counts
-		if (!mob.bypassSpawnLimits)
+		
+		MobReference mobRef = new MobReference(entity);
+		if (!mob.bypassMobManagerLimit &&
+				(!MMComponent.getSpawner().getSpawnFinder().addSpawnedMob(player, mob, mobRef) || !region.addSpawnedMob(mob, mobRef))
+				|| !mob.addSpawnedMob(mobRef))
 		{
-			// Only add entities to player and region limits if they don't bypass limit
-			MMComponent.getSpawner().getSpawnFinder().addMob(player, entity);
-			region.spawned(entity);
+			mobRef.invalidate();
+			entity.remove();
+			return false;
 		}
-		mob.spawned(entity);
 		
 		mob.executeAction(location);
 		

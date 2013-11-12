@@ -13,8 +13,7 @@ TicksPerSpawn
 #######################################################################
 How many ticks between sets of spawns.
 
-Spawns run every second tick, finding spawns for mobs
-    around each player. This value can only take even numbers.
+Spawns run every tick, finding spawns for mobs around each player.
 
 #######################################################################
 SpawnGenerateAttempts
