@@ -181,7 +181,7 @@ public class Mob extends AbstractConfig
 	
 	public boolean addSpawnedMob(MobReference mobRef)
 	{
-		return maxAliveLimiter == null || maxAliveLimiter.add(mobRef);
+		return !mobRef.isValid() || maxAliveLimiter == null || maxAliveLimiter.add(mobRef);
 	}
 	
 	/**

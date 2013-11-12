@@ -73,22 +73,30 @@ public class MobSpawner
 		if (!mob.addHeightOffset(location, playerY, heightRange))
 			return false;
 		
+		// Add mob to limits
+		MobReference mobRef = new MobReference();
+		if (!mob.bypassMobManagerLimit)
+		{
+			MMComponent.getSpawner().getSpawnFinder().addSpawnedMob(player, mob, mobRef);
+			region.addSpawnedMob(mob, mobRef);
+		}
+		mob.addSpawnedMob(mobRef);
+		
+		// Check if the reference is still valid
+		if (!mobRef.isValid())
+			return false;
+		
+		// Spawn the new mob
 		LivingEntity entity = mob.getMobType().spawnMob(location);
 		
+		// Set the reference to the entity
+		mobRef.setReference(entity);
+		
+		// If the entity failed to spawn return :(
 		if (entity == null)
 			return false;
 		
-		
-		MobReference mobRef = new MobReference(entity);
-		if (!mob.bypassMobManagerLimit &&
-				(!MMComponent.getSpawner().getSpawnFinder().addSpawnedMob(player, mob, mobRef) || !region.addSpawnedMob(mob, mobRef))
-				|| !mob.addSpawnedMob(mobRef))
-		{
-			mobRef.invalidate();
-			entity.remove();
-			return false;
-		}
-		
+		// Execute the action for this mob
 		mob.executeAction(location);
 		
 		// Apply abilities to the mob

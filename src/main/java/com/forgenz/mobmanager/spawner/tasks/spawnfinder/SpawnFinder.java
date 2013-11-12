@@ -152,6 +152,9 @@ public class SpawnFinder extends BukkitRunnable
 	 */
 	public boolean addSpawnedMob(Player player, Mob mob, MobReference mobRef)
 	{
+		if (!mobRef.isValid())
+			return false;
+		
 		// Fetch the players mob list
 		PlayerMobCounter limiter = playerMobs.get(player.getName());
 			

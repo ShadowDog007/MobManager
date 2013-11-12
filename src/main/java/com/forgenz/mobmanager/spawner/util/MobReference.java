@@ -9,15 +9,15 @@ import org.bukkit.entity.LivingEntity;
  */
 public class MobReference
 {
+	private boolean refSet;
 	private boolean valid;
 	private WeakReference<LivingEntity> e;
 	private final long spawnTime;
 	
-	public MobReference(LivingEntity entity)
+	public MobReference()
 	{
-		valid = entity != null;
-		if (entity != null)
-			e = new WeakReference<LivingEntity>(entity);
+		refSet = false;
+		valid = true;
 		spawnTime = System.currentTimeMillis();
 	}
 	
@@ -57,9 +57,32 @@ public class MobReference
 		return mobCooldown > 0 && (System.currentTimeMillis() - spawnTime) > mobCooldown;
 	}
 	
+	public void setReference(LivingEntity entity)
+	{
+		if (entity != null)
+			e = new WeakReference<LivingEntity>(entity);
+		else
+			valid = false;
+		refSet = true;
+	}
+	
 	public boolean isValid()
 	{
 		return valid;
+	}
+	
+	public boolean isSet()
+	{
+		if (refSet)
+			return true;
+		
+		if (System.currentTimeMillis() - spawnTime > 50)
+		{
+			valid = false;
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public void invalidate()

@@ -242,6 +242,9 @@ public abstract class Region extends AbstractConfig
 	 */
 	public boolean addSpawnedMob(Mob mob, MobReference mobRef)
 	{
+		if (!mobRef.isValid())
+			return false;
+		
 		// Add the mob to the regions limit
 		if (maxAliveLimiter != null && !maxAliveLimiter.add(mobRef))
 			return false;

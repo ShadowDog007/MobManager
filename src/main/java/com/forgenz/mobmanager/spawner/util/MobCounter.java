@@ -69,6 +69,10 @@ public class MobCounter
 		{
 			MobReference r = it.next();
 			
+			// Wait a little while for the reference to the mob to be set
+			if (!r.isSet())
+				continue;
+			
 			// If the reference is invalid ignore it
 			if (!r.isValid())
 			{
@@ -115,7 +119,10 @@ public class MobCounter
 		
 		// If we are outside of our limit return false
 		if (!withinLimit())
+		{
+			mobRef.invalidate();
 			return false;
+		}
 		
 		// If the aliveMobs list doesn't exist, then create it
 		if (aliveMobs == null)
