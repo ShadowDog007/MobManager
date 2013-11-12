@@ -31,10 +31,12 @@ package com.forgenz.mobmanager.common.util;
 import java.util.HashMap;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
+import org.bukkit.inventory.ItemStack;
 
 import com.forgenz.mobmanager.limiter.util.MobType;
 
@@ -222,6 +224,15 @@ public class ExtendedEntityType
 		{
 			if (eData == SkeletonType.WITHER)
 				((Skeleton) entity).setSkeletonType(SkeletonType.WITHER);
+		}
+		
+		switch (eType)
+		{
+		case SKELETON:
+			Material heldItem = eData == null || eData != SkeletonType.WITHER ? Material.BOW : Material.STONE_SWORD;
+			entity.getEquipment().setItemInHand(new ItemStack(heldItem));
+			break;
+		default:
 		}
 		
 		return entity;
