@@ -63,7 +63,8 @@ public abstract class Region extends AbstractConfig
 	
 	public final int spawnAttempts;
 	public final float spawnAttemptChance;
-	public final int maxBlockRange, minBlockRange;
+	private final int maxBlockRange, minBlockRange;
+	private final int maxUndergroundBlockRange, minUndergroundBlockRange, undergroundHeight;
 	public final int maxPlayerMobs;
 	public final int playerMobCooldown;
 	
@@ -87,8 +88,11 @@ public abstract class Region extends AbstractConfig
 		
 		spawnAttempts = getAndSet("SpawnAttempts", 1);
 		spawnAttemptChance = getAndSet("SpawnAttemptChance", 100.0F) / 100.0F;
-		maxBlockRange = getAndSet("MaxBlockRange", 56);
+		maxBlockRange = getAndSet("MaxBlockRange", 48);
 		minBlockRange = getAndSet("MinBlockRange", 24);
+		maxUndergroundBlockRange = getAndSet("MaxUndergroundBlockRange", 32);
+		minUndergroundBlockRange = getAndSet("MinUndergroundBlockRange", 16);
+		undergroundHeight = getAndSet("UndergroundHeight", 55);
 		maxPlayerMobs = getAndSet("MaxPlayerMobs", 15);
 		ConfigurationSection limitCfg = getConfigurationSection("MaxPlayerMobGroups");
 		for (String key : limitCfg.getKeys(false))
@@ -164,6 +168,16 @@ public abstract class Region extends AbstractConfig
 	public abstract void initialise();
 
 	public abstract boolean withinRegion(Location location);
+	
+	public int getMaxBlockRange(int yHeight)
+	{
+		return yHeight > undergroundHeight ? maxBlockRange : maxUndergroundBlockRange;
+	}	
+	
+	public int getMinBlockRange(int yHeight)
+	{
+		return yHeight > undergroundHeight ? minBlockRange : minUndergroundBlockRange;
+	}
 	
 	/**
 	 * Checks if the region has mobs which can ignore spawn limits

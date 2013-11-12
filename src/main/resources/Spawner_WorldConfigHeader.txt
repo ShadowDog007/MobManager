@@ -119,6 +119,24 @@ Spawn locations are not generated between the player up
 
 This distance can cause spawn generation to fail if another
     player is within range of the generated spawn.
+    
+################
+MaxUndergroundBlockRange
+################
+Replaces MaxBlockRange when the player is under the height
+    set as UndergroundHeight.
+
+################
+MinUndergroundBlockRange
+################
+Replaces MinBlockRange when the player is under the height
+    set as UndergroundHeight.
+
+################
+UndergroundHeight
+################
+When a player is under this height the spawner will use
+   different min/max block ranges for spawning mobs.
 
 ################
 MaxPlayerMobs

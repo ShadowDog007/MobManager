@@ -156,10 +156,10 @@ public class SpawnAttemptExecutor implements Runnable
 			
 			// Find the max spawn range for the world
 			MMWorld world = MMComponent.getLimiter().getWorld(playerLoc.getWorld());
-			int maxRange = world != null ? world.getSearchDistance((short) playerLoc.getBlockY()) : playerRegion.maxBlockRange;
-			if (playerRegion.maxBlockRange < maxRange)
-				maxRange = playerRegion.maxBlockRange;
-			int minRange = playerRegion.minBlockRange < maxRange ? playerRegion.minBlockRange : maxRange;
+			int yHeight = playerLoc.getBlockY();
+			
+			int maxRange = Math.min(world != null ? world.getSearchDistance((short) yHeight) : Integer.MAX_VALUE, playerRegion.getMaxBlockRange(yHeight));
+			int minRange = Math.min(playerRegion.getMinBlockRange(yHeight), maxRange);
 			int heightRange = world != null ? world.getSearchHeight() : 24;
 			
 			// Attempt 'X' spawns
