@@ -50,11 +50,9 @@ public class SpawnRequirements extends AbstractConfig
 {
 	private static boolean first = false;
 	
-	private final int minLight;
-	private final int maxLight;
-	
-	private final int minY;
-	private final int maxY;
+	private final int minLight, maxLight;
+	private final int minY, maxY;
+	private final int minTime, maxTime;
 	
 	private final long slimeLikeSpawnSeed;
 	
@@ -79,6 +77,9 @@ public class SpawnRequirements extends AbstractConfig
 		
 		minY = getAndSet("MinY", 0);
 		maxY = getAndSet("MaxY", 256);
+		
+		minTime = getAndSet("MinTime", 0);
+		maxTime = getAndSet("MaxTime", 24000);
 		
 		slimeLikeSpawnSeed = getAndSet("SlimeLikeSpawnSeed", 0L);
 		
@@ -179,6 +180,8 @@ public class SpawnRequirements extends AbstractConfig
 		return !ignoreLight()
 				|| maxY < 256
 				|| minY > 0
+				|| maxTime < 24000
+				|| minTime > 0
 				|| slimeLikeSpawnSeed != 0
 				|| requireOpaqueBlock
 				|| !blockSet.isEmpty()
@@ -193,7 +196,12 @@ public class SpawnRequirements extends AbstractConfig
 	 */
 	public boolean meetsHeightRequirements(int y)
 	{
-		return maxY >= y && minY <=y;
+		return maxY >= y && minY <= y;
+	}
+	
+	public boolean meetsTimeRequirements(int time)
+	{
+		return maxTime >= time && minTime <= time;
 	}
 	
 	public boolean meetsSlimeLikeSpawnRequirements(int chunkX, int chunkZ)
@@ -239,12 +247,12 @@ public class SpawnRequirements extends AbstractConfig
 	 * 
 	 * @return True if the requirements are met
 	 */
-	public boolean met(int chunkX, int chunkZ, int y, int lightLevel, Biome biome, Material materialBelow, Environment environment)
+	public boolean met(int chunkX, int chunkZ, int y, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment)
 	{
 		if (minLight > lightLevel || maxLight < lightLevel)
 				return false;
 		
-		if (!meetsHeightRequirements(y))
+		if (!meetsHeightRequirements(y) || !meetsTimeRequirements(time))
 			return false;
 		
 		if (requireOpaqueBlock && !materialBelow.isSolid())

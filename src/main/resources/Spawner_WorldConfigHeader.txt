@@ -212,6 +212,8 @@ Mobs:
     MaxLight: 15
     MinY: 0
     MaxY: 256
+    MinTime: 0
+    MaxTime: 24000
     SlimeLikeSpawnSeed: 0
     RequireOpaqueBlock: true
     BlockList: []
@@ -297,6 +299,8 @@ Nodes:
     - MaxLight: The maximum amount of light at the spawn
     - MinY: The minimum Y location of the spawn
     - MaxY: The maximum Y location of the spawn
+    - MinTime: The minimum world time the mob can spawn (0-24000)
+    - MaxTime: The maximum world time the mob can spawn (0-24000)
     - SlimeLikeSpawnSeed: Only lets the mob spawn in certain
         chunks dependant on the seed given. 1/10 chunks will
         be spawnable. Works exactly the same as vanilla

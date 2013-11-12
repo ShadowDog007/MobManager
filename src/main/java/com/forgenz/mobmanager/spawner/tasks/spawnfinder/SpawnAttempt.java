@@ -103,6 +103,7 @@ public class SpawnAttempt implements Runnable
 	private int lightLevel;
 	private Biome biome;
 	private Material materialBelow;
+	private int time;
 	private Environment environment;
 	
 	private MobSpawner spawner;
@@ -247,6 +248,8 @@ public class SpawnAttempt implements Runnable
 		lightLevel = b.getLightLevel();
 		biome = b.getBiome();
 		materialBelow = b.getRelative(BlockFace.DOWN).getType();
+		
+		time = (int) spawnLocation.getWorld().getTime();
 		environment = spawnLocation.getWorld().getEnvironment();
 	}
 	
@@ -256,7 +259,7 @@ public class SpawnAttempt implements Runnable
 	private void stateMethodPrepareMob()
 	{
 		// Fetch the mob spawner
-		spawner = spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
+		spawner = spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, time, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
 		// If we didn't get one we are finished
 		finish(spawner == null);
 	}

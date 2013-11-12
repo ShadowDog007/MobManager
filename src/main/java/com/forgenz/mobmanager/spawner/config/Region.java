@@ -275,10 +275,10 @@ public abstract class Region extends AbstractConfig
 	 * 
 	 * @return A mob spawner if a mob should be spawned
 	 */
-	public MobSpawner spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
+	public MobSpawner spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Fetch all the mobs which we can spawn in this location 
-		ArrayList<Mob> spawnableMobs = getSpawnableMobs(player, spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
+		ArrayList<Mob> spawnableMobs = getSpawnableMobs(player, spawnLoc.getWorld(), spawnLoc, time, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
 		
 		// If no mobs can spawn here return false :'(
 		if (spawnableMobs.isEmpty())
@@ -292,7 +292,7 @@ public abstract class Region extends AbstractConfig
 			return null;
 		
 		// If this mobs requirements check was delayed check it now
-		if (mob.delayRequirementsCheck && !mob.requirementsMet(true, spawnLoc.getWorld(), spawnLoc, lightLevel, biome, materialBelow, environment))
+		if (mob.delayRequirementsCheck && !mob.requirementsMet(true, spawnLoc.getWorld(), spawnLoc, time, lightLevel, biome, materialBelow, environment))
 			return null;
 		
 		// Return the mob spawner
@@ -312,7 +312,7 @@ public abstract class Region extends AbstractConfig
 	 * 
 	 * @return A list of spawnable mobs
 	 */
-	private ArrayList<Mob> getSpawnableMobs(Player player, World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
+	private ArrayList<Mob> getSpawnableMobs(Player player, World world, Location sLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Initialise the list
 		ArrayList<Mob> spawnableMobs = MMComponent.getSpawner().getConfig().getCachedList();
@@ -324,7 +324,7 @@ public abstract class Region extends AbstractConfig
 				continue;
 			
 			// Check if the requirements are met
-			if (!mob.requirementsMet(false, world, sLoc, lightLevel, biome, materialBelow, environment))
+			if (!mob.requirementsMet(false, world, sLoc, time, lightLevel, biome, materialBelow, environment))
 				continue;
 			
 			// Check if the mob is assigned to a player spawn limit

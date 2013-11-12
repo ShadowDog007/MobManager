@@ -154,7 +154,7 @@ public class Mob extends AbstractConfig
 	 * @param environment The environment of the world
 	 * @return True if all the mobs requirements are met
 	 */
-	public boolean requirementsMet(boolean delayed, World world, Location sLoc, int lightLevel, Biome biome, Material materialBelow, Environment environment)
+	public boolean requirementsMet(boolean delayed, World world, Location sLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment)
 	{
 		if (!delayed && delayRequirementsCheck)
 			return true;
@@ -176,7 +176,7 @@ public class Mob extends AbstractConfig
 		
 		// Check if we have more requirements and that they are met
 		return requirements == null
-				|| requirements.met(sLoc.getBlockX() >> 4, sLoc.getBlockZ() >> 4, sLoc.getBlockY(), lightLevel, biome, materialBelow, environment);
+				|| requirements.met(sLoc.getBlockX() >> 4, sLoc.getBlockZ() >> 4, sLoc.getBlockY(), time, lightLevel, biome, materialBelow, environment);
 	}
 	
 	public boolean addSpawnedMob(MobReference mobRef)
