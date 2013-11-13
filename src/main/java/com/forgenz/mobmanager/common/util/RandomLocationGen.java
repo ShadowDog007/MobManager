@@ -185,7 +185,16 @@ public class RandomLocationGen
 			else
 			{
 				 if (foundAir >= 2)
-					 cacheList.add(startY + 1);
+				 {
+					 // Prevent flying mobs from being put on the ground
+					 if (!requireOpaqueBlock)
+					 {
+						 cacheList.remove(cacheList.size()-1);
+						 cacheList.remove(cacheList.size()-1);
+					 }
+					 else
+						 cacheList.add(startY + 1);
+				 }
 				foundAir = 0;
 			}
 		}
