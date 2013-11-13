@@ -35,6 +35,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Location;
+import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 
 import com.forgenz.mobmanager.MMComponent;
@@ -156,7 +157,7 @@ public class SpawnAttemptExecutor implements Runnable
 			
 			// Find the max spawn range for the world
 			MMWorld world = MMComponent.getLimiter().getWorld(playerLoc.getWorld());
-			int yHeight = playerLoc.getBlockY();
+			int yHeight = world.getWorld().getEnvironment() == Environment.NORMAL ? playerLoc.getBlockY() : Short.MAX_VALUE;
 			
 			int maxRange = Math.min(world != null ? world.getSearchDistance((short) yHeight) : Integer.MAX_VALUE, playerRegion.getMaxBlockRange(yHeight));
 			int minRange = Math.min(playerRegion.getMinBlockRange(yHeight), maxRange);
