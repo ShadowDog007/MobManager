@@ -66,7 +66,7 @@ public class SpawnerConfig extends AbstractConfig
 	public SpawnerConfig()
 	{
 		spawnerCfg = this;
-		FileConfiguration cfg = getConfig("", SpawnerComponent.SPAWNER_CONFIG_NAME);
+		FileConfiguration cfg = getConfig("", SpawnerComponent.SPAWNER_CONFIG_NAME, SpawnerComponent.SPAWNER_CONFIG_NAME);
 		
 		super.setCfg(cfg);
 		

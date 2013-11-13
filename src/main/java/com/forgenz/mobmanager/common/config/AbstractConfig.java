@@ -101,22 +101,39 @@ public abstract class AbstractConfig
 	
 	public static FileConfiguration getConfig(String folder, String config)
 	{
+		return getConfig(folder, config, null);
+	}
+	
+	public static FileConfiguration getConfig(String folder, String config, String defaultConfig)
+	{
 		YamlConfiguration yaml = new YamlConfiguration();
 		
 		File configFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + config);
 		
-		try
+		if (configFile.exists())
 		{
-			yaml.load(configFile);
+			try
+			{
+				yaml.load(configFile);
+			}
+			catch (FileNotFoundException e) {}
+			catch (Exception e)
+			{
+				File backupFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + ("Backup-" + System.currentTimeMillis() / 1000L + "-") + config);
+				P.p().getLogger().log(Level.SEVERE, "Failed to load config: " + configFile.getPath());
+				P.p().getLogger().log(Level.SEVERE, "Creating backup: '" + backupFile.getPath(), e);
+				
+				configFile.renameTo(backupFile);
+			}
 		}
-		catch (FileNotFoundException e) {}
-		catch (Exception e)
+		else if (defaultConfig != null)
 		{
-			File backupFile = new File(P.p().getDataFolder(), (folder.length() != 0 ? folder + File.separator : "") + ("Backup-" + System.currentTimeMillis() / 1000L + "-") + config);
-			P.p().getLogger().log(Level.SEVERE, "Failed to load config: " + configFile.getPath());
-			P.p().getLogger().log(Level.SEVERE, "Creating backup: '" + backupFile.getPath(), e);
-			
-			configFile.renameTo(backupFile);
+			try
+			{
+				yaml.load(P.p().getResource(defaultConfig));
+				P.p().getLogger().info("Copied Default Configuration - " + configFile.getPath());
+			}
+			catch (Exception e) {}
 		}
 		
 		return yaml;

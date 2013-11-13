@@ -77,9 +77,6 @@ public class SpawnerComponent extends MMComponent
 		
 		enabled = true;
 		
-		// Save the default config
-		P.p().saveResource("spawner.yml", false);
-		
 		// Make sure Requirements/Actions appear in the config at least once
 		SpawnRequirements.resetConfigFlag();
 		Action.resetConfigFlag();
