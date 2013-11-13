@@ -232,6 +232,9 @@ public class ExtendedEntityType
 			Material heldItem = eData == null || eData != SkeletonType.WITHER ? Material.BOW : Material.STONE_SWORD;
 			entity.getEquipment().setItemInHand(new ItemStack(heldItem));
 			break;
+		case PIG_ZOMBIE:
+			entity.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
+			break;
 		default:
 		}
 		
