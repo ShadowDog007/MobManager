@@ -184,7 +184,7 @@ public class P extends JavaPlugin
 				type = Updater.UpdateType.DEFAULT;
 			}
 			
-			updater = new Updater(this, "mobmanager", this.getFile(), type, true);
+			updater = new Updater(this, 48713, this.getFile(), type, true);
 		}
 		else
 		{
