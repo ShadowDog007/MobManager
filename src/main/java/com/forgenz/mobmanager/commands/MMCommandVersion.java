@@ -72,24 +72,31 @@ public class MMCommandVersion extends MMCommand
 		
 		switch (updater.getResult())
 		{
-		case FAIL_BADSLUG:
 		case FAIL_DBO:
 		case FAIL_NOVERSION:
 			sender.sendMessage(String.format("%sThe was an error when checking for an update. Please notify me. ERROR: %s", ChatColor.RED, updater.getResult()));
 			break;
 		case FAIL_DOWNLOAD:
-			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' is available from BukkitDev", ChatColor.DARK_GREEN, updater.getLatestVersionString()));
+			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' is available from BukkitDev", ChatColor.DARK_GREEN, updater.getLatestGameVersion()));
 			sender.sendMessage(String.format("%sAn attempt to download this new version failed :(", ChatColor.DARK_GREEN));
 			break;
 		case NO_UPDATE:
 			sender.sendMessage(String.format("%sMobManager is up to date!", ChatColor.DARK_GREEN));
 			break;
 		case SUCCESS:
-			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' has been downloaded", ChatColor.DARK_GREEN, updater.getLatestVersionString()));
+			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' has been downloaded", ChatColor.DARK_GREEN, updater.getLatestGameVersion()));
 			sender.sendMessage(String.format("%sA restart or /reload is required to enable this new version", ChatColor.DARK_GREEN));
 			break;
 		case UPDATE_AVAILABLE:
-			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' is available from BukkitDev", ChatColor.DARK_GREEN, updater.getLatestVersionString()));
+			sender.sendMessage(String.format("%sA new version of MobManager 'v%s' is available from BukkitDev", ChatColor.DARK_GREEN, updater.getLatestGameVersion()));
+			break;
+		case DISABLED:
+			break;
+		case FAIL_APIKEY:
+			break;
+		case FAIL_BADID:
+			break;
+		default:
 			break;
 		}
 	}
