@@ -56,7 +56,7 @@ public class SpawnRequirements extends AbstractConfig
 	
 	private final long slimeLikeSpawnSeed;
 	
-	private final boolean requireOpaqueBlock;
+	public final boolean requireOpaqueBlock;
 
 	private final Set<Material> blockSet;
 	private final boolean blockWhitelist;

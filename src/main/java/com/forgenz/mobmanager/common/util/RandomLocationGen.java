@@ -124,7 +124,7 @@ public class RandomLocationGen
 			cacheLoc.setY(RandomUtil.i.nextInt(heightRange2) - heightRange + center.getBlockY() + 0.5);
 				
 			// If the location is safe we can return the location
-			if ((!checkPlayers || !PlayerFinder.playerNear(cacheLoc, minRange, heightRange)) && findSafeY(cacheLoc, center.getBlockY(), heightRange))
+			if ((!checkPlayers || !PlayerFinder.playerNear(cacheLoc, minRange, heightRange)) && findSafeY(cacheLoc, center.getBlockY(), heightRange, true))
 			{
 				// Generate a random Yaw/Pitch
 				cacheLoc.setYaw(RandomUtil.i.nextFloat() * 360.0F);
@@ -141,19 +141,19 @@ public class RandomLocationGen
 	 * Finds a safe Y location at the given x/z location
 	 * @return true if a safe location was found
 	 */
-	public static boolean findSafeY(Location location, int centerY, int heightRange)
+	public static boolean findSafeY(Location location, int centerY, int heightRange, boolean requireOpaqueBlock)
 	{
 		List<Integer> list = Bukkit.isPrimaryThread() ? cacheList : new ArrayList<Integer>();
 		if (list == null)
 			cacheList = list = new ArrayList<Integer>();
-		return findSafeY(location, centerY, heightRange, list);
+		return findSafeY(location, centerY, heightRange, requireOpaqueBlock, list);
 	}
 	
 	/**
 	 * Finds a safe Y location at the given x/z location
 	 * @return true if a safe location was found
 	 */
-	public static boolean findSafeY(Location location, int centerY, int heightRange, List<Integer> cacheList)
+	public static boolean findSafeY(Location location, int centerY, int heightRange, boolean requireOpaqueBlock, List<Integer> cacheList)
 	{
 		int foundAir = 0;
 		
@@ -178,6 +178,8 @@ public class RandomLocationGen
 			Block b = world.getBlockAt(location.getBlockX(), startY, location.getBlockZ());
 			if (isSafeMaterial(b.getType()))
 			{
+				if (!requireOpaqueBlock && foundAir >= 2)
+					cacheList.add(startY);
 				++foundAir;
 			}
 			else

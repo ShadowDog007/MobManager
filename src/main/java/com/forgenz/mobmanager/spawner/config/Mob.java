@@ -139,7 +139,7 @@ public class Mob extends AbstractConfig
 	{
 		if (heightOffset == 0)
 			return true;
-		return RandomLocationGen.findSafeY(spawnLoc, playerHeight + heightOffset, heightRange);
+		return RandomLocationGen.findSafeY(spawnLoc, playerHeight + heightOffset, heightRange, requirements == null || requirements.requireOpaqueBlock);
 	}
 	
 	/**
