@@ -50,3 +50,9 @@ RemovePlayerMobsOnDisconnect
 #######################################################################
 If true all mobs spawned around the given player will be removed
     if the player disconnects from the server
+    
+#######################################################################
+IgnoreCreativePlayers
+#######################################################################
+If true players in creative mode won't have mobs spawned around them
+    

@@ -34,6 +34,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
@@ -137,6 +138,10 @@ public class SpawnAttemptExecutor implements Runnable
 		while (checkPlayers-- > 0 && (player = playerQueue.poll()) != null)
 		{
 			if (!player.isValid())
+				continue;
+			
+			// Check if the player is in creative mode
+			if (cfg.ignoreCreativePlayers && player.getGameMode() == GameMode.CREATIVE)
 				continue;
 			
 			// Find the region the player is in
