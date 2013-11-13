@@ -44,3 +44,9 @@ MobDistanceForLimitRemoval
 #######################################################################
 The distance between the mob and player before the mob is removed
     from the players mob limit.
+
+#######################################################################
+RemovePlayerMobsOnDisconnect
+#######################################################################
+If true all mobs spawned around the given player will be removed
+    if the player disconnects from the server

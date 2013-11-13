@@ -138,7 +138,11 @@ public class SpawnFinder extends BukkitRunnable
 	 */
 	public void removeMobs(Player player)
 	{
-		playerMobs.remove(player.getName());
+		PlayerMobCounter limiter = playerMobs.remove(player.getName());
+		
+		if (limiter != null && cfg.removePlayersMobOnDisconnect)
+			limiter.killAll();
+		
 		groupedPlayerMobs.remove(player.getName());
 	}
 

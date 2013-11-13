@@ -132,4 +132,16 @@ public class MobCounter
 		aliveMobs.add(mobRef);
 		return true;
 	}
+	
+	public synchronized void killAll()
+	{
+		for (MobReference r : aliveMobs)
+		{
+			LivingEntity entity = r.getEntity();
+			
+			if (entity != null && entity.getRemoveWhenFarAway())
+				entity.remove();
+		}
+		aliveMobs.clear();
+	}
 }

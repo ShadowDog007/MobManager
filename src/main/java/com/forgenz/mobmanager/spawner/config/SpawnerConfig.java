@@ -58,6 +58,7 @@ public class SpawnerConfig extends AbstractConfig
 	
 	private final ThreadCache<ArrayList<?>> regionListCache = new ThreadCache<ArrayList<?>>();
 	
+	public final boolean removePlayersMobOnDisconnect;
 	public final int spawnFinderThreads;
 	public final int ticksPerSpawn;
 	public final int spawnGenerationAttempts;
@@ -75,6 +76,8 @@ public class SpawnerConfig extends AbstractConfig
 		
 		spawnGenerationAttempts = getAndSet("SpawnGenerateAttempts", 3);
 		mobDistanceForLimitRemoval = (int) Math.pow(getAndSet("MobDistanceForLimitRemoval", 64), 2);
+		
+		removePlayersMobOnDisconnect = getAndSet("RemovePlayerMobsOnDisconnect", true);
 		
 		ConfigurationSection regionsCfg = getConfigurationSection("Regions");
 		globalRegion = RegionType.GLOBAL.createRegion(getConfigurationSection(regionsCfg, "GlobalRegion"));
