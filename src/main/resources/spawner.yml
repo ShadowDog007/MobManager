@@ -1,0 +1,284 @@
+SharedRequirements:
+  NormalMonsterRequirements: &id001
+    MinLight: 0
+    MaxLight: 7
+    RequireOpaqueBlock: true
+    BlockWhitelist: false
+    BiomeList:
+    - MUSHROOM_ISLAND
+    - MUSHROOM_SHORE
+    BiomeWhitelist: false
+    EnvironmentList:
+    - NORMAL
+    EnvironmentWhitelist: true
+  NormalAnimalRequirements: &id002
+    MinLight: 8
+    MaxLight: 15
+    MinTime: 0
+    MaxTime: 12000
+    RequireOpaqueBlock: true
+    BlockList:
+    - GRASS
+    BlockWhitelist: true
+    BiomeList:
+    - MUSHROOM_ISLAND
+    - MUSHROOM_SHORE
+    BiomeWhitelist: false
+    EnvironmentList:
+    - NORMAL
+    EnvironmentWhitelist: true
+  NetherMonsterRequirements: &id003
+    MinLight: 0
+    MaxLight: 15
+    RequireOpaqueBlock: true
+    BlockWhitelist: false
+    BiomeWhitelist: false
+    EnvironmentList:
+    - NETHER
+    EnvironmentWhitelist: true
+  TheEndMonsterRequirements: &id004
+    MinLight: 0
+    MaxLight: 15
+    RequireOpaqueBlock: true
+    BlockWhitelist: false
+    BiomeWhitelist: false
+    EnvironmentList:
+    - THE_END
+    EnvironmentWhitelist: true
+SpawnFinderThreads: 1
+TicksPerSpawn: 10
+SpawnGenerateAttempts: 3
+MobDistanceForLimitRemoval: 64
+Regions:
+  GlobalRegion:
+    Priority: 0
+    SpawnAttempts: 1
+    SpawnAttemptChance: 100.0
+    MaxBlockRange: 48
+    MinBlockRange: 24
+    MaxUndergroundBlockRange: 32
+    MinUndergroundBlockRange: 16
+    UndergroundHeight: 55
+    MaxPlayerMobGroups:
+      NormalMonsters: 10
+      NormalAnimals: 8
+      AmbientMobs: 3
+      SpecialMonsters: 2
+      NetherMonsters: 12
+      TheEndMonsters: 8
+    PlayerMobCooldown: 0
+    MaxRegionMobs: 0
+    RegionMobCooldown: 0
+    EnforceAllCooldownConditions: false
+    Mobs:
+    # Normal Monsters
+    - SpawnChance: 2000
+      EnforceAllCooldownConditions: false
+      MobType: ZOMBIE
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id001
+    - SpawnChance: 2000
+      EnforceAllCooldownConditions: false
+      MobType: CREEPER
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id001
+    - SpawnChance: 2000
+      EnforceAllCooldownConditions: false
+      MobType: SKELETON
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id001
+    - SpawnChance: 2000
+      EnforceAllCooldownConditions: false
+      MobType: SPIDER
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id001
+    - SpawnChance: 1600
+      EnforceAllCooldownConditions: false
+      MobType: WOLF
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id001
+    - SpawnChance: 2000
+      EnforceAllCooldownConditions: false
+      MobType: ENDERMAN
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id001
+    - SpawnChance: 200
+      EnforceAllCooldownConditions: false
+      MobType: WITCH
+      PlayerLimitGroup: 'SpecialMonsters'
+      Requirements: *id001
+    # Special Monsters
+    - SpawnChance: 1600
+      EnforceAllCooldownConditions: false
+      MobType: SLIME
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements:
+        MinLight: 0
+        MaxLight: 7
+        MinY: 0
+        MaxY: 39
+        SlimeLikeSpawnSeed: 759031749324
+        RequireOpaqueBlock: true
+        BlockWhitelist: false
+        EnvironmentList: [NORMAL]
+        EnvironmentWhitelist: true
+    - SpawnChance: 1400
+      EnforceAllCooldownConditions: false
+      MobType: SLIME
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements:
+        MinLight: 0
+        MaxLight: 7
+        RequireOpaqueBlock: true
+        BlockWhitelist: false
+        BiomeList:
+        - SWAMPLAND
+        BiomeWhitelist: true
+        EnvironmentList:
+        - NORMAL
+        EnvironmentWhitelist: true
+
+    # Normal animals
+    - SpawnChance: 10
+      EnforceAllCooldownConditions: false
+      MobType: PIG
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements: *id002
+    - SpawnChance: 10
+      EnforceAllCooldownConditions: false
+      MobType: CHICKEN
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements: *id002
+    - SpawnChance: 10
+      EnforceAllCooldownConditions: false
+      MobType: COW
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements: *id002
+    - SpawnChance: 10
+      EnforceAllCooldownConditions: false
+      MobType: SHEEP
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements: *id002
+    #Special Animals
+    - SpawnChance: 5
+      EnforceAllCooldownConditions: false
+      MobType: OCELOT
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements:
+        MinLight: 8
+        MaxLight: 15
+        RequireOpaqueBlock: true
+        BlockWhitelist: false
+        BiomeList:
+        - JUNGLE
+        - JUNGLE_HILLS
+        BiomeWhitelist: true
+        EnvironmentList:
+        - NORMAL
+        EnvironmentWhitelist: true
+    - SpawnChance: 90
+      EnforceAllCooldownConditions: false
+      MobType: HORSE
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements:
+        MinLight: 8
+        MaxLight: 15
+        RequireOpaqueBlock: true
+        BlockWhitelist: false
+        BiomeList:
+        - PLAINS
+        BiomeWhitelist: true
+        EnvironmentList:
+        - NORMAL
+        EnvironmentWhitelist: true
+    - SpawnChance: 90
+      EnforceAllCooldownConditions: false
+      MobType: MUSHROOM_COW
+      PlayerLimitGroup: 'NormalAnimals'
+      Requirements:
+        MinLight: 8
+        MaxLight: 15
+        RequireOpaqueBlock: true
+        BlockWhitelist: false
+        BiomeList:
+        - MUSHROOM_ISLAND
+        - MUSHROOM_SHORE
+        BiomeWhitelist: true
+        EnvironmentList:
+        - NORMAL
+        EnvironmentWhitelist: true
+    - SpawnChance: 90
+      EnforceAllCooldownConditions: false
+      HeightOffset: 5
+      MobType: BAT
+      PlayerLimitGroup: 'AmbientMobs'
+      Requirements:
+        MinLight: 0
+        MaxLight: 7
+        RequireOpaqueBlock: false
+        BlockList:
+        - WATER
+        - STATIONARY_WATER
+        - LAVA
+        - STATIONARY_LAVA
+        BlockWhitelist: false
+        BiomeWhitelist: false
+        EnvironmentList:
+        - NORMAL
+        EnvironmentWhitelist: true
+
+    # Nether Monsters
+    - SpawnChance: 800
+      EnforceAllCooldownConditions: false
+      MobType: SKELETON_WITHER
+      PlayerLimitGroup: 'NetherMonsters'
+      Requirements: *id003
+    - SpawnChance: 3500
+      EnforceAllCooldownConditions: false
+      MobType: PIG_ZOMBIE
+      PlayerLimitGroup: 'NormalMonsters'
+      Requirements: *id003
+    - SpawnChance: 200
+      EnforceAllCooldownConditions: false
+      MobType: BLAZE
+      PlayerLimitGroup: 'NetherMonsters'
+      Requirements: *id003
+    - SpawnChance: 200
+      EnforceAllCooldownConditions: false
+      HeightOffset: 20
+      MobType: GHAST
+      PlayerLimitGroup: 'SpecialMonsters'
+      Requirements:
+        MinLight: 0
+        MaxLight: 15
+        RequireOpaqueBlock: false
+        BlockWhitelist: false
+        BiomeWhitelist: false
+        EnvironmentList:
+        - NETHER
+        EnvironmentWhitelist: true
+    - SpawnChance: 1200
+      EnforceAllCooldownConditions: false
+      MobType: MAGMA_CUBE
+      PlayerLimitGroup: 'NetherMonsters'
+      Requirements: *id003
+    - SpawnChance: 10
+      EnforceAllCooldownConditions: false
+      MobType: SKELETON
+      Requirements: *id003
+
+    # The End Monsters
+    - SpawnChance: 2000
+      MaxAlive: 1
+      MobCooldown: 7200
+      EnforceAllCooldownConditions: true
+      HeightOffset: 32
+      BypassMobManagerLimit: true
+      BypassRegionMobLimit: true
+      MobType: ENDER_DRAGON
+      Requirements: *id004
+    - SpawnChance: 2000
+      EnforceAllCooldownConditions: false
+      MobType: ENDERMAN
+      PlayerLimitGroup: 'TheEndMonsters'
+      Requirements: *id004
