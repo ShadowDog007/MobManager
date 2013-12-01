@@ -189,8 +189,10 @@ public class RandomLocationGen
 					 // Prevent flying mobs from being put on the ground
 					 if (!requireOpaqueBlock)
 					 {
-						 cacheList.remove(cacheList.size()-1);
-						 cacheList.remove(cacheList.size()-1);
+						 if (!cacheList.isEmpty())
+							 cacheList.remove(cacheList.size()-1);
+						 if (!cacheList.isEmpty())
+							 cacheList.remove(cacheList.size()-1);
 					 }
 					 else
 						 cacheList.add(startY + 1);
