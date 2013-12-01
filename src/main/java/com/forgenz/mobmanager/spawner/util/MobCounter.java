@@ -135,6 +135,9 @@ public class MobCounter
 	
 	public synchronized void killAll()
 	{
+		if (aliveMobs == null)
+			return;
+		
 		for (MobReference r : aliveMobs)
 		{
 			LivingEntity entity = r.getEntity();
