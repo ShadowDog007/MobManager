@@ -28,11 +28,15 @@
 
 package com.forgenz.mobmanager.common.util;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Horse;
+import org.bukkit.entity.Horse.Color;
+import org.bukkit.entity.Horse.Style;
+import org.bukkit.entity.Horse.Variant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
@@ -44,7 +48,7 @@ public class ExtendedEntityType
 {
 	private static int nextId = 0;
 	public static final ExtendedEntityType UNKNOWN;
-	private static HashMap<String, ExtendedEntityType> entityTypes = new HashMap<String, ExtendedEntityType>();
+	private static LinkedHashMap<String, ExtendedEntityType> entityTypes = new LinkedHashMap<String, ExtendedEntityType>();
 	
 	// Adds entities
 	static
@@ -55,8 +59,27 @@ public class ExtendedEntityType
 		// EntityTypes
 		for (EntityType eType : EntityType.values())
 		{
-			if (eType.isAlive())
+			if (eType.isAlive() && eType != EntityType.PLAYER)
 				new ExtendedEntityType(eType, "");
+		}
+		
+		ExtendedEntityType horse = ExtendedEntityType.valueOf(EntityType.HORSE);
+		
+		for (Variant v : Variant.values())
+		{
+			if (v == Variant.HORSE)
+			{
+				for (Style s : Style.values()) {
+					if (s == Style.NONE)
+						s = null;
+					for (Color c : Color.values())
+						new ExtendedEntityType(EntityType.HORSE, new Object[] {c, s}, horse);
+				}
+			}
+			else
+			{
+				new ExtendedEntityType(EntityType.HORSE, v);
+			}
 		}
 		
 		// Unknown mobs
@@ -111,6 +134,15 @@ public class ExtendedEntityType
 		if (entity.getType() == EntityType.SKELETON && ((Skeleton) entity).getSkeletonType() != SkeletonType.NORMAL)
 			return ((Skeleton) entity).getSkeletonType().toString();
 		
+		// Handle the case for horses
+		if (entity.getType() == EntityType.HORSE)
+		{
+			Horse horse = (Horse) entity;
+			if (horse.getVariant() == Variant.HORSE)
+				return horse.getStyle() + getDataSeperator() + horse.getColor();
+			return horse.getVariant().toString();
+		}
+		
 		return "";
 	}
 	
@@ -118,12 +150,19 @@ public class ExtendedEntityType
 	private final EntityType eType;
 	private final Object eData;
 	private final MobType mobType;
+	private final ExtendedEntityType parent;
 	
 	private ExtendedEntityType(EntityType eType, Object eData)
+	{
+		this(eType, eData, null);
+	}
+	
+	private ExtendedEntityType(EntityType eType, Object eData, ExtendedEntityType parent)
 	{
 		id = nextId++;
 		this.eType = eType;
 		this.eData = eData;
+		this.parent = parent;
 		
 		if (eType != null && eType.getEntityClass() != null)
 			mobType = MobType.valueOf(eType);
@@ -161,8 +200,33 @@ public class ExtendedEntityType
 		return mobType;
 	}
 	
+	public ExtendedEntityType getParent()
+	{
+		return parent;
+	}
+	
+	public boolean hasParent()
+	{
+		return parent != null;
+	}
+	
 	public String getData()
 	{
+		if (eData instanceof Object[])
+		{
+			Object[] a = (Object[]) eData;
+			String data = "";
+			for (int i = 0; i < a.length; ++i)
+			{
+				if (a[i] == null)
+					continue;
+				
+				if (i > 0)
+					data += getDataSeperator();
+				data += a[i];
+			}
+			return data;
+		}
 		return eData.toString();
 	}
 	
@@ -173,35 +237,42 @@ public class ExtendedEntityType
 	
 	public String getTypeData()
 	{
+		String typeData = eType.toString();
 		String dataString = getData();
 		
-		return String.format("%s%s%s", eType.toString(), dataString.length() != 0 ? getDataSeperator() : "", dataString);
+		if (dataString.length() != 0)
+			typeData += getDataSeperator() + dataString;
+		
+		return typeData;
 	}
 	
-	public static String getExtendedEntityList()
+	public static String getExtendedEntityList(boolean subtypes)
 	{
 		final int charLimit = 68;
 		int currentLoc = 1;
 		
-		String list = "";
+		StringBuilder list = new StringBuilder();
 		
 		for (ExtendedEntityType type : entityTypes.values())
-		{			
+		{
+			if (subtypes && !type.hasParent() || !subtypes && type.hasParent())
+				continue;
+			
 			String addition = type.getTypeData();
 			
 			if (currentLoc + addition.length() + 2 > charLimit)
 			{
 				currentLoc = 1;
-				list += ",\n";
+				list.append(",\n");
 			}
 			
 			if (currentLoc != 1)
-				list += ", ";
-			list += addition;
+				list.append(", ");
+			list.append(addition);
 			currentLoc += addition.length();
 		}
 		
-		return list;
+		return list.toString();
 	}
 
 	@Override
@@ -219,6 +290,40 @@ public class ExtendedEntityType
 		
 		if (entity == null)
 			return null;
+		
+		if (eType == EntityType.HORSE)
+		{
+			Horse horse = (Horse) entity;
+			Variant v = Variant.HORSE;
+			Style s = null;
+			Color c = null;
+			if (eData.toString().length() == 0)
+			{
+				s = RandomUtil.getRandomElement(Style.values());
+				c = RandomUtil.getRandomElement(Color.values());
+			}
+			else if (eData instanceof Object[])
+			{
+				Object[] dataArr = (Object[]) eData;
+				if (dataArr[1] != null)
+					horse.setStyle((Style) dataArr[1]);
+				horse.setColor((Color) dataArr[0]);
+			}
+			else
+			{
+				v = (Variant) eData;
+			}
+			
+			horse.setVariant(v);
+			
+			if (v == Variant.HORSE)
+			{
+				if (s != null) horse.setStyle(s);
+				if (c != null) horse.setColor(c);
+			}
+			
+			return horse;
+		}
 		
 		if (eData != null)
 		{

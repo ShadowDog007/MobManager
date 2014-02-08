@@ -155,7 +155,8 @@ public class P extends JavaPlugin
 		
 		// Copy the Config header into config.yml
 		AbstractConfig.copyHeader(getConfig(), "Config_Header.txt", "Global Config\n"
-				+ "\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList());
+				+ "\nValid EntityTypes:\n" + ExtendedEntityType.getExtendedEntityList(false)
+				+ "\n\nValid SubEntityTypes:\n" + ExtendedEntityType.getExtendedEntityList(true));
 		
 		integration.integrate();
 		

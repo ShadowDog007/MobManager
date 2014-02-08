@@ -279,6 +279,10 @@ public class MMWorld
 			mob = ExtendedEntityType.valueOf(entity);
 		}
 		
+		// Check if the mobs parent is within the limits first
+		if (mob.hasParent() && !withinMobLimit(mob.getParent(), null))
+			return false;
+		
 		// If the mob is not within its types counts return false
 		if (!withinMobLimit(mob.getMobType()))
 			return false;
@@ -311,6 +315,9 @@ public class MMWorld
 		if (mob == null)
 			return;
 		
+		if (mob.hasParent())
+			incrementMobCount(mob.getParent(), entity);
+		
 		// Increment the MobTypes count
 		incrementMobCount(mob.getMobType(entity));
 		
@@ -331,6 +338,9 @@ public class MMWorld
 	{
 		if (mob == null)
 			return;
+		
+		if (mob.hasParent())
+			decrementMobCount(mob.getParent(), entity);
 		
 		// Decrement the MobTypes count
 		decrementMobCount(mob.getMobType(entity));

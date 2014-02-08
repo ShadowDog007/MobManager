@@ -76,9 +76,13 @@ public class MMCommandListener implements CommandExecutor
 					return true;
 				}
 			}
+			
+			sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
 		}
-		
-		sender.sendMessage(ChatColor.RED + "Sub-Command does not exist");
+		else
+		{
+			sender.sendMessage(ChatColor.DARK_GREEN + "Run /mm help for sub-commands");
+		}
 		return true;
 	}
 

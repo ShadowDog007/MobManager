@@ -54,7 +54,15 @@ public class SpawnerWorldConfig extends AbstractConfig
 		
 		super.setCfg(cfg);
 		
-		spawnMobs = getAndSet("SpawnMobs", true);
+		boolean spawnMobs = getAndSet("SpawnMobs", true);
+		
+		if (spawnMobs && MMComponent.getLimiter().getWorld(world) == null)
+		{
+			spawnMobs = false;
+			MMComponent.getSpawner().warning("The world %s has spawning enabled, but is not enabled in the limiter component.", world.getName());
+		}
+		
+		this.spawnMobs = spawnMobs;
 		
 		if (spawnMobs)
 		{

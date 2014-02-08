@@ -36,4 +36,11 @@ public class RandomUtil
 	public static final Random i = new Random();
 	
 	private RandomUtil() {}
+	
+	public static <T> T getRandomElement(T[] arr)
+	{
+		if (arr.length == 0)
+			return null;
+		return arr[i.nextInt(arr.length)];
+	}
 }

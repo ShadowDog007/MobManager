@@ -76,7 +76,7 @@ public class MobListener implements Listener
 		
 		ExtendedEntityType eMobType = ExtendedEntityType.valueOf(event.getEntity());
 		// Check if the entity is disabled
-		if (LimiterConfig.disabledMobs.contains(eMobType))
+		if (LimiterConfig.disabledMobs.contains(eMobType) || eMobType.hasParent() && LimiterConfig.disabledMobs.contains(eMobType.getParent()))
 		{
 			// Prevent the entity from spawning
 			event.setCancelled(true);
@@ -85,7 +85,7 @@ public class MobListener implements Listener
 		
 		// Checks if we can ignore the creature spawn
 		MobType mob = eMobType.getMobType(event.getEntity());
-		if (mob == null || LimiterConfig.ignoredMobs.contains(eMobType))
+		if (mob == null || LimiterConfig.ignoredMobs.contains(eMobType) || eMobType.hasParent() && LimiterConfig.ignoredMobs.contains(eMobType.getParent()))
 		{
 			return;
 		}
@@ -188,7 +188,7 @@ public class MobListener implements Listener
 		// Fetch the entity type
 		ExtendedEntityType eType = ExtendedEntityType.valueOf(event.getEntity());
 		// If the mob is being ignored it was not counted towards the limits
-		if (LimiterConfig.ignoredMobs.contains(eType))
+		if (LimiterConfig.ignoredMobs.contains(eType) || eType.hasParent() && LimiterConfig.ignoredMobs.contains(eType.getParent()))
 			return;
 		
 		// Decrement counts for the entity

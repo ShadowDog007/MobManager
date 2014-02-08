@@ -41,7 +41,7 @@ public class MMCommandMobTypes extends MMCommand
 
 	MMCommandMobTypes()
 	{
-		super(Pattern.compile("mobtypes", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"),
+		super(Pattern.compile("mobtypes|submobtypes", Pattern.CASE_INSENSITIVE), Pattern.compile("^.*$"),
 				0, 0);
 	}
 
@@ -54,16 +54,20 @@ public class MMCommandMobTypes extends MMCommand
 			return;
 		}
 		
-		String message = "";
+		boolean subMobTypes = args[0].equalsIgnoreCase("submobtypes");
+		
+		StringBuilder message = new StringBuilder();
 		
 		for (ExtendedEntityType type : ExtendedEntityType.values())
 		{
+			if (!subMobTypes && type.hasParent() || subMobTypes && !type.hasParent())
+				continue;
 			if (message.length() != 0)
-				message += ", ";
-			message += type.getTypeData();
+				message.append(", ");
+			message.append(type.getTypeData());
 		}
 		
-		sender.sendMessage(ChatColor.GRAY + "~Valid Entity Types: " + message);
+		sender.sendMessage(ChatColor.GRAY + "~Valid Entity Types: " + message.toString());
 	}
 
 	@Override
@@ -81,7 +85,7 @@ public class MMCommandMobTypes extends MMCommand
 	@Override
 	public String getAliases()
 	{
-		return "mobtypes";
+		return "mobtypes,submobtypes";
 	}
 
 }
