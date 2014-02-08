@@ -36,6 +36,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.abilities.abilities.AbilitySet;
@@ -139,7 +140,11 @@ public class Mob extends AbstractConfig
 	{
 		if (heightOffset == 0)
 			return true;
-		return RandomLocationGen.findSafeY(spawnLoc, playerHeight + heightOffset, heightRange, requirements == null || requirements.requireOpaqueBlock);
+		if (!RandomLocationGen.findSafeY(spawnLoc, playerHeight + heightOffset, heightRange, requirements == null || requirements.requireOpaqueBlock))
+			return false;
+		
+		Block b = spawnLoc.getBlock();
+		return (!getMobType().isTall() || RandomLocationGen.isTallLocation(b)) && (!getMobType().isWide() || RandomLocationGen.isWideLocation(b));
 	}
 	
 	/**

@@ -97,6 +97,7 @@ public class SpawnAttempt implements Runnable
 	private AttemptState currentState = AttemptState.INITIALISE;
 	
 	private Location spawnLocation;
+	boolean wideLoc, tallLoc;
 	private Region spawnRegion;
 	private int playerY;
 	
@@ -215,6 +216,9 @@ public class SpawnAttempt implements Runnable
 		{
 			spawnLoc.setWorld(cache.playerLoc.getWorld());
 			spawnLocation = LocationCache.getCachedLocation(spawnLoc);
+			Block b = spawnLocation.getBlock();
+			wideLoc = RandomLocationGen.isWideLocation(b);
+			tallLoc = RandomLocationGen.isTallLocation(b);
 		}
 	}
 	
@@ -259,7 +263,7 @@ public class SpawnAttempt implements Runnable
 	private void stateMethodPrepareMob()
 	{
 		// Fetch the mob spawner
-		spawner = spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, time, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
+		spawner = spawnRegion.spawnMob(player, playerY, heightRange, spawnLocation, wideLoc, tallLoc, time, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
 		// If we didn't get one we are finished
 		finish(spawner == null);
 	}

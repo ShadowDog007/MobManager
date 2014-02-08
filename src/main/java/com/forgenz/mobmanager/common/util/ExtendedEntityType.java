@@ -350,4 +350,43 @@ public class ExtendedEntityType
 	{
 		return id;
 	}
+
+	public boolean isWide()
+	{
+		switch (eType)
+		{
+		case CAVE_SPIDER:
+		case ENDER_DRAGON:
+		case GHAST:
+		case GIANT:
+		case HORSE:
+		case IRON_GOLEM:
+		case MAGMA_CUBE:
+		case SLIME:
+		case SPIDER:
+		case WITHER:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public boolean isTall()
+	{
+		switch (eType)
+		{
+		case ENDERMAN:
+		case ENDER_DRAGON:
+		case GHAST:
+		case GIANT:
+		case HORSE:
+		case IRON_GOLEM:
+		case MAGMA_CUBE:
+		case SLIME:
+		case WITHER:
+			return true;
+		default:
+			return false;
+		}
+	}
 }

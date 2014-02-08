@@ -37,6 +37,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import com.forgenz.mobmanager.P;
 
@@ -262,6 +263,23 @@ public class RandomLocationGen
 		cacheList.clear();
 		
 		return true;	
+	}
+	
+	public static boolean isTallLocation(Block b)
+	{
+		return isSafeBlock(b.getRelative(BlockFace.UP, 2));
+	}
+	
+	public static boolean isWideLocation(Block b)
+	{
+		return isSafeBlock(b.getRelative(BlockFace.NORTH))
+				&& isSafeBlock(b.getRelative(BlockFace.NORTH_EAST))
+				&& isSafeBlock(b.getRelative(BlockFace.EAST))
+				&& isSafeBlock(b.getRelative(BlockFace.SOUTH_EAST))
+				&& isSafeBlock(b.getRelative(BlockFace.SOUTH))
+				&& isSafeBlock(b.getRelative(BlockFace.SOUTH_WEST))
+				&& isSafeBlock(b.getRelative(BlockFace.WEST))
+				&& isSafeBlock(b.getRelative(BlockFace.NORTH_WEST));
 	}
 	
 	/**

@@ -275,10 +275,10 @@ public abstract class Region extends AbstractConfig
 	 * 
 	 * @return A mob spawner if a mob should be spawned
 	 */
-	public MobSpawner spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
+	public MobSpawner spawnMob(Player player, int playerY, int heightRange, Location spawnLoc, boolean wideLoc, boolean tallLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Fetch all the mobs which we can spawn in this location 
-		ArrayList<Mob> spawnableMobs = getSpawnableMobs(player, spawnLoc.getWorld(), spawnLoc, time, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
+		ArrayList<Mob> spawnableMobs = getSpawnableMobs(player, spawnLoc.getWorld(), spawnLoc, wideLoc, tallLoc, time, lightLevel, biome, materialBelow, environment, outsideSpawnLimits);
 		
 		// If no mobs can spawn here return false :'(
 		if (spawnableMobs.isEmpty())
@@ -312,7 +312,7 @@ public abstract class Region extends AbstractConfig
 	 * 
 	 * @return A list of spawnable mobs
 	 */
-	private ArrayList<Mob> getSpawnableMobs(Player player, World world, Location sLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
+	private ArrayList<Mob> getSpawnableMobs(Player player, World world, Location sLoc, boolean wideLoc, boolean tallLoc, int time, int lightLevel, Biome biome, Material materialBelow, Environment environment, boolean outsideSpawnLimits)
 	{
 		// Initialise the list
 		ArrayList<Mob> spawnableMobs = MMComponent.getSpawner().getConfig().getCachedList();
@@ -321,6 +321,14 @@ public abstract class Region extends AbstractConfig
 		{
 			// If we are operating outside spawn limits the mob must be able to bypass those limits
 			if (outsideSpawnLimits && !mob.bypassSpawnLimits)
+				continue;
+			
+			// Don't allow wide mobs to spawn in a tight location
+			if (mob.getMobType().isWide() && !wideLoc)
+				continue;
+			
+			// Don't allow tall mobs to spawn in a tight location
+			if (mob.getMobType().isTall() && !tallLoc)
 				continue;
 			
 			// Check if the requirements are met
