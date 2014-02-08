@@ -68,17 +68,10 @@
   		<artifactId>Vault</artifactId>
   		<version>1.2.26-SNAPSHOT</version>
   	</dependency>
-  	<dependency>
-  		<groupId>me.thehelper</groupId>
-  		<artifactId>EpicBossRecoded</artifactId>
-  		<version>1.3.0</version>
-  	    <scope>system</scope>
-  		<systemPath>${project.basedir}/lib/integration/EpicBossRecoded.jar</systemPath>
-  	</dependency>
   </dependencies>
   <scm>
   	<url>https://github.com/ShadowDog007/MobManager</url>
   	<connection>git://github.com/ShadowDog007/MobManager.git</connection>
   </scm>
-  <version>3_0_1</version>
+  <version>3_0_2</version>
 </project>
