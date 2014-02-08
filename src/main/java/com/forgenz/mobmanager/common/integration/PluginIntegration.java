@@ -36,7 +36,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.forgenz.mobmanager.MMComponent;
 import com.forgenz.mobmanager.P;
-import com.forgenz.mobmanager.common.config.AbstractConfig;
 
 /**
  * Used to stop MobManager from despawning/editing special mobs spawned by other plugins<br/>
@@ -68,9 +67,6 @@ public class PluginIntegration implements Protector
 		/* MobManager integration */
 		new MobManagerProtector();
 		/* Plugins Integrated by me :) */
-		if (P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true))
-			new EpicBossRecodedProtector();
-		AbstractConfig.set(P.p().getConfig(), "Integration.EpicBossRecoded", P.p().getConfig().getBoolean("Integration.EpicBossRecoded", true));
 	}
 	
 	/**

@@ -79,13 +79,5 @@ A restart or /reload will be required to use them.
 MobManager will automatically backup your configuration files for you
     before updating
 
-#######################################################################
-Integration.EpicBossRecoded
-#######################################################################
-Enables integration of EpicBossRecoded to prevent EpicBosses from
-    having their abilities messed up or from being de-spawned
-    
-EpicBoss-BukkitDev: http://dev.bukkit.org/server-mods/epicboss/
-
 
 #######################################################################
