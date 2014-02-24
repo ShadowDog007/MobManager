@@ -223,7 +223,7 @@ public class BountyDeathListener implements Listener
 				reward = balance;
 			}
 			
-			econ.withdrawPlayer(player.getName(), balance);
+			econ.withdrawPlayer(player.getName(), reward);
 		}
 	}
 	
