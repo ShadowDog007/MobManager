@@ -73,5 +73,5 @@
   	<url>https://github.com/ShadowDog007/MobManager</url>
   	<connection>git://github.com/ShadowDog007/MobManager.git</connection>
   </scm>
-  <version>3_0_2</version>
+  <version>3_0_3</version>
 </project>
