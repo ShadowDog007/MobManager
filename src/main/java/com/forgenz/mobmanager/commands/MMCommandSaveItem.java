@@ -74,7 +74,7 @@ public class MMCommandSaveItem extends MMCommand
 			return;
 		}
 		
-		String key = args.length == 2 ? String.valueOf(System.currentTimeMillis()) : args[1];
+		String key = args.length >= 2 ? args[1] : String.valueOf(System.currentTimeMillis());
 		
 		File cfgFile = new File(P.p().getDataFolder(), "items.yml");
 		YamlConfiguration cfg = YamlConfiguration.loadConfiguration(cfgFile);
