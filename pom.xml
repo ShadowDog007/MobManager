@@ -20,6 +20,7 @@
     </testResources>
 
     <plugins>
+
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.0</version>
@@ -28,6 +29,30 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <version>1.5.2</version>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <file>target/classes/plugin.yml</file>
+            <replacements>
+              <replacement>
+                <token>__PROJECT_VERSION__</token>
+                <value>${project.version}</value>
+              </replacement>
+            </replacements>
+          </configuration>
+       </plugin>
+
     </plugins>
   </build>
   
@@ -73,5 +98,5 @@
   	<url>https://github.com/ShadowDog007/MobManager</url>
   	<connection>git://github.com/ShadowDog007/MobManager.git</connection>
   </scm>
-  <version>3_0_3</version>
+  <version>3.0.3</version>
 </project>
