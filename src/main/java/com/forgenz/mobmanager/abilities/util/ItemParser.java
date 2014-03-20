@@ -132,7 +132,7 @@ public class ItemParser
 	
 	private String colouriseString(String str, boolean toColour)
 	{
-		return toColour ? ChatColor.translateAlternateColorCodes('&', str) : str.replace('§', '&');
+		return toColour ? ChatColor.translateAlternateColorCodes('&', str) : str.replace('\u00A7', '&');
 	}
 	
 	private void colouriseMeta(ItemStack item, boolean toColour)
