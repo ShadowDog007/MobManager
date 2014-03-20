@@ -156,7 +156,7 @@ public class AbilitiesMobListener implements Listener
 		
 		if (applyNormalAbilities)
 		{
-			applyNormalAbilities(entity, rateMa);
+			applyNormalAbilities(entity, ma);
 		}
 		
 		if (abilitySet != null)
