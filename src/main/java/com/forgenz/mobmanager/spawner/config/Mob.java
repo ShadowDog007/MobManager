@@ -92,7 +92,10 @@ public class Mob extends AbstractConfig
 		mobType = ExtendedEntityType.valueOf(getAndSet("MobType", "UNKNOWN"));
 		if (MMComponent.getAbilities().isEnabled())
 		{
-			abilitySet = AbilitySet.getAbilitySet(getAndSet("AbilitySet", "none"));
+			String abilitySetName = getAndSet("AbilitySet", "default");
+			abilitySet = abilitySetName.equalsIgnoreCase("default") ? null : AbilitySet.getAbilitySet(abilitySetName);
+			if (abilitySetName.equalsIgnoreCase("default") && abilitySet == null)
+				MMComponent.getSpawner().warning("Missing AbilitySet: " + abilitySetName);
 			if (abilitySet != null && mobType == ExtendedEntityType.UNKNOWN)
 				mobType = abilitySet.getAbilitySetsEntityType();
 		}
