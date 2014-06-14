@@ -26,10 +26,8 @@
 *.war
 *.ear
 
-# Maven Stuff #
-/target
-mvn_*.bat
-mvn_*.command
+# Gradle Stuff #
+/.gradle
 
 # Libraries #
 !/lib/integration/*.jar
