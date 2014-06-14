@@ -28,7 +28,7 @@ defaultTasks 'clean', 'build', 'shadowJar', 'test', 'uploadArchives', 'jacocoTes
 group = group_
 if (project.hasProperty('teamcity')) {
     println teamcity
-    version = version_ + '-' + teamcity['build.counter']
+    version = version_ + '-' + teamcity['build.number']
     println "##teamcity[buildNumber '${version}']"
 } else {
     version = version_ + '-SNAPSHOT'
