@@ -249,7 +249,7 @@ public class AbilitiesMobListener implements Listener
 		{
 			Projectile entity = (Projectile) event.getDamager();
 			
-			if (entity.getShooter() instanceof LivingEntity);
+			if (entity.getShooter() instanceof LivingEntity)
 				damager = (LivingEntity) entity.getShooter();
 		}
 		else if (event.getDamager() instanceof LivingEntity)
