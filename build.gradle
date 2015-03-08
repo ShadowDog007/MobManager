@@ -106,6 +106,10 @@ task wrapper(type: Wrapper) {
 // #######################
 repositories {
     mavenCentral()
+    // Mcknight repo
+    maven {
+        url "http://maven.mcknight.ninja/repo"
+    }
     // Bukkit repo
     maven { 
         url "http://repo.bukkit.org/content/groups/public/"
@@ -118,9 +122,11 @@ repositories {
 
 dependencies {
     compile group: 'org.bukkit', name: 'bukkit', version: '1.7.9-R0.2'
-    compile group: 'net.milkbowl.vault', name: 'Vault', version: '1.4.1'
+    compile 'ninja.mcknight.bukkit:BKnightCore:1.0.1'
+    //compile group: 'net.milkbowl.vault', name: 'Vault', version: '1.4.1'
     
-    compile group: 'org.projectlombok', name: 'lombok', version: '1.14.2'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.14.8'
     
     testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile 'org.mockito:mockito-all:2.0.2-beta'
 }
