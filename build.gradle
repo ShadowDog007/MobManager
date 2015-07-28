@@ -27,14 +27,42 @@ defaultTasks 'clean', 'build', 'shadowJar', 'test', 'uploadArchives', 'jacocoTes
 // #########################
 group = group_
 if (project.hasProperty('teamcity')) {
-    version = version_ + '-' + teamcity['build.number']
+    
+    if (teamcity['RELEASE'] != 'true') {
+        version = version_ + '#' + teamcity['build.number']
+    } else {
+        version = version_
+    }
+    
     println "##teamcity[buildNumber '${version}']"
 } else {
     version = version_ + '-SNAPSHOT'
 }
 
-ext {
-    localMavenRepoLoc = "file://" + file('../mavenRepo/').absolutePath
+if (project.hasProperty('teamcity')) {
+    ext {
+        localMavenRepoLoc = "file://" + file('/var/www/maven.mcknight.ninja/web/repo').absolutePath
+    }
+} else {
+    ext {
+        localMavenRepoLoc = "file://" + file('../mavenRepo/').absolutePath
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+    }
 }
 
 // #############################
@@ -122,7 +150,7 @@ repositories {
 
 dependencies {
     compile group: 'org.bukkit', name: 'bukkit', version: '1.7.9-R0.2'
-    compile 'ninja.mcknight.bukkit:BKnightCore:1.0.1'
+    compile 'ninja.mcknight.bukkit:BKnightCore:1.0.2'
     //compile group: 'net.milkbowl.vault', name: 'Vault', version: '1.4.1'
     
     compile group: 'org.projectlombok', name: 'lombok', version: '1.14.8'
