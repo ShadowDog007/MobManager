@@ -1,4 +1,4 @@
-main: com.forgenz.mobmanager.P
+main: ninja.mcknight.bukkit.mobmanager.P
 name: MobManager
 version: $(PROJECT_VERSION)
 website: http://dev.bukkit.org/server-mods/mobmanager/
