@@ -227,46 +227,58 @@ class DespawnTask extends BukkitRunnable
 	@Override
 	public void run()
 	{
-		// Note the time we start
-		long start = System.nanoTime();
-		LivingEntity entity;
-		
-		// Iterate through each entity until there are none left or the task has run for 0.5ms
-		while ((entity = it.next()) != null && (System.nanoTime() - start) < 500000L)
+		try
 		{
-			// Check if the mob should be despawned
-			if (MobDespawnCheck.shouldDespawn(it.getWorld(), entity, true))
+			// Note the time we start
+			long start = System.nanoTime();
+			LivingEntity entity;
+
+			// Iterate through each entity until there are none left or the task has run for 0.5ms
+			while ((entity = it.next()) != null && (System.nanoTime() - start) < 500000L)
 			{
-				// try/catch just in case Bukkit decide to add an event for removing entities
-				try
+				// Check if the mob should be despawned
+				if (MobDespawnCheck.shouldDespawn(it.getWorld(), entity, true))
 				{
-					entity.remove();
-				}
-				catch (Exception e)
-				{
-					// Make sure this isn't spamed
-					if (!warning)
+					// try/catch just in case Bukkit decide to add an event for removing entities
+					try
 					{
-						warning = true;
-						MMComponent.getLimiter().warning("Please disable \"UseAsyncDespawnScanner\" it needs to be fixed. Please notify ShadowDog007");
-						MMComponent.getLimiter().warning("Automatically switching to Synchronous Despawn Scanner");
-						LimiterConfig.useAsyncDespawnScanner = false;
-						
-						// Empty the iterator
-						it.empty();
-						break;
+						entity.remove();
 					}
+					catch (Exception e)
+					{
+						// Make sure this isn't spamed
+						if (!warning)
+						{
+							warning = true;
+							MMComponent.getLimiter().warning("Please disable \"UseAsyncDespawnScanner\" it needs to be fixed. Please notify ShadowDog007");
+							MMComponent.getLimiter().warning("Automatically switching to Synchronous Despawn Scanner");
+							LimiterConfig.useAsyncDespawnScanner = false;
+
+							// Empty the iterator
+							it.empty();
+							break;
+						}
+					}
+
+					it.getWorld().decrementMobCount(ExtendedEntityType.valueOf(entity), entity);
 				}
-				
-				it.getWorld().decrementMobCount(ExtendedEntityType.valueOf(entity), entity);
+			}
+
+			boolean finished = !it.hasNext() || P.p() == null;
+
+			// The task is finished, and allow a new one to start
+			if (finished)
+			{
+				/* ######## END TASK ######## */
+				cancel();
+				running.compareAndSet(true, false);
 			}
 		}
-		
-		boolean finished = !it.hasNext() || P.p() == null;
-		
-		// The task is finished, and allow a new one to start
-		if (finished)
-		{			
+		catch (Throwable e)
+		{
+			P.p().getLogger().severe("Something unexpected happened: " + e.getMessage());
+			e.printStackTrace();
+
 			/* ######## END TASK ######## */
 			cancel();
 			running.compareAndSet(true, false);
